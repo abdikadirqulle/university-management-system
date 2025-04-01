@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon src/server.js",
-    "build": "prisma generate",
+    "build": "npx prisma generate --schema=./src/prisma/schema.prisma",
     "start": "node src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
