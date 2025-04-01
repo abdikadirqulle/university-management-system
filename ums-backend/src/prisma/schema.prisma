@@ -1,0 +1,178 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  student   Student?
+  admin     Admin?
+  faculty   Faculty?
+}
+
+model Student {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String    @unique @db.ObjectId
+  studentId     String    @unique // Registration number
+  department    String
+  yearOfStudy   Int
+  
+  // Relations
+  enrollments   Enrollment[]
+  payments      Payment[]
+  examResults   ExamResult[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Admin {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String    @unique @db.ObjectId
+  role      AdminRole
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Faculty {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String    @unique @db.ObjectId
+  department    String
+  position      String
+  
+  // Relations
+  courses       Course[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Course {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  code        String       @unique // Course code like CS101
+  title       String
+  description String
+  credits     Int
+  semester    String
+  faculty     Faculty      @relation(fields: [facultyId], references: [id])
+  facultyId   String       @db.ObjectId
+  
+  // Relations
+  enrollments Enrollment[]
+  exams       Exam[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Enrollment {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  course     Course    @relation(fields: [courseId], references: [id])
+  courseId   String    @db.ObjectId
+  student    Student   @relation(fields: [studentId], references: [id])
+  studentId  String    @db.ObjectId
+  status     EnrollmentStatus @default(ACTIVE)
+  grade      String?
+  academicYear String
+  semester   String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  
+  @@unique([courseId, studentId, academicYear, semester])
+}
+
+model Exam {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  course      Course       @relation(fields: [courseId], references: [id])
+  courseId    String       @db.ObjectId
+  examDate    DateTime
+  duration    Int          // in minutes
+  totalMarks  Int
+  
+  // Relations
+  examResults ExamResult[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model ExamResult {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  exam       Exam     @relation(fields: [examId], references: [id])
+  examId     String   @db.ObjectId
+  student    Student  @relation(fields: [studentId], references: [id])
+  studentId  String   @db.ObjectId
+  marks      Float
+  comments   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  @@unique([examId, studentId])
+}
+
+model Payment {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  student        Student       @relation(fields: [studentId], references: [id])
+  studentId      String        @db.ObjectId
+  amount         Float
+  paymentMethod  String
+  transactionId  String?       @unique
+  status         PaymentStatus @default(PENDING)
+  description    String?
+  academicYear   String
+  semester       String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model Department {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String    @unique
+  code        String    @unique
+  description String?
+  headId      String?   @db.ObjectId
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  FACULTY
+  STUDENT
+}
+
+enum AdminRole {
+  EXAM_ADMIN
+  FINANCE_ADMIN
+  ENROLLMENT_ADMIN
+  DEAN
+  REGISTRAR
+}
+
+enum EnrollmentStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  DROPPED
+  WAITLISTED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
