@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { AuthProvider } from "./context/AuthContext"
+import { Analytics } from "@vercel/analytics/react"
 
 // Layouts
 import AuthLayout from "./layouts/AuthLayout"
@@ -55,6 +56,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
+      <Analytics />
       <Sonner position="top-right" />
       <BrowserRouter>
         <AuthProvider>
