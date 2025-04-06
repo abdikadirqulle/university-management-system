@@ -48,6 +48,13 @@ interface UserFormDialogProps {
   onSubmit: (data: UserFormValues) => Promise<void>
 }
 
+const roleOptions = [
+  { value: "academic", label: "Academic" },
+  { value: "admission", label: "Admission" },
+  { value: "financial", label: "Financial" },
+  { value: "student", label: "Student" }, // Added student role
+];
+
 const UserFormDialog: React.FC<UserFormDialogProps> = ({
   isOpen,
   onOpenChange,
@@ -166,6 +173,7 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
                       <SelectItem value="academic">Admin</SelectItem>
                       <SelectItem value="admission">Admission</SelectItem>
                       <SelectItem value="financial">Financial</SelectItem>
+                      <SelectItem value="student">Student</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

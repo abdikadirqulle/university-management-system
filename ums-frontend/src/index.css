@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -174,5 +175,21 @@
 
   .table-university tr {
     @apply bg-white border-b;
+  }
+  
+  /* Add 404 page animations */
+  .animate-enter {
+    animation: enterAnimation 0.6s ease-out;
+  }
+  
+  @keyframes enterAnimation {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
