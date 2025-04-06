@@ -30,21 +30,22 @@ export const useUserStore = create<UserState>((set) => ({
           id: "1",
           email: "admin@university.edu",
           name: "Admin User",
+          password: "password",
           role: "academic",
         },
         {
           id: "2",
           email: "admission@university.edu",
-          name: "Admission User",
+          name: "Admission Officer",
+          password: "password",
           role: "admission",
-          admissionId: "admission001",
         },
         {
           id: "3",
-          email: "student@university.edu",
-          name: "Student User",
-          role: "student",
-          studentId: "STU001",
+          email: "financial@university.edu",
+          name: "Finance Officer",
+          password: "password",
+          role: "financial",
         },
       ]
 

@@ -33,24 +33,18 @@ const UserTable: React.FC<UserTableProps> = ({
       header: "Name",
     },
     {
-      accessorKey: "email",
-      header: "Email",
-    },
-    {
       accessorKey: "role",
       header: "Role",
       cell: ({ row }) => {
         const role = row.getValue("role") as UserRole
         const roleLabels: Record<UserRole, string> = {
-          academic: "Academic (Admin)",
-          admission: "admission",
-          student: "Student",
-          financial: "Financial Admin",
+          academic: "(Admin)",
+          admission: "Admission",
+          financial: "Financial",
         }
         const roleClasses: Record<UserRole, string> = {
           academic: "badge-role-admin",
           admission: "badge-role-admission",
-          student: "badge-role-student",
           financial: "badge-role-financial",
         }
 
@@ -62,20 +56,15 @@ const UserTable: React.FC<UserTableProps> = ({
       },
     },
     {
-      accessorKey: "department",
-      header: "Department",
-      cell: ({ row }) => row.getValue("department") || "-",
+      accessorKey: "email",
+      header: "Email",
     },
     {
-      accessorKey: "admissionId",
-      header: "admission ID",
-      cell: ({ row }) => row.getValue("admissionId") || "-",
+      accessorKey: "password",
+      header: "Password",
+      cell: ({ row }) => row.getValue("password") || "-",
     },
-    {
-      accessorKey: "studentId",
-      header: "Student ID",
-      cell: ({ row }) => row.getValue("studentId") || "-",
-    },
+
     {
       id: "actions",
       cell: ({ row }) => {

@@ -34,10 +34,8 @@ import {
 const userFormSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
   email: z.string().email("Please enter a valid email"),
-  role: z.enum(["academic", "admission", "student", "financial"] as const),
-  department: z.string().optional(),
-  admissionId: z.string().optional(),
-  studentId: z.string().optional(),
+  password: z.string().min(6, "Please enter a password"),
+  role: z.enum(["academic", "admission", "financial"] as const),
 })
 
 export type UserFormValues = z.infer<typeof userFormSchema>
@@ -62,10 +60,7 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
     defaultValues: {
       name: "",
       email: "",
-      role: "student",
-      department: "",
-      admissionId: "",
-      studentId: "",
+      password: "",
     },
   })
 
@@ -75,19 +70,14 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
       form.reset({
         name: "",
         email: "",
-        role: "student",
-        department: "",
-        admissionId: "",
-        studentId: "",
+        password: "",
       })
     } else if (isOpen && dialogMode === "edit" && currentUser) {
       form.reset({
         name: currentUser.name,
         email: currentUser.email,
+        password: currentUser.password,
         role: currentUser.role,
-        department: currentUser.department || "",
-        admissionId: currentUser.admissionId || "",
-        studentId: currentUser.studentId || "",
       })
     }
   }, [isOpen, dialogMode, currentUser, form])
@@ -142,6 +132,19 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>password</FormLabel>
+                  <FormControl>
+                    <Input placeholder="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
@@ -160,65 +163,15 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="academic">Academic (Admin)</SelectItem>
-                      <SelectItem value="admission">admission</SelectItem>
-                      <SelectItem value="student">Student</SelectItem>
-                      <SelectItem value="financial">Financial Admin</SelectItem>
+                      <SelectItem value="academic">Admin</SelectItem>
+                      <SelectItem value="admission">Admission</SelectItem>
+                      <SelectItem value="financial">Financial</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {(form.watch("role") === "admission" ||
-              form.watch("role") === "student") && (
-              <FormField
-                control={form.control}
-                name="department"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Department</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., Computer Science" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-
-            {form.watch("role") === "admission" && (
-              <FormField
-                control={form.control}
-                name="admissionId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>admission ID</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., admission001" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-
-            {form.watch("role") === "student" && (
-              <FormField
-                control={form.control}
-                name="studentId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Student ID</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., STU001" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
 
             <DialogFooter>
               <Button

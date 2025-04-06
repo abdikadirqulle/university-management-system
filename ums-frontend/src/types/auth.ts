@@ -1,13 +1,11 @@
-export type UserRole = "academic" | "admission" | "student" | "financial"
+export type UserRole = "academic" | "admission" | "financial"
 
 export interface User {
   id: string
   name: string
   email: string
   role: UserRole
-  department?: string
-  admissionId?: string
-  studentId?: string
+  password: string
 }
 
 export interface LoginCredentials {
