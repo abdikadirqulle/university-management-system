@@ -28,6 +28,7 @@ import {
   BookLock,
   DollarSign,
   UserPlus,
+  UsersRound,
 } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 
@@ -119,7 +120,7 @@ const AppSidebar = () => {
 
       {
         title: "Students",
-        icon: GraduationCap,
+        icon: UsersRound,
         path: "/admission/students",
       },
       {

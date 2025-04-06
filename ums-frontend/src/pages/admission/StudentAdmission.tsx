@@ -51,6 +51,25 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
+// Define available departments
+const departments = [
+  "Computer Science",
+  "Electrical Engineering",
+  "Mechanical Engineering",
+  "Civil Engineering",
+  "Business Administration",
+  "Economics",
+  "Physics",
+  "Chemistry",
+  "Mathematics",
+  "Biology",
+  "Psychology",
+  "Sociology",
+  "English Literature",
+  "History",
+  "Political Science",
+]
+
 const StudentAdmission = () => {
   // Auth guard to ensure only admins can access this page
   useAuthGuard(["admission"])

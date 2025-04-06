@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { Toaster } from "@/components/ui/toaster"
 import { Toaster as Sonner } from "@/components/ui/sonner"
@@ -27,6 +28,7 @@ import CalendarPage from "./pages/admin/Calendar"
 import AdmissionDashboard from "./pages/admission/Dashboard"
 import StudentEnrollment from "./pages/admission/StudentEnrollment"
 import StudentAdmission from "./pages/admission/StudentAdmission"
+import StudentManager from "./pages/admission/StudentManager"
 
 // Student Pages
 import StudentDashboard from "./pages/student/Dashboard"
@@ -86,7 +88,7 @@ const App = () => (
                 element={<StudentEnrollment />}
               />
               <Route path="student-admission" element={<StudentAdmission />} />
-              {/* Add other admission routes as needed */}
+              <Route path="students" element={<StudentManager />} />
             </Route>
 
             {/* Student routes */}
