@@ -29,6 +29,7 @@ import AdmissionDashboard from "./pages/admission/Dashboard"
 import StudentEnrollment from "./pages/admission/StudentEnrollment"
 import StudentAdmission from "./pages/admission/StudentAdmission"
 import StudentManager from "./pages/admission/StudentManager"
+import AdmissionSettings from "./pages/admission/Settings"
 
 // Student Pages
 import StudentDashboard from "./pages/student/Dashboard"
@@ -89,6 +90,7 @@ const App = () => (
               />
               <Route path="student-admission" element={<StudentAdmission />} />
               <Route path="students" element={<StudentManager />} />
+              <Route path="settings" element={<AdmissionSettings />} />
             </Route>
 
             {/* Student routes */}
