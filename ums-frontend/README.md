@@ -1,73 +1,103 @@
-# Welcome to your Lovable project
+# University Management System (UMS) Frontend
 
-## Project info
+## 🚀 Overview
 
-**URL**: https://lovable.dev/projects/2f674dd8-e63b-4be6-a58c-8da9be625e13
+The **University Management System (UMS) Frontend** is a web-based interface that provides a user-friendly experience for managing academic administration, student management, course registration, exams, and financial operations. The system is designed to support multiple user roles, including admins, faculty, and students, ensuring efficient university operations.
 
-## How can I edit this code?
+## 📌 Features
 
-There are several ways of editing your application.
+- **User Management** (Admins, Students, Faculty, Staff)
+- **Student Enrollment & Management**
+- **Course & Class Management**
+- **Faculty & Staff Management**
+- **Exams & Results Management**
+- **Fee & Finance Management**
+- **Authentication & Role-Based Access**
+- **Real-time Data Handling with React Query**
 
-**Use Lovable**
+## 👥 User Roles & Permissions
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/2f674dd8-e63b-4be6-a58c-8da9be625e13) and start prompting.
+### 1️⃣ **Super Admin (Academic)**
 
-Changes made via Lovable will be committed automatically to this repo.
+- Manages academic calendar
+- Creates staff accounts
+- Manages courses and classes
 
-**Use your preferred IDE**
+### 2️⃣ **Normal Admins**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Exam Admin** → Manages exams & results
+- **Finance Admin** → Handles student payments & invoices
+- **Student Enrollment Admin** → Registers students
+- **Staff (Deans)** → Creates lectures & assigns courses
+- **Staff (Lecturers)** → Adds exam results, views assigned courses
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 3️⃣ **Students**
 
-Follow these steps:
+- Registers for courses
+- Views grades and results
+- Pays fees
+
+## 🛠 Tech Stack
+
+### **Frontend**
+
+- **Vite + React.js** (Fast Development)
+- **Tailwind CSS + Shadcn UI** (Modern UI Design)
+- **React Query** (Efficient Data Fetching)
+
+### **Deployment**
+
+- **Frontend:** Vercel
+
+## 🚀 Getting Started
+
+### **1️⃣ Clone the Repository**
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+git clone https://github.com/abdikadirqulle/university-management-system.git
+cd university-management-system
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### **2️⃣ Install Dependencies**
 
-# Step 3: Install the necessary dependencies.
-npm i
+```sh
+# Frontend
+cd frontend
+npm install
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### **3️⃣ Set Up Environment Variables**
+
+Create a `.env` file in the `backend/` directory (if not already present):
+
+```env
+PORT=5000
+DATABASE_URL=mongodb+srv://your-mongo-db-url
+JWT_SECRET=your-secret-key
+```
+
+### **4️⃣ Start the Application**
+
+```sh
+# Run frontend
+cd frontend
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 🚀 Deployment
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### **Frontend Deployment (Vercel)**
 
-**Use GitHub Codespaces**
+```sh
+npm install -g vercel
+vercel
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🛠 Contributors
 
-## What technologies are used for this project?
+- **[Abdikadir Qulle](https://github.com/abdikadirqulle)** (Lead Developer)
+- **Your Team Members (if any)**
 
-This project is built with .
+## 📜 License
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/2f674dd8-e63b-4be6-a58c-8da9be625e13) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes it is!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+This project is licensed under the [MIT License](LICENSE).
