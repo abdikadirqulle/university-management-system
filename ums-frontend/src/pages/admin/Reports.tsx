@@ -1,54 +1,77 @@
-
-import { useState } from 'react';
-import PageHeader from '@/components/PageHeader';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart, LineChart, PieChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar, Line, Pie } from 'recharts';
-import { FileText, Download, BarChart as BarChartIcon, PieChart as PieChartIcon, LineChart as LineChartIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState } from "react";
+import PageHeader from "@/components/PageHeader";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  BarChart,
+  LineChart,
+  PieChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  Bar,
+  Line,
+  Pie,
+} from "recharts";
+import {
+  FileText,
+  Download,
+  BarChart as BarChartIcon,
+  PieChart as PieChartIcon,
+  LineChart as LineChartIcon,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { DataTable } from '@/components/DataTable';
-import { ColumnDef } from '@tanstack/react-table';
-import { toast } from 'sonner';
+} from "@/components/ui/select";
+import { DataTable } from "@/components/DataTable";
+import { ColumnDef } from "@tanstack/react-table";
+import { toast } from "sonner";
 
 // Sample data for enrollment chart
 const enrollmentData = [
-  { name: 'Jan', value: 120 },
-  { name: 'Feb', value: 145 },
-  { name: 'Mar', value: 150 },
-  { name: 'Apr', value: 170 },
-  { name: 'May', value: 190 },
-  { name: 'Jun', value: 130 },
-  { name: 'Jul', value: 110 },
-  { name: 'Aug', value: 220 },
-  { name: 'Sep', value: 260 },
-  { name: 'Oct', value: 240 },
-  { name: 'Nov', value: 220 },
-  { name: 'Dec', value: 200 },
+  { name: "Jan", value: 120 },
+  { name: "Feb", value: 145 },
+  { name: "Mar", value: 150 },
+  { name: "Apr", value: 170 },
+  { name: "May", value: 190 },
+  { name: "Jun", value: 130 },
+  { name: "Jul", value: 110 },
+  { name: "Aug", value: 220 },
+  { name: "Sep", value: 260 },
+  { name: "Oct", value: 240 },
+  { name: "Nov", value: 220 },
+  { name: "Dec", value: 200 },
 ];
 
 // Sample data for faculty distribution
 const facultyDistributionData = [
-  { name: 'Science', value: 45 },
-  { name: 'Engineering', value: 35 },
-  { name: 'Business', value: 30 },
-  { name: 'Arts', value: 25 },
-  { name: 'Medicine', value: 20 },
+  { name: "Science", value: 45 },
+  { name: "Engineering", value: 35 },
+  { name: "Business", value: 30 },
+  { name: "Arts", value: 25 },
+  { name: "Medicine", value: 20 },
 ];
 
 // Sample data for course enrollment
 const courseEnrollmentData = [
-  { name: 'Introduction to Programming', students: 150 },
-  { name: 'Business Ethics', students: 120 },
-  { name: 'Organic Chemistry', students: 95 },
-  { name: 'World History', students: 110 },
-  { name: 'Calculus I', students: 130 },
+  { name: "Introduction to Programming", students: 150 },
+  { name: "Business Ethics", students: 120 },
+  { name: "Organic Chemistry", students: 95 },
+  { name: "World History", students: 110 },
+  { name: "Calculus I", students: 130 },
 ];
 
 // Sample data for enrollment by department
@@ -64,8 +87,8 @@ interface EnrollmentRecord {
 
 const enrollmentByDepartment: EnrollmentRecord[] = [
   {
-    id: '1',
-    department: 'Computer Science',
+    id: "1",
+    department: "Computer Science",
     totalStudents: 456,
     maleStudents: 320,
     femaleStudents: 136,
@@ -73,8 +96,8 @@ const enrollmentByDepartment: EnrollmentRecord[] = [
     partTime: 56,
   },
   {
-    id: '2',
-    department: 'Business Administration',
+    id: "2",
+    department: "Business Administration",
     totalStudents: 380,
     maleStudents: 190,
     femaleStudents: 190,
@@ -82,8 +105,8 @@ const enrollmentByDepartment: EnrollmentRecord[] = [
     partTime: 70,
   },
   {
-    id: '3',
-    department: 'Electrical Engineering',
+    id: "3",
+    department: "Electrical Engineering",
     totalStudents: 290,
     maleStudents: 230,
     femaleStudents: 60,
@@ -91,8 +114,8 @@ const enrollmentByDepartment: EnrollmentRecord[] = [
     partTime: 25,
   },
   {
-    id: '4',
-    department: 'Psychology',
+    id: "4",
+    department: "Psychology",
     totalStudents: 420,
     maleStudents: 150,
     femaleStudents: 270,
@@ -100,8 +123,8 @@ const enrollmentByDepartment: EnrollmentRecord[] = [
     partTime: 40,
   },
   {
-    id: '5',
-    department: 'Literature',
+    id: "5",
+    department: "Literature",
     totalStudents: 210,
     maleStudents: 70,
     femaleStudents: 140,
@@ -113,34 +136,34 @@ const enrollmentByDepartment: EnrollmentRecord[] = [
 // Define columns for the data table
 const columns: ColumnDef<EnrollmentRecord>[] = [
   {
-    accessorKey: 'department',
-    header: 'Department',
+    accessorKey: "department",
+    header: "Department",
   },
   {
-    accessorKey: 'totalStudents',
-    header: 'Total Students',
+    accessorKey: "totalStudents",
+    header: "Total Students",
   },
   {
-    accessorKey: 'maleStudents',
-    header: 'Male',
+    accessorKey: "maleStudents",
+    header: "Male",
   },
   {
-    accessorKey: 'femaleStudents',
-    header: 'Female',
+    accessorKey: "femaleStudents",
+    header: "Female",
   },
   {
-    accessorKey: 'fullTime',
-    header: 'Full Time',
+    accessorKey: "fullTime",
+    header: "Full Time",
   },
   {
-    accessorKey: 'partTime',
-    header: 'Part Time',
+    accessorKey: "partTime",
+    header: "Part Time",
   },
 ];
 
 const ReportsPage = () => {
-  const [academicYear, setAcademicYear] = useState('2023-2024');
-  const [semester, setSemester] = useState('Fall');
+  const [academicYear, setAcademicYear] = useState("2023-2024");
+  const [semester, setSemester] = useState("Fall");
 
   // Function to handle report download (mock)
   const handleDownloadReport = (reportType: string) => {
@@ -158,15 +181,16 @@ const ReportsPage = () => {
         <Card>
           <CardHeader>
             <CardTitle>Filters</CardTitle>
-            <CardDescription>Select parameters to generate reports</CardDescription>
+            <CardDescription>
+              Select parameters to generate reports
+            </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col sm:flex-row gap-4">
             <div className="w-full sm:w-1/2">
-              <label className="text-sm font-medium block mb-2">Academic Year</label>
-              <Select 
-                value={academicYear} 
-                onValueChange={setAcademicYear}
-              >
+              <label className="text-sm font-medium block mb-2">
+                Academic Year
+              </label>
+              <Select value={academicYear} onValueChange={setAcademicYear}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Year" />
                 </SelectTrigger>
@@ -179,10 +203,7 @@ const ReportsPage = () => {
             </div>
             <div className="w-full sm:w-1/2">
               <label className="text-sm font-medium block mb-2">Semester</label>
-              <Select 
-                value={semester} 
-                onValueChange={setSemester}
-              >
+              <Select value={semester} onValueChange={setSemester}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Semester" />
                 </SelectTrigger>
@@ -199,37 +220,39 @@ const ReportsPage = () => {
         <Card>
           <CardHeader>
             <CardTitle>Export Reports</CardTitle>
-            <CardDescription>Download reports in different formats</CardDescription>
+            <CardDescription>
+              Download reports in different formats
+            </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-3">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="flex items-center gap-2"
-              onClick={() => handleDownloadReport('Enrollment')}
+              onClick={() => handleDownloadReport("Enrollment")}
             >
               <FileText className="h-4 w-4" />
               Enrollment Report
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="flex items-center gap-2"
-              onClick={() => handleDownloadReport('Faculty')}
+              onClick={() => handleDownloadReport("Faculty")}
             >
               <FileText className="h-4 w-4" />
               Faculty Report
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="flex items-center gap-2"
-              onClick={() => handleDownloadReport('Course')}
+              onClick={() => handleDownloadReport("Course")}
             >
               <FileText className="h-4 w-4" />
               Course Report
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="flex items-center gap-2"
-              onClick={() => handleDownloadReport('Financial')}
+              onClick={() => handleDownloadReport("Financial")}
             >
               <FileText className="h-4 w-4" />
               Financial Report
@@ -253,12 +276,14 @@ const ReportsPage = () => {
             Courses
           </TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="enrollment" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Student Enrollment Trends</CardTitle>
-              <CardDescription>Monthly enrollment data for {academicYear}</CardDescription>
+              <CardDescription>
+                Monthly enrollment data for {academicYear}
+              </CardDescription>
             </CardHeader>
             <CardContent className="h-80">
               <BarChart
@@ -276,23 +301,28 @@ const ReportsPage = () => {
               </BarChart>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Enrollment by Department</CardTitle>
-              <CardDescription>Student distribution across departments for {semester} {academicYear}</CardDescription>
+              <CardDescription>
+                Student distribution across departments for {semester}{" "}
+                {academicYear}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <DataTable columns={columns} data={enrollmentByDepartment} />
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="faculty" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Faculty Distribution</CardTitle>
-              <CardDescription>Number of faculty members by department</CardDescription>
+              <CardDescription>
+                Number of faculty members by department
+              </CardDescription>
             </CardHeader>
             <CardContent className="h-80">
               <PieChart
@@ -316,12 +346,14 @@ const ReportsPage = () => {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="courses" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Course Enrollment</CardTitle>
-              <CardDescription>Top courses by enrollment for {semester} {academicYear}</CardDescription>
+              <CardDescription>
+                Top courses by enrollment for {semester} {academicYear}
+              </CardDescription>
             </CardHeader>
             <CardContent className="h-80">
               <LineChart
@@ -335,7 +367,13 @@ const ReportsPage = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="students" stroke="#8884d8" activeDot={{ r: 8 }} name="Students" />
+                <Line
+                  type="monotone"
+                  dataKey="students"
+                  stroke="#8884d8"
+                  activeDot={{ r: 8 }}
+                  name="Students"
+                />
               </LineChart>
             </CardContent>
           </Card>

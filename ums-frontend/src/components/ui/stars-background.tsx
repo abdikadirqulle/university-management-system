@@ -1,4 +1,3 @@
-
 import React from "react";
 import { ShootingStars } from "@/components/ui/shooting-stars";
 
@@ -12,9 +11,7 @@ export function StarsBackground({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 min-h-screen">
-        {children}
-      </div>
+      <div className="relative z-10 min-h-screen">{children}</div>
 
       {/* Multiple shooting star layers with different colors and speeds */}
       <ShootingStars

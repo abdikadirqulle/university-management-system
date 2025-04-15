@@ -1,17 +1,16 @@
-
-import { create } from "zustand"
-import { Student } from "@/types/student"
+import { create } from "zustand";
+import { Student } from "@/types/student";
 
 interface StudentState {
-  students: Student[]
-  isLoading: boolean
-  error: string | null
+  students: Student[];
+  isLoading: boolean;
+  error: string | null;
 
   // Actions
-  fetchStudents: () => Promise<void>
-  addStudent: (student: Student) => Promise<void>
-  updateStudent: (id: string, studentData: Partial<Student>) => Promise<void>
-  deleteStudent: (id: string) => Promise<void>
+  fetchStudents: () => Promise<void>;
+  addStudent: (student: Student) => Promise<void>;
+  updateStudent: (id: string, studentData: Partial<Student>) => Promise<void>;
+  deleteStudent: (id: string) => Promise<void>;
 }
 
 // Sample student data for initial state
@@ -91,7 +90,7 @@ const sampleStudents: Student[] = [
     contactNumber: "+1777888999",
     address: "654 Graduate Lane",
   },
-]
+];
 
 export const useStudentStore = create<StudentState>((set) => ({
   students: [],
@@ -99,72 +98,75 @@ export const useStudentStore = create<StudentState>((set) => ({
   error: null,
 
   fetchStudents: async () => {
-    set({ isLoading: true, error: null })
+    set({ isLoading: true, error: null });
     try {
       // This would be an API call in a real app
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      set({ students: sampleStudents, isLoading: false })
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      set({ students: sampleStudents, isLoading: false });
     } catch (error) {
       set({
-        error: error instanceof Error ? error.message : "Failed to fetch students",
+        error:
+          error instanceof Error ? error.message : "Failed to fetch students",
         isLoading: false,
-      })
+      });
     }
   },
 
   addStudent: async (student: Student) => {
-    set({ isLoading: true, error: null })
+    set({ isLoading: true, error: null });
     try {
       // This would be an API call in a real app
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       set((state) => ({
         students: [...state.students, { ...student, id: String(Date.now()) }],
         isLoading: false,
-      }))
+      }));
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : "Failed to add student",
         isLoading: false,
-      })
+      });
     }
   },
 
   updateStudent: async (id: string, studentData: Partial<Student>) => {
-    set({ isLoading: true, error: null })
+    set({ isLoading: true, error: null });
     try {
       // This would be an API call in a real app
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       set((state) => ({
         students: state.students.map((student) =>
-          student.id === id ? { ...student, ...studentData } : student
+          student.id === id ? { ...student, ...studentData } : student,
         ),
         isLoading: false,
-      }))
+      }));
     } catch (error) {
       set({
-        error: error instanceof Error ? error.message : "Failed to update student",
+        error:
+          error instanceof Error ? error.message : "Failed to update student",
         isLoading: false,
-      })
+      });
     }
   },
 
   deleteStudent: async (id: string) => {
-    set({ isLoading: true, error: null })
+    set({ isLoading: true, error: null });
     try {
       // This would be an API call in a real app
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       set((state) => ({
         students: state.students.filter((student) => student.id !== id),
         isLoading: false,
-      }))
+      }));
     } catch (error) {
       set({
-        error: error instanceof Error ? error.message : "Failed to delete student",
+        error:
+          error instanceof Error ? error.message : "Failed to delete student",
         isLoading: false,
-      })
+      });
     }
   },
-}))
+}));

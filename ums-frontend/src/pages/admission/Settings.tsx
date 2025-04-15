@@ -1,13 +1,18 @@
-
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { useAuth } from "@/context/AuthContext"
-import { useAuthGuard } from "@/hooks/useAuthGuard"
-import PageHeader from "@/components/PageHeader"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useAuth } from "@/context/AuthContext";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import PageHeader from "@/components/PageHeader";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -16,14 +21,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Separator } from "@/components/ui/separator"
-import { Switch } from "@/components/ui/switch"
-import { toast } from "@/hooks/use-toast"
-import { BellRing, Mail, UserCog, Bell, Lock } from "lucide-react"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "@/hooks/use-toast";
+import { BellRing, Mail, UserCog, Bell, Lock } from "lucide-react";
 
 // Define form schema for the profile settings
 const profileFormSchema = z.object({
@@ -31,7 +36,7 @@ const profileFormSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
   phone: z.string().optional(),
   department: z.string().optional(),
-})
+});
 
 // Define form schema for the notification settings
 const notificationFormSchema = z.object({
@@ -40,23 +45,31 @@ const notificationFormSchema = z.object({
   applicationUpdated: z.boolean().default(true),
   documentUploaded: z.boolean().default(true),
   reminderNotifications: z.boolean().default(true),
-})
-
-// Define form schema for the security settings
-const securityFormSchema = z.object({
-  currentPassword: z.string().min(8, { message: "Password must be at least 8 characters." }).optional(),
-  newPassword: z.string().min(8, { message: "Password must be at least 8 characters." }).optional(),
-  confirmPassword: z.string().optional(),
-}).refine(data => data.newPassword === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
 });
 
+// Define form schema for the security settings
+const securityFormSchema = z
+  .object({
+    currentPassword: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters." })
+      .optional(),
+    newPassword: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters." })
+      .optional(),
+    confirmPassword: z.string().optional(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
+
 const Settings = () => {
-  const { user } = useAuth()
-  useAuthGuard(["admission"])
-  const [activeTab, setActiveTab] = useState("profile")
-  
+  const { user } = useAuth();
+  useAuthGuard(["admission"]);
+  const [activeTab, setActiveTab] = useState("profile");
+
   // Profile form
   const profileForm = useForm<z.infer<typeof profileFormSchema>>({
     resolver: zodResolver(profileFormSchema),
@@ -66,7 +79,7 @@ const Settings = () => {
       phone: "",
       department: user?.department || "",
     },
-  })
+  });
 
   // Notification form
   const notificationForm = useForm<z.infer<typeof notificationFormSchema>>({
@@ -78,7 +91,7 @@ const Settings = () => {
       documentUploaded: true,
       reminderNotifications: true,
     },
-  })
+  });
 
   // Security form
   const securityForm = useForm<z.infer<typeof securityFormSchema>>({
@@ -88,15 +101,15 @@ const Settings = () => {
       newPassword: "",
       confirmPassword: "",
     },
-  })
+  });
 
   // Handle profile form submission
   function onProfileSubmit(data: z.infer<typeof profileFormSchema>) {
     toast({
       title: "Profile updated",
       description: "Your profile settings have been updated.",
-    })
-    console.log("Profile data:", data)
+    });
+    console.log("Profile data:", data);
   }
 
   // Handle notification form submission
@@ -104,8 +117,8 @@ const Settings = () => {
     toast({
       title: "Notification preferences updated",
       description: "Your notification preferences have been saved.",
-    })
-    console.log("Notification data:", data)
+    });
+    console.log("Notification data:", data);
   }
 
   // Handle security form submission
@@ -114,9 +127,9 @@ const Settings = () => {
       toast({
         title: "Password updated",
         description: "Your password has been changed successfully.",
-      })
+      });
     }
-    console.log("Security data:", data)
+    console.log("Security data:", data);
   }
 
   return (
@@ -126,7 +139,12 @@ const Settings = () => {
         description="Manage your account settings and preferences."
       />
 
-      <Tabs defaultValue="profile" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <Tabs
+        defaultValue="profile"
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-6"
+      >
         <TabsList className="grid w-full max-w-md grid-cols-3">
           <TabsTrigger value="profile">
             <UserCog className="mr-2 h-4 w-4" />
@@ -141,7 +159,7 @@ const Settings = () => {
             Security
           </TabsTrigger>
         </TabsList>
-        
+
         {/* Profile Settings */}
         <TabsContent value="profile" className="space-y-6">
           <Card>
@@ -153,7 +171,10 @@ const Settings = () => {
             </CardHeader>
             <CardContent>
               <Form {...profileForm}>
-                <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
+                <form
+                  onSubmit={profileForm.handleSubmit(onProfileSubmit)}
+                  className="space-y-6"
+                >
                   <FormField
                     control={profileForm.control}
                     name="name"
@@ -161,13 +182,16 @@ const Settings = () => {
                       <FormItem>
                         <FormLabel>Full Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your full name" {...field} />
+                          <Input
+                            placeholder="Enter your full name"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={profileForm.control}
                     name="email"
@@ -184,7 +208,7 @@ const Settings = () => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={profileForm.control}
                     name="phone"
@@ -192,13 +216,16 @@ const Settings = () => {
                       <FormItem>
                         <FormLabel>Phone Number</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your phone number" {...field} />
+                          <Input
+                            placeholder="Enter your phone number"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={profileForm.control}
                     name="department"
@@ -206,20 +233,23 @@ const Settings = () => {
                       <FormItem>
                         <FormLabel>Department</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your department" {...field} />
+                          <Input
+                            placeholder="Enter your department"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  
+
                   <Button type="submit">Save Profile Changes</Button>
                 </form>
               </Form>
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         {/* Notifications Settings */}
         <TabsContent value="notifications" className="space-y-6">
           <Card>
@@ -231,7 +261,10 @@ const Settings = () => {
             </CardHeader>
             <CardContent>
               <Form {...notificationForm}>
-                <form onSubmit={notificationForm.handleSubmit(onNotificationSubmit)} className="space-y-6">
+                <form
+                  onSubmit={notificationForm.handleSubmit(onNotificationSubmit)}
+                  className="space-y-6"
+                >
                   <div className="space-y-4">
                     <FormField
                       control={notificationForm.control}
@@ -239,7 +272,9 @@ const Settings = () => {
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                           <div className="space-y-0.5">
-                            <FormLabel className="text-base">Email Notifications</FormLabel>
+                            <FormLabel className="text-base">
+                              Email Notifications
+                            </FormLabel>
                             <FormDescription>
                               Receive notifications via email
                             </FormDescription>
@@ -253,27 +288,27 @@ const Settings = () => {
                         </FormItem>
                       )}
                     />
-                    
+
                     <Separator />
-                    
+
                     <div className="space-y-3">
-                      <h3 className="text-sm font-medium">When to notify you</h3>
-                      
+                      <h3 className="text-sm font-medium">
+                        When to notify you
+                      </h3>
+
                       <FormField
                         control={notificationForm.control}
                         name="applicationSubmitted"
                         render={({ field }) => (
                           <FormItem className="flex flex-row items-center space-x-3 space-y-0">
                             <FormControl>
-                              <Checkbox 
-                                checked={field.value} 
+                              <Checkbox
+                                checked={field.value}
                                 onCheckedChange={field.onChange}
                               />
                             </FormControl>
                             <div className="space-y-1 leading-none">
-                              <FormLabel>
-                                Application Submitted
-                              </FormLabel>
+                              <FormLabel>Application Submitted</FormLabel>
                               <FormDescription>
                                 Get notified when a new application is submitted
                               </FormDescription>
@@ -281,22 +316,20 @@ const Settings = () => {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={notificationForm.control}
                         name="applicationUpdated"
                         render={({ field }) => (
                           <FormItem className="flex flex-row items-center space-x-3 space-y-0">
                             <FormControl>
-                              <Checkbox 
-                                checked={field.value} 
+                              <Checkbox
+                                checked={field.value}
                                 onCheckedChange={field.onChange}
                               />
                             </FormControl>
                             <div className="space-y-1 leading-none">
-                              <FormLabel>
-                                Application Updated
-                              </FormLabel>
+                              <FormLabel>Application Updated</FormLabel>
                               <FormDescription>
                                 Get notified when an application is updated
                               </FormDescription>
@@ -304,22 +337,20 @@ const Settings = () => {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={notificationForm.control}
                         name="documentUploaded"
                         render={({ field }) => (
                           <FormItem className="flex flex-row items-center space-x-3 space-y-0">
                             <FormControl>
-                              <Checkbox 
-                                checked={field.value} 
+                              <Checkbox
+                                checked={field.value}
                                 onCheckedChange={field.onChange}
                               />
                             </FormControl>
                             <div className="space-y-1 leading-none">
-                              <FormLabel>
-                                Documents Uploaded
-                              </FormLabel>
+                              <FormLabel>Documents Uploaded</FormLabel>
                               <FormDescription>
                                 Get notified when documents are uploaded
                               </FormDescription>
@@ -327,22 +358,20 @@ const Settings = () => {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={notificationForm.control}
                         name="reminderNotifications"
                         render={({ field }) => (
                           <FormItem className="flex flex-row items-center space-x-3 space-y-0">
                             <FormControl>
-                              <Checkbox 
-                                checked={field.value} 
+                              <Checkbox
+                                checked={field.value}
                                 onCheckedChange={field.onChange}
                               />
                             </FormControl>
                             <div className="space-y-1 leading-none">
-                              <FormLabel>
-                                Reminders
-                              </FormLabel>
+                              <FormLabel>Reminders</FormLabel>
                               <FormDescription>
                                 Get reminded about upcoming deadlines
                               </FormDescription>
@@ -352,14 +381,14 @@ const Settings = () => {
                       />
                     </div>
                   </div>
-                  
+
                   <Button type="submit">Save Notification Preferences</Button>
                 </form>
               </Form>
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         {/* Security Settings */}
         <TabsContent value="security" className="space-y-6">
           <Card>
@@ -371,7 +400,10 @@ const Settings = () => {
             </CardHeader>
             <CardContent>
               <Form {...securityForm}>
-                <form onSubmit={securityForm.handleSubmit(onSecuritySubmit)} className="space-y-6">
+                <form
+                  onSubmit={securityForm.handleSubmit(onSecuritySubmit)}
+                  className="space-y-6"
+                >
                   <FormField
                     control={securityForm.control}
                     name="currentPassword"
@@ -379,13 +411,17 @@ const Settings = () => {
                       <FormItem>
                         <FormLabel>Current Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} />
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={securityForm.control}
                     name="newPassword"
@@ -393,7 +429,11 @@ const Settings = () => {
                       <FormItem>
                         <FormLabel>New Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} />
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            {...field}
+                          />
                         </FormControl>
                         <FormDescription>
                           Password must be at least 8 characters
@@ -402,7 +442,7 @@ const Settings = () => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={securityForm.control}
                     name="confirmPassword"
@@ -410,13 +450,17 @@ const Settings = () => {
                       <FormItem>
                         <FormLabel>Confirm New Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} />
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  
+
                   <Button type="submit">Update Password</Button>
                 </form>
               </Form>
@@ -425,7 +469,7 @@ const Settings = () => {
         </TabsContent>
       </Tabs>
     </div>
-  )
-}
+  );
+};
 
-export default Settings
+export default Settings;

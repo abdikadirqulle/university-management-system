@@ -1,4 +1,4 @@
-import { useAuth } from "@/context/AuthContext"
+import { useAuth } from "@/context/AuthContext";
 import {
   Sidebar,
   SidebarContent,
@@ -8,8 +8,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 import {
   BookOpen,
   Calendar,
@@ -29,16 +29,16 @@ import {
   DollarSign,
   UserPlus,
   UsersRound,
-} from "lucide-react"
-import { Link, useLocation } from "react-router-dom"
+} from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 
 const AppSidebar = () => {
-  const { user, logout } = useAuth()
-  const location = useLocation()
+  const { user, logout } = useAuth();
+  const location = useLocation();
 
   const isActive = (path: string) => {
-    return location.pathname === path
-  }
+    return location.pathname === path;
+  };
 
   // Common menu items for all roles
   const commonMenuItems = [
@@ -47,7 +47,7 @@ const AppSidebar = () => {
       icon: Settings,
       path: `/${user?.role === "academic" ? "admin" : user?.role}/settings`,
     },
-  ]
+  ];
 
   // Role-specific menu items
   const roleMenuItems = {
@@ -161,12 +161,12 @@ const AppSidebar = () => {
         path: "/student/payments",
       },
     ],
-  }
+  };
 
   // Get menu items based on user role
   const menuItems = user?.role
     ? [...roleMenuItems[user.role], ...commonMenuItems]
-    : []
+    : [];
 
   const roleLabel = user?.role
     ? {
@@ -175,7 +175,7 @@ const AppSidebar = () => {
         student: "Student",
         financial: "Financial Officer",
       }[user.role]
-    : ""
+    : "";
 
   const roleBadgeClass = user?.role
     ? {
@@ -184,7 +184,7 @@ const AppSidebar = () => {
         student: "badge-role-student",
         financial: "badge-role-financial",
       }[user.role]
-    : ""
+    : "";
 
   return (
     <Sidebar>
@@ -250,7 +250,7 @@ const AppSidebar = () => {
         </Button>
       </SidebarFooter>
     </Sidebar>
-  )
-}
+  );
+};
 
-export default AppSidebar
+export default AppSidebar;

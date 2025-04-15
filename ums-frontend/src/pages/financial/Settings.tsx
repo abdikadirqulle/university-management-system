@@ -1,27 +1,28 @@
-
-import { useState } from 'react';
-import { useAuthGuard } from '@/hooks/useAuthGuard';
-import PageHeader from '@/components/PageHeader';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
+import { useState } from "react";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import PageHeader from "@/components/PageHeader";
+import { Button } from "@/components/ui/button";
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import {
   AlertTriangle,
   Building,
@@ -31,23 +32,23 @@ import {
   Settings as SettingsIcon,
   Shield,
   Users,
-} from 'lucide-react';
-import { toast } from 'sonner';
+} from "lucide-react";
+import { toast } from "sonner";
 
 const FinancialSettingsPage = () => {
-  useAuthGuard(['financial']);
-  
+  useAuthGuard(["financial"]);
+
   // State for form values
   const [generalSettings, setGeneralSettings] = useState({
-    universityName: 'University of Knowledge',
-    fiscalYear: '2023-2024',
-    currencyFormat: 'USD',
-    taxId: '12-3456789',
-    address: '123 University Ave, Academic City, ST 12345',
-    email: 'finance@university.edu',
-    phone: '(555) 123-4567',
+    universityName: "University of Knowledge",
+    fiscalYear: "2023-2024",
+    currencyFormat: "USD",
+    taxId: "12-3456789",
+    address: "123 University Ave, Academic City, ST 12345",
+    email: "finance@university.edu",
+    phone: "(555) 123-4567",
   });
-  
+
   const [paymentSettings, setPaymentSettings] = useState({
     acceptCreditCards: true,
     acceptBankTransfers: true,
@@ -58,55 +59,59 @@ const FinancialSettingsPage = () => {
     paymentReminderDays: [3, 7, 14],
     overdueReminderDays: [1, 7, 14, 30],
   });
-  
+
   const [processingEnabled, setProcessingEnabled] = useState({
     stripe: true,
     paypal: false,
     bankTransfer: true,
   });
-  
+
   // Handlers
-  const handleGeneralSettingsChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleGeneralSettingsChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     setGeneralSettings({
       ...generalSettings,
       [e.target.name]: e.target.value,
     });
   };
-  
+
   const handleSaveGeneralSettings = () => {
     // In a real app, this would send the data to your API
-    toast.success('General settings saved successfully');
+    toast.success("General settings saved successfully");
   };
-  
+
   const handleSavePaymentSettings = () => {
     // In a real app, this would send the data to your API
-    toast.success('Payment settings saved successfully');
+    toast.success("Payment settings saved successfully");
   };
-  
+
   const handleSaveApiIntegrations = () => {
     // In a real app, this would send the data to your API
-    toast.success('API Integrations saved successfully');
+    toast.success("API Integrations saved successfully");
   };
-  
-  const handlePaymentProcessorToggle = (processor: keyof typeof processingEnabled) => {
+
+  const handlePaymentProcessorToggle = (
+    processor: keyof typeof processingEnabled,
+  ) => {
     setProcessingEnabled({
       ...processingEnabled,
       [processor]: !processingEnabled[processor],
     });
   };
-  
+
   return (
     <div className="space-y-6">
-      <PageHeader 
-        title="Financial Settings" 
+      <PageHeader
+        title="Financial Settings"
         description="Configure system-wide financial settings and preferences"
         action={{
           label: "Save All Settings",
           icon: Save,
-          onClick: () => toast.success('All settings saved successfully'),
+          onClick: () => toast.success("All settings saved successfully"),
         }}
       />
-      
+
       <Tabs defaultValue="general" className="w-full">
         <TabsList className="mb-6 grid w-full grid-cols-3">
           <TabsTrigger value="general">
@@ -122,13 +127,14 @@ const FinancialSettingsPage = () => {
             API Integrations
           </TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="general" className="space-y-4 mt-0">
           <Card>
             <CardHeader>
               <CardTitle>University Information</CardTitle>
               <CardDescription>
-                Basic information about your institution used in financial documents
+                Basic information about your institution used in financial
+                documents
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -153,9 +159,14 @@ const FinancialSettingsPage = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="currencyFormat">Currency Format</Label>
-                  <Select 
+                  <Select
                     value={generalSettings.currencyFormat}
-                    onValueChange={(value) => setGeneralSettings({...generalSettings, currencyFormat: value})}
+                    onValueChange={(value) =>
+                      setGeneralSettings({
+                        ...generalSettings,
+                        currencyFormat: value,
+                      })
+                    }
                   >
                     <SelectTrigger id="currencyFormat">
                       <SelectValue placeholder="Select currency format" />
@@ -215,7 +226,7 @@ const FinancialSettingsPage = () => {
               </Button>
             </CardFooter>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Document Customization</CardTitle>
@@ -256,13 +267,11 @@ const FinancialSettingsPage = () => {
               <Button variant="outline" className="mr-2">
                 Preview Documents
               </Button>
-              <Button>
-                Save Document Settings
-              </Button>
+              <Button>Save Document Settings</Button>
             </CardFooter>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="payment" className="space-y-4 mt-0">
           <Card>
             <CardHeader>
@@ -275,56 +284,94 @@ const FinancialSettingsPage = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex flex-col">
-                    <Label htmlFor="acceptCreditCards" className="mb-1">Accept Credit Cards</Label>
-                    <span className="text-sm text-muted-foreground">Allow payments via credit/debit cards</span>
+                    <Label htmlFor="acceptCreditCards" className="mb-1">
+                      Accept Credit Cards
+                    </Label>
+                    <span className="text-sm text-muted-foreground">
+                      Allow payments via credit/debit cards
+                    </span>
                   </div>
                   <Switch
                     id="acceptCreditCards"
                     checked={paymentSettings.acceptCreditCards}
-                    onCheckedChange={(checked) => setPaymentSettings({...paymentSettings, acceptCreditCards: checked})}
+                    onCheckedChange={(checked) =>
+                      setPaymentSettings({
+                        ...paymentSettings,
+                        acceptCreditCards: checked,
+                      })
+                    }
                   />
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex flex-col">
-                    <Label htmlFor="acceptBankTransfers" className="mb-1">Accept Bank Transfers</Label>
-                    <span className="text-sm text-muted-foreground">Allow payments via direct bank transfers</span>
+                    <Label htmlFor="acceptBankTransfers" className="mb-1">
+                      Accept Bank Transfers
+                    </Label>
+                    <span className="text-sm text-muted-foreground">
+                      Allow payments via direct bank transfers
+                    </span>
                   </div>
                   <Switch
                     id="acceptBankTransfers"
                     checked={paymentSettings.acceptBankTransfers}
-                    onCheckedChange={(checked) => setPaymentSettings({...paymentSettings, acceptBankTransfers: checked})}
+                    onCheckedChange={(checked) =>
+                      setPaymentSettings({
+                        ...paymentSettings,
+                        acceptBankTransfers: checked,
+                      })
+                    }
                   />
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex flex-col">
-                    <Label htmlFor="acceptCash" className="mb-1">Accept Cash</Label>
-                    <span className="text-sm text-muted-foreground">Allow in-person cash payments</span>
+                    <Label htmlFor="acceptCash" className="mb-1">
+                      Accept Cash
+                    </Label>
+                    <span className="text-sm text-muted-foreground">
+                      Allow in-person cash payments
+                    </span>
                   </div>
                   <Switch
                     id="acceptCash"
                     checked={paymentSettings.acceptCash}
-                    onCheckedChange={(checked) => setPaymentSettings({...paymentSettings, acceptCash: checked})}
+                    onCheckedChange={(checked) =>
+                      setPaymentSettings({
+                        ...paymentSettings,
+                        acceptCash: checked,
+                      })
+                    }
                   />
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex flex-col">
-                    <Label htmlFor="acceptChecks" className="mb-1">Accept Checks</Label>
-                    <span className="text-sm text-muted-foreground">Allow payments via personal or bank checks</span>
+                    <Label htmlFor="acceptChecks" className="mb-1">
+                      Accept Checks
+                    </Label>
+                    <span className="text-sm text-muted-foreground">
+                      Allow payments via personal or bank checks
+                    </span>
                   </div>
                   <Switch
                     id="acceptChecks"
                     checked={paymentSettings.acceptChecks}
-                    onCheckedChange={(checked) => setPaymentSettings({...paymentSettings, acceptChecks: checked})}
+                    onCheckedChange={(checked) =>
+                      setPaymentSettings({
+                        ...paymentSettings,
+                        acceptChecks: checked,
+                      })
+                    }
                   />
                 </div>
               </div>
-              
+
               <div className="mt-6 space-y-4">
                 <h3 className="text-lg font-medium">Late Payment Settings</h3>
-                
+
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="lateFeePercentage">Late Fee Percentage</Label>
+                    <Label htmlFor="lateFeePercentage">
+                      Late Fee Percentage
+                    </Label>
                     <div className="flex items-center">
                       <Input
                         id="lateFeePercentage"
@@ -332,7 +379,12 @@ const FinancialSettingsPage = () => {
                         min="0"
                         max="100"
                         value={paymentSettings.lateFeePercentage}
-                        onChange={(e) => setPaymentSettings({...paymentSettings, lateFeePercentage: parseFloat(e.target.value)})}
+                        onChange={(e) =>
+                          setPaymentSettings({
+                            ...paymentSettings,
+                            lateFeePercentage: parseFloat(e.target.value),
+                          })
+                        }
                       />
                       <span className="ml-2">%</span>
                     </div>
@@ -344,38 +396,63 @@ const FinancialSettingsPage = () => {
                       type="number"
                       min="0"
                       value={paymentSettings.gracePeriodDays}
-                      onChange={(e) => setPaymentSettings({...paymentSettings, gracePeriodDays: parseInt(e.target.value)})}
+                      onChange={(e) =>
+                        setPaymentSettings({
+                          ...paymentSettings,
+                          gracePeriodDays: parseInt(e.target.value),
+                        })
+                      }
                     />
                   </div>
                 </div>
               </div>
-              
+
               <div className="mt-6 space-y-4">
                 <h3 className="text-lg font-medium">Reminder Settings</h3>
-                
+
                 <div className="space-y-2">
-                  <Label htmlFor="paymentReminderDays">Payment Reminder Days (Before Due Date)</Label>
+                  <Label htmlFor="paymentReminderDays">
+                    Payment Reminder Days (Before Due Date)
+                  </Label>
                   <div className="flex flex-wrap gap-2">
                     {paymentSettings.paymentReminderDays.map((days, index) => (
-                      <Badge key={index} variant="outline" className="px-3 py-1">
-                        {days} {days === 1 ? 'day' : 'days'}
-                        <button className="ml-2 text-muted-foreground hover:text-foreground">×</button>
+                      <Badge
+                        key={index}
+                        variant="outline"
+                        className="px-3 py-1"
+                      >
+                        {days} {days === 1 ? "day" : "days"}
+                        <button className="ml-2 text-muted-foreground hover:text-foreground">
+                          ×
+                        </button>
                       </Badge>
                     ))}
-                    <Button variant="outline" size="sm">Add</Button>
+                    <Button variant="outline" size="sm">
+                      Add
+                    </Button>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
-                  <Label htmlFor="overdueReminderDays">Overdue Reminder Days (After Due Date)</Label>
+                  <Label htmlFor="overdueReminderDays">
+                    Overdue Reminder Days (After Due Date)
+                  </Label>
                   <div className="flex flex-wrap gap-2">
                     {paymentSettings.overdueReminderDays.map((days, index) => (
-                      <Badge key={index} variant="outline" className="px-3 py-1">
-                        {days} {days === 1 ? 'day' : 'days'}
-                        <button className="ml-2 text-muted-foreground hover:text-foreground">×</button>
+                      <Badge
+                        key={index}
+                        variant="outline"
+                        className="px-3 py-1"
+                      >
+                        {days} {days === 1 ? "day" : "days"}
+                        <button className="ml-2 text-muted-foreground hover:text-foreground">
+                          ×
+                        </button>
                       </Badge>
                     ))}
-                    <Button variant="outline" size="sm">Add</Button>
+                    <Button variant="outline" size="sm">
+                      Add
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -387,7 +464,7 @@ const FinancialSettingsPage = () => {
             </CardFooter>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="integrations" className="space-y-4 mt-0">
           <Card>
             <CardHeader>
@@ -406,25 +483,35 @@ const FinancialSettingsPage = () => {
                       </div>
                       <div>
                         <h3 className="text-lg font-medium">Stripe</h3>
-                        <p className="text-sm text-muted-foreground">Credit card processing via Stripe</p>
+                        <p className="text-sm text-muted-foreground">
+                          Credit card processing via Stripe
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Badge variant={processingEnabled.stripe ? "success" : "outline"}>
+                      <Badge
+                        variant={
+                          processingEnabled.stripe ? "success" : "outline"
+                        }
+                      >
                         {processingEnabled.stripe ? "Active" : "Inactive"}
                       </Badge>
                       <Switch
                         checked={processingEnabled.stripe}
-                        onCheckedChange={() => handlePaymentProcessorToggle('stripe')}
+                        onCheckedChange={() =>
+                          handlePaymentProcessorToggle("stripe")
+                        }
                       />
                     </div>
                   </div>
-                  
+
                   {processingEnabled.stripe && (
                     <div className="mt-4 border-t pt-4">
                       <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
-                          <Label htmlFor="stripePublicKey">Stripe Public Key</Label>
+                          <Label htmlFor="stripePublicKey">
+                            Stripe Public Key
+                          </Label>
                           <Input
                             id="stripePublicKey"
                             defaultValue="pk_test_******************************"
@@ -432,7 +519,9 @@ const FinancialSettingsPage = () => {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="stripeSecretKey">Stripe Secret Key</Label>
+                          <Label htmlFor="stripeSecretKey">
+                            Stripe Secret Key
+                          </Label>
                           <Input
                             id="stripeSecretKey"
                             defaultValue="sk_test_******************************"
@@ -448,7 +537,10 @@ const FinancialSettingsPage = () => {
                               readOnly
                               className="rounded-r-none"
                             />
-                            <Button variant="secondary" className="rounded-l-none">
+                            <Button
+                              variant="secondary"
+                              className="rounded-l-none"
+                            >
                               Copy
                             </Button>
                           </div>
@@ -457,7 +549,7 @@ const FinancialSettingsPage = () => {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="rounded-lg border p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
@@ -466,25 +558,35 @@ const FinancialSettingsPage = () => {
                       </div>
                       <div>
                         <h3 className="text-lg font-medium">PayPal</h3>
-                        <p className="text-sm text-muted-foreground">Process payments through PayPal</p>
+                        <p className="text-sm text-muted-foreground">
+                          Process payments through PayPal
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Badge variant={processingEnabled.paypal ? "success" : "outline"}>
+                      <Badge
+                        variant={
+                          processingEnabled.paypal ? "success" : "outline"
+                        }
+                      >
                         {processingEnabled.paypal ? "Active" : "Inactive"}
                       </Badge>
                       <Switch
                         checked={processingEnabled.paypal}
-                        onCheckedChange={() => handlePaymentProcessorToggle('paypal')}
+                        onCheckedChange={() =>
+                          handlePaymentProcessorToggle("paypal")
+                        }
                       />
                     </div>
                   </div>
-                  
+
                   {processingEnabled.paypal && (
                     <div className="mt-4 border-t pt-4">
                       <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
-                          <Label htmlFor="paypalClientId">PayPal Client ID</Label>
+                          <Label htmlFor="paypalClientId">
+                            PayPal Client ID
+                          </Label>
                           <Input
                             id="paypalClientId"
                             placeholder="Enter your PayPal client ID"
@@ -502,7 +604,7 @@ const FinancialSettingsPage = () => {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="rounded-lg border p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
@@ -511,20 +613,28 @@ const FinancialSettingsPage = () => {
                       </div>
                       <div>
                         <h3 className="text-lg font-medium">Bank Transfer</h3>
-                        <p className="text-sm text-muted-foreground">Configure direct bank transfer details</p>
+                        <p className="text-sm text-muted-foreground">
+                          Configure direct bank transfer details
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Badge variant={processingEnabled.bankTransfer ? "success" : "outline"}>
+                      <Badge
+                        variant={
+                          processingEnabled.bankTransfer ? "success" : "outline"
+                        }
+                      >
                         {processingEnabled.bankTransfer ? "Active" : "Inactive"}
                       </Badge>
                       <Switch
                         checked={processingEnabled.bankTransfer}
-                        onCheckedChange={() => handlePaymentProcessorToggle('bankTransfer')}
+                        onCheckedChange={() =>
+                          handlePaymentProcessorToggle("bankTransfer")
+                        }
                       />
                     </div>
                   </div>
-                  
+
                   {processingEnabled.bankTransfer && (
                     <div className="mt-4 border-t pt-4">
                       <div className="grid gap-4 md:grid-cols-2">
@@ -544,20 +654,16 @@ const FinancialSettingsPage = () => {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="accountNumber">Account Number</Label>
-                          <Input
-                            id="accountNumber"
-                            defaultValue="****3456"
-                          />
+                          <Input id="accountNumber" defaultValue="****3456" />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="routingNumber">Routing Number</Label>
-                          <Input
-                            id="routingNumber"
-                            defaultValue="*****7890"
-                          />
+                          <Input id="routingNumber" defaultValue="*****7890" />
                         </div>
                         <div className="space-y-2 md:col-span-2">
-                          <Label htmlFor="bankInstructions">Payment Instructions</Label>
+                          <Label htmlFor="bankInstructions">
+                            Payment Instructions
+                          </Label>
                           <Textarea
                             id="bankInstructions"
                             defaultValue="Please include student ID and name in the transfer reference."

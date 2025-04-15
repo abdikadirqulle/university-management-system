@@ -1,8 +1,8 @@
-import React, { useEffect } from "react"
-import { z } from "zod"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { User } from "@/types/auth"
+import React, { useEffect } from "react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { User } from "@/types/auth";
 
 import {
   Dialog,
@@ -11,7 +11,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -19,16 +19,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
 // Form schema for user form
 const userFormSchema = z.object({
@@ -36,16 +36,16 @@ const userFormSchema = z.object({
   email: z.string().email("Please enter a valid email"),
   password: z.string().min(6, "Please enter a password"),
   role: z.enum(["academic", "admission", "financial"] as const),
-})
+});
 
-export type UserFormValues = z.infer<typeof userFormSchema>
+export type UserFormValues = z.infer<typeof userFormSchema>;
 
 interface UserFormDialogProps {
-  isOpen: boolean
-  onOpenChange: (open: boolean) => void
-  dialogMode: "add" | "edit"
-  currentUser: User | null
-  onSubmit: (data: UserFormValues) => Promise<void>
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  dialogMode: "add" | "edit";
+  currentUser: User | null;
+  onSubmit: (data: UserFormValues) => Promise<void>;
 }
 
 const roleOptions = [
@@ -69,7 +69,7 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
       email: "",
       password: "",
     },
-  })
+  });
 
   // Reset form when dialog opens/closes or when currentUser changes
   useEffect(() => {
@@ -78,20 +78,20 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
         name: "",
         email: "",
         password: "",
-      })
+      });
     } else if (isOpen && dialogMode === "edit" && currentUser) {
       form.reset({
         name: currentUser.name,
         email: currentUser.email,
         password: currentUser.password,
         role: currentUser.role,
-      })
+      });
     }
-  }, [isOpen, dialogMode, currentUser, form])
+  }, [isOpen, dialogMode, currentUser, form]);
 
   const handleSubmit = async (data: UserFormValues) => {
-    await onSubmit(data)
-  }
+    await onSubmit(data);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -197,7 +197,7 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
         </Form>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
-export default UserFormDialog
+export default UserFormDialog;

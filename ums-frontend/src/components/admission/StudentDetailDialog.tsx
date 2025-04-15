@@ -1,6 +1,5 @@
-
-import { useState } from "react"
-import { Student } from "@/types/student"
+import { useState } from "react";
+import { Student } from "@/types/student";
 import {
   Dialog,
   DialogContent,
@@ -8,26 +7,26 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface StudentDetailDialogProps {
-  student: Student | null
-  isOpen: boolean
-  onClose: () => void
-  onSave: (student: Student) => void
-  viewOnly?: boolean
+  student: Student | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (student: Student) => void;
+  viewOnly?: boolean;
 }
 
 const StudentDetailDialog = ({
@@ -37,39 +36,41 @@ const StudentDetailDialog = ({
   onSave,
   viewOnly = false,
 }: StudentDetailDialogProps) => {
-  const [editableStudent, setEditableStudent] = useState<Student | null>(student)
+  const [editableStudent, setEditableStudent] = useState<Student | null>(
+    student,
+  );
 
   // Reset form when student prop changes
   if (student && student.id !== editableStudent?.id) {
-    setEditableStudent(student)
+    setEditableStudent(student);
   }
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    if (!editableStudent) return
+    if (!editableStudent) return;
     setEditableStudent({
       ...editableStudent,
       [e.target.name]: e.target.value,
-    })
-  }
+    });
+  };
 
   const handleSelectChange = (field: string, value: string) => {
-    if (!editableStudent) return
+    if (!editableStudent) return;
     setEditableStudent({
       ...editableStudent,
       [field]: value,
-    })
-  }
+    });
+  };
 
   const handleSave = () => {
     if (editableStudent) {
-      onSave(editableStudent)
+      onSave(editableStudent);
     }
-    onClose()
-  }
+    onClose();
+  };
 
-  if (!editableStudent) return null
+  if (!editableStudent) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -280,7 +281,7 @@ const StudentDetailDialog = ({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
-export default StudentDetailDialog
+export default StudentDetailDialog;

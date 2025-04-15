@@ -1,16 +1,16 @@
-import { useState } from "react"
-import { useAuthGuard } from "@/hooks/useAuthGuard"
-import { useQuery } from "@tanstack/react-query"
-import PageHeader from "@/components/PageHeader"
+import { useState } from "react";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { useQuery } from "@tanstack/react-query";
+import PageHeader from "@/components/PageHeader";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import {
   BarChart,
   Bar,
@@ -20,7 +20,7 @@ import {
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
   Legend,
-} from "recharts"
+} from "recharts";
 import {
   AlertTriangle,
   ArrowDown,
@@ -28,7 +28,7 @@ import {
   Download,
   Edit,
   Plus,
-} from "lucide-react"
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -36,7 +36,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -45,30 +45,30 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 // Define interfaces
 interface BudgetItem {
-  id: string
-  category: string
-  subcategory: string
-  allocated: number
-  spent: number
-  remaining: number
-  fiscalYear: string
-  department: string
+  id: string;
+  category: string;
+  subcategory: string;
+  allocated: number;
+  spent: number;
+  remaining: number;
+  fiscalYear: string;
+  department: string;
 }
 
 interface BudgetSummary {
-  totalBudget: number
-  totalSpent: number
-  totalRemaining: number
-  fiscalYear: string
-  status: "on-track" | "warning" | "over-budget"
-  lastUpdated: string
+  totalBudget: number;
+  totalSpent: number;
+  totalRemaining: number;
+  fiscalYear: string;
+  status: "on-track" | "warning" | "over-budget";
+  lastUpdated: string;
 }
 
 // Mock data
@@ -173,20 +173,20 @@ const mockBudgetItems: BudgetItem[] = [
     fiscalYear: "2023-2024",
     department: "IT",
   },
-]
+];
 
 // Calculate summary from budget items
 const calculateBudgetSummary = (items: BudgetItem[]): BudgetSummary => {
-  const totalBudget = items.reduce((sum, item) => sum + item.allocated, 0)
-  const totalSpent = items.reduce((sum, item) => sum + item.spent, 0)
-  const totalRemaining = totalBudget - totalSpent
-  const percentageSpent = (totalSpent / totalBudget) * 100
+  const totalBudget = items.reduce((sum, item) => sum + item.allocated, 0);
+  const totalSpent = items.reduce((sum, item) => sum + item.spent, 0);
+  const totalRemaining = totalBudget - totalSpent;
+  const percentageSpent = (totalSpent / totalBudget) * 100;
 
-  let status: "on-track" | "warning" | "over-budget" = "on-track"
+  let status: "on-track" | "warning" | "over-budget" = "on-track";
   if (percentageSpent > 100) {
-    status = "over-budget"
+    status = "over-budget";
   } else if (percentageSpent > 85) {
-    status = "warning"
+    status = "warning";
   }
 
   return {
@@ -196,57 +196,57 @@ const calculateBudgetSummary = (items: BudgetItem[]): BudgetSummary => {
     fiscalYear: "2023-2024",
     status,
     lastUpdated: new Date().toISOString().split("T")[0],
-  }
-}
+  };
+};
 
 // Create chart data by category
 const getBudgetChartData = (items: BudgetItem[]) => {
-  const categoryMap = new Map<string, { allocated: number; spent: number }>()
+  const categoryMap = new Map<string, { allocated: number; spent: number }>();
 
   items.forEach((item) => {
     if (!categoryMap.has(item.category)) {
-      categoryMap.set(item.category, { allocated: 0, spent: 0 })
+      categoryMap.set(item.category, { allocated: 0, spent: 0 });
     }
 
-    const current = categoryMap.get(item.category)!
-    current.allocated += item.allocated
-    current.spent += item.spent
-    categoryMap.set(item.category, current)
-  })
+    const current = categoryMap.get(item.category)!;
+    current.allocated += item.allocated;
+    current.spent += item.spent;
+    categoryMap.set(item.category, current);
+  });
 
   return Array.from(categoryMap.entries()).map(([category, values]) => ({
     category,
     allocated: values.allocated,
     spent: values.spent,
-  }))
-}
+  }));
+};
 
 const BudgetPage = () => {
-  useAuthGuard(["financial"])
-  const [openNewBudgetDialog, setOpenNewBudgetDialog] = useState(false)
+  useAuthGuard(["financial"]);
+  const [openNewBudgetDialog, setOpenNewBudgetDialog] = useState(false);
 
   // Simulate data loading with react-query
   const { data: budgetItems = [], isLoading } = useQuery({
     queryKey: ["budget-items"],
     queryFn: () =>
       new Promise<BudgetItem[]>((resolve) =>
-        setTimeout(() => resolve(mockBudgetItems), 1000)
+        setTimeout(() => resolve(mockBudgetItems), 1000),
       ),
-  })
+  });
 
-  const budgetSummary = calculateBudgetSummary(budgetItems)
-  const chartData = getBudgetChartData(budgetItems)
+  const budgetSummary = calculateBudgetSummary(budgetItems);
+  const chartData = getBudgetChartData(budgetItems);
 
   // Calculate percentage values for progress bars
   const getPercentage = (spent: number, allocated: number) => {
-    return Math.min(Math.round((spent / allocated) * 100), 100)
-  }
+    return Math.min(Math.round((spent / allocated) * 100), 100);
+  };
 
   const getProgressColor = (percentage: number) => {
-    if (percentage > 90) return "bg-red-500"
-    if (percentage > 75) return "bg-amber-500"
-    return "bg-emerald-500"
-  }
+    if (percentage > 90) return "bg-red-500";
+    if (percentage > 75) return "bg-amber-500";
+    return "bg-emerald-500";
+  };
 
   return (
     <div className="space-y-6">
@@ -281,7 +281,7 @@ const BudgetPage = () => {
                   <span>
                     {getPercentage(
                       budgetSummary.totalSpent,
-                      budgetSummary.totalBudget
+                      budgetSummary.totalBudget,
                     )}
                     %
                   </span>
@@ -289,13 +289,13 @@ const BudgetPage = () => {
                 <Progress
                   value={getPercentage(
                     budgetSummary.totalSpent,
-                    budgetSummary.totalBudget
+                    budgetSummary.totalBudget,
                   )}
                   className={`h-2 ${getProgressColor(
                     getPercentage(
                       budgetSummary.totalSpent,
-                      budgetSummary.totalBudget
-                    )
+                      budgetSummary.totalBudget,
+                    ),
                   )}`}
                 />
               </div>
@@ -392,8 +392,8 @@ const BudgetPage = () => {
                     budgetItems.map((item) => {
                       const percentageSpent = getPercentage(
                         item.spent,
-                        item.allocated
-                      )
+                        item.allocated,
+                      );
 
                       return (
                         <TableRow key={item.id}>
@@ -420,7 +420,7 @@ const BudgetPage = () => {
                               <Progress
                                 value={percentageSpent}
                                 className={`h-2 ${getProgressColor(
-                                  percentageSpent
+                                  percentageSpent,
                                 )}`}
                               />
                               <span className="text-xs whitespace-nowrap">
@@ -438,7 +438,7 @@ const BudgetPage = () => {
                             </Button>
                           </TableCell>
                         </TableRow>
-                      )
+                      );
                     })
                   )}
                 </TableBody>
@@ -466,8 +466,8 @@ const BudgetPage = () => {
                     .map((item) => {
                       const percentageSpent = getPercentage(
                         item.spent,
-                        item.allocated
-                      )
+                        item.allocated,
+                      );
 
                       return (
                         <TableRow key={item.id}>
@@ -487,7 +487,7 @@ const BudgetPage = () => {
                               <Progress
                                 value={percentageSpent}
                                 className={`h-2 ${getProgressColor(
-                                  percentageSpent
+                                  percentageSpent,
                                 )}`}
                               />
                               <span className="text-xs whitespace-nowrap">
@@ -502,7 +502,7 @@ const BudgetPage = () => {
                             </Button>
                           </TableCell>
                         </TableRow>
-                      )
+                      );
                     })}
                 </TableBody>
               </Table>
@@ -600,7 +600,7 @@ const BudgetPage = () => {
         </DialogContent>
       </Dialog>
     </div>
-  )
-}
+  );
+};
 
-export default BudgetPage
+export default BudgetPage;

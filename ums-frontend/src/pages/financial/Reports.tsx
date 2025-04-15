@@ -1,23 +1,23 @@
-import { useState } from "react"
-import { useAuthGuard } from "@/hooks/useAuthGuard"
-import { useQuery } from "@tanstack/react-query"
-import PageHeader from "@/components/PageHeader"
+import { useState } from "react";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { useQuery } from "@tanstack/react-query";
+import PageHeader from "@/components/PageHeader";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   BarChart,
   Bar,
@@ -32,8 +32,8 @@ import {
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
   Legend,
-} from "recharts"
-import { Download, FileText } from "lucide-react"
+} from "recharts";
+import { Download, FileText } from "lucide-react";
 
 // Mock data for reports
 const monthlyRevenueData = [
@@ -49,7 +49,7 @@ const monthlyRevenueData = [
   { month: "Oct", tuition: 130000, housing: 150000, other: 85000 },
   { month: "Nov", tuition: 110000, housing: 140000, other: 80000 },
   { month: "Dec", tuition: 90000, housing: 130000, other: 70000 },
-]
+];
 
 const revenueBySourceData = [
   { name: "Undergraduate Tuition", value: 2850000 },
@@ -58,7 +58,7 @@ const revenueBySourceData = [
   { name: "Research Grants", value: 950000 },
   { name: "Donations", value: 525000 },
   { name: "Other Income", value: 350000 },
-]
+];
 
 const monthlyExpensesData = [
   {
@@ -145,7 +145,7 @@ const monthlyExpensesData = [
     facilities: 115000,
     student: 85000,
   },
-]
+];
 
 const expensesByTypeData = [
   { name: "Faculty Salaries", value: 2500000 },
@@ -156,7 +156,7 @@ const expensesByTypeData = [
   { name: "IT Infrastructure", value: 450000 },
   { name: "Research", value: 650000 },
   { name: "Other Expenses", value: 400000 },
-]
+];
 
 const financialRatios = [
   { name: "Operating Margin", value: 8.5, target: 10, unit: "%" },
@@ -165,9 +165,9 @@ const financialRatios = [
   { name: "Debt to Revenue", value: 0.32, target: 0.3, unit: "ratio" },
   { name: "Endowment per Student", value: 32500, target: 35000, unit: "$" },
   { name: "Cash Flow Margin", value: 9.2, target: 12, unit: "%" },
-]
+];
 
-const availableYears = ["2023-2024", "2022-2023", "2021-2022", "2020-2021"]
+const availableYears = ["2023-2024", "2022-2023", "2021-2022", "2020-2021"];
 
 // Colors for charts
 const COLORS = [
@@ -177,11 +177,11 @@ const COLORS = [
   "#FF8042",
   "#8884D8",
   "#82CA9D",
-]
+];
 
 const FinancialReportsPage = () => {
-  useAuthGuard(["financial"])
-  const [selectedYear, setSelectedYear] = useState("2023-2024")
+  useAuthGuard(["financial"]);
+  const [selectedYear, setSelectedYear] = useState("2023-2024");
 
   return (
     <div className="space-y-6">
@@ -634,16 +634,16 @@ const FinancialReportsPage = () => {
                           {ratio.unit === "$"
                             ? `$${ratio.value.toLocaleString()}`
                             : ratio.unit === "ratio"
-                            ? ratio.value.toFixed(2)
-                            : `${ratio.value}${ratio.unit}`}
+                              ? ratio.value.toFixed(2)
+                              : `${ratio.value}${ratio.unit}`}
                         </p>
                         <p className="ml-2 text-xs text-muted-foreground">
                           Target:{" "}
                           {ratio.unit === "$"
                             ? `$${ratio.target.toLocaleString()}`
                             : ratio.unit === "ratio"
-                            ? ratio.target.toFixed(2)
-                            : `${ratio.target}${ratio.unit}`}
+                              ? ratio.target.toFixed(2)
+                              : `${ratio.target}${ratio.unit}`}
                         </p>
                       </div>
                       <div className="mt-2">
@@ -657,7 +657,7 @@ const FinancialReportsPage = () => {
                             style={{
                               width: `${Math.min(
                                 (ratio.value / ratio.target) * 100,
-                                100
+                                100,
                               )}%`,
                             }}
                           />
@@ -672,7 +672,7 @@ const FinancialReportsPage = () => {
         </Tabs>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default FinancialReportsPage
+export default FinancialReportsPage;

@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { DataTable } from "@/components/DataTable"
-import { ColumnDef } from "@tanstack/react-table"
-import { Plus, Edit, Trash2 } from "lucide-react"
-import PageHeader from "@/components/PageHeader"
-import { Course, useCourseStore } from "@/store/useCourseStore"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/DataTable";
+import { ColumnDef } from "@tanstack/react-table";
+import { Plus, Edit, Trash2 } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
+import { Course, useCourseStore } from "@/store/useCourseStore";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -21,20 +21,20 @@ import {
   FormLabel,
   FormMessage,
   FormDescription,
-} from "@/components/ui/form"
+} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { toast } from "sonner"
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { toast } from "sonner";
 
 // Form schema
 const courseFormSchema = z.object({
@@ -50,9 +50,9 @@ const courseFormSchema = z.object({
     .min(10, { message: "Description must be at least 10 characters" }),
   semester: z.string().min(1, { message: "Semester is required" }),
   instructor: z.string().optional(),
-})
+});
 
-type CourseFormValues = z.infer<typeof courseFormSchema>
+type CourseFormValues = z.infer<typeof courseFormSchema>;
 
 // Sample departments
 const departments = [
@@ -66,7 +66,7 @@ const departments = [
   "Economics",
   "History",
   "Psychology",
-]
+];
 
 // Sample semesters
 const semesters = [
@@ -75,7 +75,7 @@ const semesters = [
   "Summer 2024",
   "Fall 2024",
   "Spring 2025",
-]
+];
 
 const CoursesPage = () => {
   const {
@@ -85,9 +85,9 @@ const CoursesPage = () => {
     updateCourse,
     deleteCourse,
     isLoading,
-  } = useCourseStore()
-  const [isOpen, setIsOpen] = useState(false)
-  const [editingCourse, setEditingCourse] = useState<Course | null>(null)
+  } = useCourseStore();
+  const [isOpen, setIsOpen] = useState(false);
+  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
 
   // Setup form
   const form = useForm<CourseFormValues>({
@@ -101,44 +101,44 @@ const CoursesPage = () => {
       semester: "",
       instructor: "",
     },
-  })
+  });
 
   // Fetch courses on component mount
   useEffect(() => {
-    fetchCourses()
-  }, [fetchCourses])
+    fetchCourses();
+  }, [fetchCourses]);
 
   // Reset form when dialog closes
   const handleDialogOpenChange = (open: boolean) => {
     if (!open) {
-      form.reset()
-      setEditingCourse(null)
+      form.reset();
+      setEditingCourse(null);
     }
-    setIsOpen(open)
-  }
+    setIsOpen(open);
+  };
 
   // Handle form submission
   const onSubmit = async (data: Course) => {
     try {
       if (editingCourse) {
         // Update existing course
-        await updateCourse(editingCourse.id, data)
-        toast.success("Course updated successfully")
+        await updateCourse(editingCourse.id, data);
+        toast.success("Course updated successfully");
       } else {
         // Add new course
-        await addCourse(data)
-        toast.success("Course added successfully")
+        await addCourse(data);
+        toast.success("Course added successfully");
       }
-      handleDialogOpenChange(false)
+      handleDialogOpenChange(false);
     } catch (error) {
-      toast.error("Failed to save course")
-      console.error(error)
+      toast.error("Failed to save course");
+      console.error(error);
     }
-  }
+  };
 
   // Handle edit course
   const handleEdit = (course: Course) => {
-    setEditingCourse(course)
+    setEditingCourse(course);
     form.reset({
       code: course.code,
       title: course.title,
@@ -147,20 +147,20 @@ const CoursesPage = () => {
       description: course.description,
       semester: course.semester,
       instructor: course.instructor || "",
-    })
-    setIsOpen(true)
-  }
+    });
+    setIsOpen(true);
+  };
 
   // Handle delete course
   const handleDelete = async (id: string) => {
     try {
-      await deleteCourse(id)
-      toast.success("Course deleted successfully")
+      await deleteCourse(id);
+      toast.success("Course deleted successfully");
     } catch (error) {
-      toast.error("Failed to delete course")
-      console.error(error)
+      toast.error("Failed to delete course");
+      console.error(error);
     }
-  }
+  };
 
   // Define columns
   const columns: ColumnDef<Course>[] = [
@@ -192,7 +192,7 @@ const CoursesPage = () => {
     {
       id: "actions",
       cell: ({ row }) => {
-        const course = row.original
+        const course = row.original;
         return (
           <div className="flex space-x-2">
             <Button
@@ -212,10 +212,10 @@ const CoursesPage = () => {
               <span className="sr-only">Delete</span>
             </Button>
           </div>
-        )
+        );
       },
     },
-  ]
+  ];
 
   return (
     <div className="space-y-6">
@@ -402,7 +402,7 @@ const CoursesPage = () => {
         </DialogContent>
       </Dialog>
     </div>
-  )
-}
+  );
+};
 
-export default CoursesPage
+export default CoursesPage;

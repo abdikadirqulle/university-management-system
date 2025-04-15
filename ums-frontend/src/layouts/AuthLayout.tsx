@@ -1,29 +1,29 @@
-import { useEffect } from "react"
-import { Outlet, useNavigate } from "react-router-dom"
-import { useAuth } from "@/context/AuthContext"
+import { useEffect } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 const AuthLayout = () => {
-  const { isAuthenticated, user } = useAuth()
-  const navigate = useNavigate()
+  const { isAuthenticated, user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isAuthenticated && user) {
       // Redirect based on user role
       switch (user.role) {
         case "academic":
-          navigate("/admin/dashboard")
-          break
+          navigate("/admin/dashboard");
+          break;
         case "admission":
-          navigate("/admission/dashboard")
-          break
+          navigate("/admission/dashboard");
+          break;
         case "student":
-          navigate("/student/dashboard")
-          break
+          navigate("/student/dashboard");
+          break;
         default:
-          break
+          break;
       }
     }
-  }, [isAuthenticated, user, navigate])
+  }, [isAuthenticated, user, navigate]);
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-university-500 via-university-900 to-university-800">
@@ -31,7 +31,7 @@ const AuthLayout = () => {
         <Outlet />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AuthLayout
+export default AuthLayout;

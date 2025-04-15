@@ -1,10 +1,9 @@
-
-import { useEffect } from 'react';
-import { useAuthGuard } from '@/hooks/useAuthGuard';
-import { useQuery } from '@tanstack/react-query';
-import { Skeleton } from '@/components/ui/skeleton';
-import PageHeader from '@/components/PageHeader';
-import StatsCard from '@/components/StatsCard';
+import { useEffect } from "react";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "@/components/ui/skeleton";
+import PageHeader from "@/components/PageHeader";
+import StatsCard from "@/components/StatsCard";
 import {
   Users,
   CreditCard,
@@ -12,80 +11,85 @@ import {
   BarChart3,
   BookOpen,
   Building,
-} from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip as RechartsTooltip, 
-  ResponsiveContainer, 
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
   PieChart,
   Pie,
-  Cell
-} from 'recharts';
+  Cell,
+} from "recharts";
 
 // Mock financial data for demonstration
 const mockFinancialStats = {
-  totalRevenue: '$1,245,890',
-  pendingPayments: '$78,250',
+  totalRevenue: "$1,245,890",
+  pendingPayments: "$78,250",
   completedTransactions: 1245,
-  outstandingFees: '$125,450',
+  outstandingFees: "$125,450",
 };
 
 const mockMonthlyRevenue = [
-  { month: 'Jan', revenue: 65000 },
-  { month: 'Feb', revenue: 59000 },
-  { month: 'Mar', revenue: 80000 },
-  { month: 'Apr', revenue: 81000 },
-  { month: 'May', revenue: 56000 },
-  { month: 'Jun', revenue: 55000 },
-  { month: 'Jul', revenue: 40000 },
-  { month: 'Aug', revenue: 70000 },
-  { month: 'Sep', revenue: 90000 },
-  { month: 'Oct', revenue: 95000 },
-  { month: 'Nov', revenue: 110000 },
-  { month: 'Dec', revenue: 120000 },
+  { month: "Jan", revenue: 65000 },
+  { month: "Feb", revenue: 59000 },
+  { month: "Mar", revenue: 80000 },
+  { month: "Apr", revenue: 81000 },
+  { month: "May", revenue: 56000 },
+  { month: "Jun", revenue: 55000 },
+  { month: "Jul", revenue: 40000 },
+  { month: "Aug", revenue: 70000 },
+  { month: "Sep", revenue: 90000 },
+  { month: "Oct", revenue: 95000 },
+  { month: "Nov", revenue: 110000 },
+  { month: "Dec", revenue: 120000 },
 ];
 
 const mockRevenueBySource = [
-  { name: 'Tuition Fees', value: 75 },
-  { name: 'Research Grants', value: 15 },
-  { name: 'Accommodation', value: 7 },
-  { name: 'Other Services', value: 3 },
+  { name: "Tuition Fees", value: 75 },
+  { name: "Research Grants", value: 15 },
+  { name: "Accommodation", value: 7 },
+  { name: "Other Services", value: 3 },
 ];
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const FinancialDashboard = () => {
   // Use auth guard to protect this page
-  useAuthGuard(['financial']);
+  useAuthGuard(["financial"]);
 
   // Simulate data loading with react-query
   const { data: stats, isLoading: isStatsLoading } = useQuery({
-    queryKey: ['financial-stats'],
-    queryFn: () => new Promise(resolve => setTimeout(() => resolve(mockFinancialStats), 1000)),
+    queryKey: ["financial-stats"],
+    queryFn: () =>
+      new Promise((resolve) =>
+        setTimeout(() => resolve(mockFinancialStats), 1000),
+      ),
   });
-  
+
   return (
     <div className="space-y-6">
-      <PageHeader 
-        title="Financial Dashboard" 
+      <PageHeader
+        title="Financial Dashboard"
         description="Overview of university financial metrics and operations"
       />
-      
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {isStatsLoading ? (
-          Array(4).fill(0).map((_, i) => (
-            <Card key={i} className="shadow-sm">
-              <CardContent className="p-6">
-                <Skeleton className="h-10 w-[80px] mb-2" />
-                <Skeleton className="h-6 w-[120px]" />
-              </CardContent>
-            </Card>
-          ))
+          Array(4)
+            .fill(0)
+            .map((_, i) => (
+              <Card key={i} className="shadow-sm">
+                <CardContent className="p-6">
+                  <Skeleton className="h-10 w-[80px] mb-2" />
+                  <Skeleton className="h-6 w-[120px]" />
+                </CardContent>
+              </Card>
+            ))
         ) : (
           <>
             <StatsCard
@@ -119,7 +123,7 @@ const FinancialDashboard = () => {
           </>
         )}
       </div>
-      
+
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="shadow-sm">
           <CardHeader>
@@ -139,11 +143,12 @@ const FinancialDashboard = () => {
                 >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
-                  <YAxis 
-                    tickFormatter={(value) => `$${value/1000}k`}
-                  />
-                  <RechartsTooltip 
-                    formatter={(value) => [`$${value.toLocaleString()}`, 'Revenue']}
+                  <YAxis tickFormatter={(value) => `$${value / 1000}k`} />
+                  <RechartsTooltip
+                    formatter={(value) => [
+                      `$${value.toLocaleString()}`,
+                      "Revenue",
+                    ]}
                   />
                   <Bar dataKey="revenue" fill="#8884d8" />
                 </BarChart>
@@ -151,7 +156,7 @@ const FinancialDashboard = () => {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card className="shadow-sm">
           <CardHeader>
             <CardTitle>Revenue by Source</CardTitle>
@@ -165,13 +170,18 @@ const FinancialDashboard = () => {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) =>
+                      `${name}: ${(percent * 100).toFixed(0)}%`
+                    }
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="value"
                   >
                     {mockRevenueBySource.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
                     ))}
                   </Pie>
                   <RechartsTooltip />
@@ -181,7 +191,7 @@ const FinancialDashboard = () => {
           </CardContent>
         </Card>
       </div>
-      
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card className="shadow-sm">
           <CardHeader>
@@ -211,7 +221,9 @@ const FinancialDashboard = () => {
                   </div>
                   <div>
                     <p className="text-sm font-medium">Accommodation Fee</p>
-                    <p className="text-xs text-muted-foreground">Emma Johnson</p>
+                    <p className="text-xs text-muted-foreground">
+                      Emma Johnson
+                    </p>
                   </div>
                 </div>
                 <div className="text-right">
@@ -237,7 +249,7 @@ const FinancialDashboard = () => {
             </ul>
           </CardContent>
         </Card>
-        
+
         <Card className="shadow-sm lg:col-span-2">
           <CardHeader>
             <CardTitle>Financial Alerts</CardTitle>
@@ -248,27 +260,40 @@ const FinancialDashboard = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-red-800">Overdue Payments</p>
-                    <p className="text-sm text-red-600">15 students have overdue payments exceeding 30 days</p>
+                    <p className="text-sm text-red-600">
+                      15 students have overdue payments exceeding 30 days
+                    </p>
                   </div>
-                  <span className="text-xs bg-red-200 text-red-800 px-2 py-1 rounded-full">High Priority</span>
+                  <span className="text-xs bg-red-200 text-red-800 px-2 py-1 rounded-full">
+                    High Priority
+                  </span>
                 </div>
               </li>
               <li className="rounded-md bg-amber-50 p-3 border-l-4 border-amber-500">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-amber-800">Budget Review</p>
-                    <p className="text-sm text-amber-600">Quarterly budget review meeting scheduled for 10/15/2023</p>
+                    <p className="text-sm text-amber-600">
+                      Quarterly budget review meeting scheduled for 10/15/2023
+                    </p>
                   </div>
-                  <span className="text-xs bg-amber-200 text-amber-800 px-2 py-1 rounded-full">Medium Priority</span>
+                  <span className="text-xs bg-amber-200 text-amber-800 px-2 py-1 rounded-full">
+                    Medium Priority
+                  </span>
                 </div>
               </li>
               <li className="rounded-md bg-blue-50 p-3 border-l-4 border-blue-500">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-blue-800">Grant Deadline</p>
-                    <p className="text-sm text-blue-600">Research grant application deadline is approaching (7 days remaining)</p>
+                    <p className="text-sm text-blue-600">
+                      Research grant application deadline is approaching (7 days
+                      remaining)
+                    </p>
                   </div>
-                  <span className="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded-full">Information</span>
+                  <span className="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded-full">
+                    Information
+                  </span>
                 </div>
               </li>
             </ul>

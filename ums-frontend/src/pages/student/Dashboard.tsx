@@ -1,103 +1,102 @@
-
-import { useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { useAuthGuard } from '@/hooks/useAuthGuard';
-import PageHeader from '@/components/PageHeader';
-import StatsCard from '@/components/StatsCard';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, Calendar, CreditCard, GraduationCap } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
+import { useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import PageHeader from "@/components/PageHeader";
+import StatsCard from "@/components/StatsCard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BookOpen, Calendar, CreditCard, GraduationCap } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 
 // Sample stats for student dashboard
 const studentStats = [
   {
-    title: 'Enrolled Courses',
-    value: '5',
+    title: "Enrolled Courses",
+    value: "5",
     icon: BookOpen,
-    iconColor: 'text-blue-600',
+    iconColor: "text-blue-600",
   },
   {
-    title: 'Upcoming Exams',
-    value: '3',
+    title: "Upcoming Exams",
+    value: "3",
     icon: Calendar,
-    iconColor: 'text-indigo-600',
+    iconColor: "text-indigo-600",
   },
   {
-    title: 'Current GPA',
-    value: '3.8',
+    title: "Current GPA",
+    value: "3.8",
     icon: GraduationCap,
-    iconColor: 'text-emerald-600',
+    iconColor: "text-emerald-600",
   },
   {
-    title: 'Payment Status',
-    value: 'Paid',
+    title: "Payment Status",
+    value: "Paid",
     icon: CreditCard,
-    iconColor: 'text-green-600',
+    iconColor: "text-green-600",
   },
 ];
 
 // Sample course progress data
 const courseProgress = [
   {
-    id: '1',
-    code: 'CS101',
-    name: 'Introduction to Computer Science',
+    id: "1",
+    code: "CS101",
+    name: "Introduction to Computer Science",
     progress: 85,
-    grade: 'A-',
+    grade: "A-",
   },
   {
-    id: '2',
-    code: 'MTH201',
-    name: 'Calculus II',
+    id: "2",
+    code: "MTH201",
+    name: "Calculus II",
     progress: 72,
-    grade: 'B+',
+    grade: "B+",
   },
   {
-    id: '3',
-    code: 'PHY105',
-    name: 'Physics for Scientists',
+    id: "3",
+    code: "PHY105",
+    name: "Physics for Scientists",
     progress: 90,
-    grade: 'A',
+    grade: "A",
   },
   {
-    id: '4',
-    code: 'ENG150',
-    name: 'Engineering Mechanics',
+    id: "4",
+    code: "ENG150",
+    name: "Engineering Mechanics",
     progress: 65,
-    grade: 'B',
+    grade: "B",
   },
   {
-    id: '5',
-    code: 'BUS200',
-    name: 'Business Economics',
+    id: "5",
+    code: "BUS200",
+    name: "Business Economics",
     progress: 78,
-    grade: 'B+',
+    grade: "B+",
   },
 ];
 
 const getGradeColor = (grade: string) => {
-  if (grade.startsWith('A')) return 'text-emerald-600';
-  if (grade.startsWith('B')) return 'text-blue-600';
-  if (grade.startsWith('C')) return 'text-amber-600';
-  return 'text-red-600';
+  if (grade.startsWith("A")) return "text-emerald-600";
+  if (grade.startsWith("B")) return "text-blue-600";
+  if (grade.startsWith("C")) return "text-amber-600";
+  return "text-red-600";
 };
 
 const StudentDashboard = () => {
   const { user } = useAuth();
-  useAuthGuard(['student']);
-  
+  useAuthGuard(["student"]);
+
   useEffect(() => {
     // This could fetch student dashboard data from an API
-    console.log('Student dashboard loaded');
+    console.log("Student dashboard loaded");
   }, []);
-  
+
   return (
     <div className="space-y-6">
-      <PageHeader 
+      <PageHeader
         title={`Welcome, ${user?.name}`}
         description="View your courses, grades, and upcoming events"
       />
-      
+
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {studentStats.map((stat, idx) => (
           <StatsCard
@@ -109,7 +108,7 @@ const StudentDashboard = () => {
           />
         ))}
       </div>
-      
+
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
@@ -121,7 +120,9 @@ const StudentDashboard = () => {
                 <div key={course.id} className="space-y-2">
                   <div className="flex justify-between">
                     <div>
-                      <p className="font-medium">{course.code}: {course.name}</p>
+                      <p className="font-medium">
+                        {course.code}: {course.name}
+                      </p>
                     </div>
                     <div className={getGradeColor(course.grade)}>
                       <p className="font-medium">{course.grade}</p>
@@ -129,14 +130,16 @@ const StudentDashboard = () => {
                   </div>
                   <div className="flex items-center gap-4">
                     <Progress value={course.progress} className="h-2" />
-                    <span className="text-sm font-medium">{course.progress}%</span>
+                    <span className="text-sm font-medium">
+                      {course.progress}%
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
-        
+
         <div className="grid gap-6">
           <Card>
             <CardHeader>
@@ -147,17 +150,23 @@ const StudentDashboard = () => {
                 <div className="flex items-center justify-between rounded-lg border p-3">
                   <div>
                     <p className="font-medium">CS101 Midterm Exam</p>
-                    <p className="text-xs text-muted-foreground">Hall A, Building 2</p>
+                    <p className="text-xs text-muted-foreground">
+                      Hall A, Building 2
+                    </p>
                   </div>
                   <div className="text-right">
                     <p className="font-medium">Oct 12, 2023</p>
-                    <p className="text-xs text-muted-foreground">9:00 AM - 11:00 AM</p>
+                    <p className="text-xs text-muted-foreground">
+                      9:00 AM - 11:00 AM
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center justify-between rounded-lg border p-3">
                   <div>
                     <p className="font-medium">MTH201 Assignment Due</p>
-                    <p className="text-xs text-muted-foreground">Submit online</p>
+                    <p className="text-xs text-muted-foreground">
+                      Submit online
+                    </p>
                   </div>
                   <div className="text-right">
                     <p className="font-medium">Oct 15, 2023</p>
@@ -171,13 +180,15 @@ const StudentDashboard = () => {
                   </div>
                   <div className="text-right">
                     <p className="font-medium">Oct 18, 2023</p>
-                    <p className="text-xs text-muted-foreground">2:00 PM - 4:00 PM</p>
+                    <p className="text-xs text-muted-foreground">
+                      2:00 PM - 4:00 PM
+                    </p>
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Payment Information</CardTitle>

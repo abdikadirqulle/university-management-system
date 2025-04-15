@@ -1,6 +1,6 @@
-import { useAuth } from "@/context/AuthContext"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+import { useAuth } from "@/context/AuthContext";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,13 +8,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Bell, LogOut, Settings, User } from "lucide-react"
-import { Link } from "react-router-dom"
-import { SidebarTrigger } from "@/components/ui/sidebar"
+} from "@/components/ui/dropdown-menu";
+import { Bell, LogOut, Settings, User } from "lucide-react";
+import { Link } from "react-router-dom";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 const Header = () => {
-  const { user, logout } = useAuth()
+  const { user, logout } = useAuth();
 
   return (
     <header className="border-b bg-card px-6 py-3">
@@ -76,7 +76,7 @@ const Header = () => {
         </div>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

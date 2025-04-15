@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -42,7 +41,12 @@ export function LandingNav() {
                 {item.name}
               </a>
             ))}
-            <Button asChild size="sm" variant="outline" className="text-white border-white/20 bg-white/5 hover:bg-white/10">
+            <Button
+              asChild
+              size="sm"
+              variant="outline"
+              className="text-white border-white/20 bg-white/5 hover:bg-white/10"
+            >
               <Link to="/login">Log In</Link>
             </Button>
             <Button asChild size="sm">
@@ -72,7 +76,11 @@ export function LandingNav() {
                   </a>
                 ))}
                 <div className="flex flex-col gap-3 mt-4">
-                  <Button asChild variant="outline" className="border-white/20 bg-white/5 hover:bg-white/10">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="border-white/20 bg-white/5 hover:bg-white/10"
+                  >
                     <Link to="/login" onClick={closeMenu}>
                       Log In
                     </Link>

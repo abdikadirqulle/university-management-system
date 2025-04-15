@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { toast } from "sonner"
-import { useQuery } from "@tanstack/react-query"
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 import {
   Table,
   TableBody,
@@ -11,8 +11,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -21,7 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -29,18 +29,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Search, Plus, Edit, Trash2 } from "lucide-react"
-import PageHeader from "@/components/PageHeader"
-import { useAuthGuard } from "@/hooks/useAuthGuard"
+} from "@/components/ui/select";
+import { Search, Plus, Edit, Trash2 } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 
 // Sample data
 const FACULTIES = [
@@ -48,7 +48,7 @@ const FACULTIES = [
   { id: "2", name: "Science" },
   { id: "3", name: "Arts" },
   { id: "4", name: "Business" },
-]
+];
 
 const DEPARTMENTS = {
   "1": [
@@ -71,7 +71,7 @@ const DEPARTMENTS = {
     { id: "402", name: "Finance" },
     { id: "403", name: "Management" },
   ],
-}
+};
 
 // Define the form schema with Zod
 const enrollmentSchema = z.object({
@@ -81,30 +81,30 @@ const enrollmentSchema = z.object({
   department: z.string().min(1, "Department is required"),
   session: z.string().min(1, "Session is required"),
   class: z.string().min(1, "Class is required"),
-})
+});
 
-type EnrollmentFormValues = z.infer<typeof enrollmentSchema>
+type EnrollmentFormValues = z.infer<typeof enrollmentSchema>;
 
 // Student type
 interface Student {
-  id: string
-  studentId: string
-  studentName: string
-  faculty: string
-  department: string
-  session: string
-  class: string
+  id: string;
+  studentId: string;
+  studentName: string;
+  faculty: string;
+  department: string;
+  session: string;
+  class: string;
 }
 
 const StudentEnrollment = () => {
-  useAuthGuard(["admission"])
+  useAuthGuard(["admission"]);
 
-  const [students, setStudents] = useState<Student[]>([])
-  const [selectedFaculty, setSelectedFaculty] = useState<string>("")
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [isEditing, setIsEditing] = useState(false)
-  const [currentStudent, setCurrentStudent] = useState<Student | null>(null)
-  const [searchTerm, setSearchTerm] = useState("")
+  const [students, setStudents] = useState<Student[]>([]);
+  const [selectedFaculty, setSelectedFaculty] = useState<string>("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentStudent, setCurrentStudent] = useState<Student | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Setup form
   const form = useForm<EnrollmentFormValues>({
@@ -117,7 +117,7 @@ const StudentEnrollment = () => {
       session: "",
       class: "",
     },
-  })
+  });
 
   // Load sample data
   useEffect(() => {
@@ -150,9 +150,9 @@ const StudentEnrollment = () => {
         session: "2023-2024",
         class: "Year 3",
       },
-    ]
-    setStudents(sampleStudents)
-  }, [])
+    ];
+    setStudents(sampleStudents);
+  }, []);
 
   // Handle form submission
   const onSubmit = (data: EnrollmentFormValues) => {
@@ -160,45 +160,45 @@ const StudentEnrollment = () => {
       // Update existing student
       setStudents((prev) =>
         prev.map((student) =>
-          student.id === currentStudent.id ? { ...student, ...data } : student
-        )
-      )
-      toast.success("Student updated successfully")
+          student.id === currentStudent.id ? { ...student, ...data } : student,
+        ),
+      );
+      toast.success("Student updated successfully");
     } else {
       // Add new student
       const newStudent: Student = {
         id: Date.now().toString(),
         ...data,
-      }
-      setStudents((prev) => [...prev, newStudent])
-      toast.success("Student enrolled successfully")
+      };
+      setStudents((prev) => [...prev, newStudent]);
+      toast.success("Student enrolled successfully");
     }
-    setIsDialogOpen(false)
-    resetForm()
-  }
+    setIsDialogOpen(false);
+    resetForm();
+  };
 
   // Reset form and editing state
   const resetForm = () => {
-    form.reset()
-    setIsEditing(false)
-    setCurrentStudent(null)
-    setSelectedFaculty("")
-  }
+    form.reset();
+    setIsEditing(false);
+    setCurrentStudent(null);
+    setSelectedFaculty("");
+  };
 
   // Filter departments based on selected faculty
   const filteredDepartments = selectedFaculty
     ? DEPARTMENTS[selectedFaculty as keyof typeof DEPARTMENTS] || []
-    : []
+    : [];
 
   // Handle editing a student
   const handleEdit = (student: Student) => {
-    setCurrentStudent(student)
-    setIsEditing(true)
+    setCurrentStudent(student);
+    setIsEditing(true);
 
     // Find faculty ID by name
-    const faculty = FACULTIES.find((f) => f.name === student.faculty)
+    const faculty = FACULTIES.find((f) => f.name === student.faculty);
     if (faculty) {
-      setSelectedFaculty(faculty.id)
+      setSelectedFaculty(faculty.id);
     }
 
     form.reset({
@@ -211,23 +211,23 @@ const StudentEnrollment = () => {
           .find((d) => d.name === student.department)?.id || "",
       session: student.session,
       class: student.class,
-    })
+    });
 
-    setIsDialogOpen(true)
-  }
+    setIsDialogOpen(true);
+  };
 
   // Handle deleting a student
   const handleDelete = (id: string) => {
-    setStudents((prev) => prev.filter((student) => student.id !== id))
-    toast.success("Student removed successfully")
-  }
+    setStudents((prev) => prev.filter((student) => student.id !== id));
+    toast.success("Student removed successfully");
+  };
 
   // Filter students based on search term
   const filteredStudents = students.filter(
     (student) =>
       student.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.studentId.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+      student.studentId.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   return (
     <div className="space-y-6">
@@ -238,8 +238,8 @@ const StudentEnrollment = () => {
           label: "Enroll Student",
           icon: Plus,
           onClick: () => {
-            resetForm()
-            setIsDialogOpen(true)
+            resetForm();
+            setIsDialogOpen(true);
           },
         }}
       />
@@ -370,9 +370,9 @@ const StudentEnrollment = () => {
                       <FormLabel>Faculty</FormLabel>
                       <Select
                         onValueChange={(value) => {
-                          field.onChange(value)
-                          setSelectedFaculty(value)
-                          form.setValue("department", "") // Reset department when faculty changes
+                          field.onChange(value);
+                          setSelectedFaculty(value);
+                          form.setValue("department", ""); // Reset department when faculty changes
                         }}
                         value={field.value}
                       >
@@ -470,8 +470,8 @@ const StudentEnrollment = () => {
                   type="button"
                   variant="outline"
                   onClick={() => {
-                    setIsDialogOpen(false)
-                    resetForm()
+                    setIsDialogOpen(false);
+                    resetForm();
                   }}
                 >
                   Cancel
@@ -485,7 +485,7 @@ const StudentEnrollment = () => {
         </DialogContent>
       </Dialog>
     </div>
-  )
-}
+  );
+};
 
-export default StudentEnrollment
+export default StudentEnrollment;

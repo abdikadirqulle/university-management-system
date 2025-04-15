@@ -1,13 +1,13 @@
-import React, { createContext, useContext, useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { toast } from "sonner"
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import {
   AuthContextType,
   AuthState,
   LoginCredentials,
   User,
-} from "../types/auth"
-import { api } from "../services/api"
+} from "../types/auth";
+import { api } from "../services/api";
 
 // This would normally come from a real API
 const mockUsers = {
@@ -38,7 +38,7 @@ const mockUsers = {
     role: "financial",
     studentId: "FN001",
   },
-} as const
+} as const;
 
 const initialAuthState: AuthState = {
   user: null,
@@ -46,17 +46,17 @@ const initialAuthState: AuthState = {
   isAuthenticated: false,
   isLoading: false,
   error: null,
-}
+};
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [authState, setAuthState] = useState<AuthState>(() => {
     // Check if token and user exist in local storage
-    const token = localStorage.getItem("token")
-    const user = localStorage.getItem("user")
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
 
     if (token && user) {
       return {
@@ -65,25 +65,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         isAuthenticated: true,
         isLoading: false,
         error: null,
-      }
+      };
     }
 
-    return initialAuthState
-  })
+    return initialAuthState;
+  });
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // When auth state changes, set API auth header
   useEffect(() => {
     if (authState?.token) {
-      api.defaults.headers.common["Authorization"] = `Bearer ${authState.token}`
+      api.defaults.headers.common["Authorization"] =
+        `Bearer ${authState.token}`;
     } else {
-      delete api.defaults.headers.common["Authorization"]
+      delete api.defaults.headers.common["Authorization"];
     }
-  }, [authState.token])
+  }, [authState.token]);
 
   const login = async (credentials: LoginCredentials): Promise<void> => {
-    setAuthState((prev) => ({ ...prev, isLoading: true, error: null }))
+    setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
       // For the demo, we'll use mock data instead of a real API call
@@ -91,43 +92,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // const response = await api.post('/auth/login', credentials);
 
       // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Mock authentication logic - in a real app this would come from your API
-      let user: User | null = null
-      let token = null
+      let user: User | null = null;
+      let token = null;
 
       if (
         credentials.email === "admin@university.edu" &&
         credentials.password === "password"
       ) {
-        user = mockUsers.academic as User
-        token = "mock-token-academic"
+        user = mockUsers.academic as User;
+        token = "mock-token-academic";
       } else if (
         credentials.email === "admission@university.edu" &&
         credentials.password === "password"
       ) {
-        user = mockUsers.admission as User
-        token = "mock-token-admission"
+        user = mockUsers.admission as User;
+        token = "mock-token-admission";
       } else if (
         credentials.email === "student@university.edu" &&
         credentials.password === "password"
       ) {
-        user = mockUsers.student as User
-        token = "mock-token-student"
+        user = mockUsers.student as User;
+        token = "mock-token-student";
       } else if (
         credentials.email === "financial@university.edu" &&
         credentials.password === "password"
       ) {
-        user = mockUsers.financial as User
-        token = "mock-token-financial"
+        user = mockUsers.financial as User;
+        token = "mock-token-financial";
       } else {
-        throw new Error("Invalid credentials")
+        throw new Error("Invalid credentials");
       }
 
       // Save to local storage
-      localStorage.setItem("token", token)
-      localStorage.setItem("user", JSON.stringify(user))
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
       setAuthState({
         user,
@@ -135,68 +136,68 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         isAuthenticated: true,
         isLoading: false,
         error: null,
-      })
+      });
 
       // Navigate based on role
       if (user.role === "academic") {
-        navigate("/admin/dashboard")
+        navigate("/admin/dashboard");
       } else if (user.role === "admission") {
-        navigate("/admission/dashboard")
+        navigate("/admission/dashboard");
       } else if (user.role === "student") {
-        navigate("/student/dashboard")
+        navigate("/student/dashboard");
       } else if (user.role === "financial") {
-        navigate("/financial/dashboard")
+        navigate("/financial/dashboard");
       }
 
-      toast.success(`Welcome back, ${user.name}!`)
+      toast.success(`Welcome back, ${user.name}!`);
     } catch (error) {
-      let errorMessage = "An error occurred during login"
+      let errorMessage = "An error occurred during login";
 
       if (error instanceof Error) {
-        errorMessage = error.message
+        errorMessage = error.message;
       }
 
       setAuthState((prev) => ({
         ...prev,
         isLoading: false,
         error: errorMessage,
-      }))
+      }));
 
-      toast.error(errorMessage)
+      toast.error(errorMessage);
     }
-  }
+  };
 
   const logout = (): void => {
     // Clear local storage
-    localStorage.removeItem("token")
-    localStorage.removeItem("user")
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
 
     // Reset auth state
-    setAuthState(initialAuthState)
+    setAuthState(initialAuthState);
 
     // Navigate to login
-    navigate("/login")
+    navigate("/login");
 
-    toast.success("Logged out successfully")
-  }
+    toast.success("Logged out successfully");
+  };
 
   const clearError = (): void => {
-    setAuthState((prev) => ({ ...prev, error: null }))
-  }
+    setAuthState((prev) => ({ ...prev, error: null }));
+  };
 
   return (
     <AuthContext.Provider value={{ ...authState, login, logout, clearError }}>
       {children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
 
 export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext)
+  const context = useContext(AuthContext);
 
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
+    throw new Error("useAuth must be used within an AuthProvider");
   }
 
-  return context
-}
+  return context;
+};

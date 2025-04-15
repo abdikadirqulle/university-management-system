@@ -1,49 +1,48 @@
-
-import { BrowserRouter, Routes, Route } from "react-router-dom"
-import { Toaster } from "@/components/ui/toaster"
-import { Toaster as Sonner } from "@/components/ui/sonner"
-import { TooltipProvider } from "@/components/ui/tooltip"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { AuthProvider } from "./context/AuthContext"
-import { Analytics } from "@vercel/analytics/react"
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider } from "./context/AuthContext";
+import { Analytics } from "@vercel/analytics/react";
 
 // Layouts
-import AuthLayout from "./layouts/AuthLayout"
-import AppLayout from "./layouts/AppLayout"
+import AuthLayout from "./layouts/AuthLayout";
+import AppLayout from "./layouts/AppLayout";
 
 // Auth Pages
-import LoginPage from "./pages/auth/LoginPage"
+import LoginPage from "./pages/auth/LoginPage";
 
 // Admin Pages
-import AdminDashboard from "./pages/admin/Dashboard"
-import UsersPage from "./pages/admin/Users"
-import FacultiesPage from "./pages/admin/Faculties"
-import CoursesPage from "./pages/admin/Courses"
-import DepartmentsPage from "./pages/admin/Departments"
-import ReportsPage from "./pages/admin/Reports"
-import SettingsPage from "./pages/admin/Settings"
-import CalendarPage from "./pages/admin/Calendar"
+import AdminDashboard from "./pages/admin/Dashboard";
+import UsersPage from "./pages/admin/Users";
+import FacultiesPage from "./pages/admin/Faculties";
+import CoursesPage from "./pages/admin/Courses";
+import DepartmentsPage from "./pages/admin/Departments";
+import ReportsPage from "./pages/admin/Reports";
+import SettingsPage from "./pages/admin/Settings";
+import CalendarPage from "./pages/admin/Calendar";
 
 // admission Pages
-import AdmissionDashboard from "./pages/admission/Dashboard"
-import StudentEnrollment from "./pages/admission/StudentEnrollment"
-import StudentAdmission from "./pages/admission/StudentAdmission"
-import StudentManager from "./pages/admission/StudentManager"
-import AdmissionSettings from "./pages/admission/Settings"
+import AdmissionDashboard from "./pages/admission/Dashboard";
+import StudentEnrollment from "./pages/admission/StudentEnrollment";
+import StudentAdmission from "./pages/admission/StudentAdmission";
+import StudentManager from "./pages/admission/StudentManager";
+import AdmissionSettings from "./pages/admission/Settings";
 
 // Student Pages
-import StudentDashboard from "./pages/student/Dashboard"
+import StudentDashboard from "./pages/student/Dashboard";
 
 // Financial Admin Pages
-import FinancialDashboard from "./pages/financial/Dashboard"
-import PaymentsPage from "./pages/financial/Payments"
-import BudgetPage from "./pages/financial/Budget"
-import FinancialReportsPage from "./pages/financial/Reports"
-import FinancialSettingsPage from "./pages/financial/Settings"
+import FinancialDashboard from "./pages/financial/Dashboard";
+import PaymentsPage from "./pages/financial/Payments";
+import BudgetPage from "./pages/financial/Budget";
+import FinancialReportsPage from "./pages/financial/Reports";
+import FinancialSettingsPage from "./pages/financial/Settings";
 
 // Not Found
-import NotFound from "./pages/NotFound"
-import Index from "./pages/Index"
+import NotFound from "./pages/NotFound";
+import Index from "./pages/Index";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -53,7 +52,7 @@ const queryClient = new QueryClient({
       retry: 1,
     },
   },
-})
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -118,6 +117,6 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
-)
+);
 
-export default App
+export default App;

@@ -1,13 +1,18 @@
-
-import { useState } from 'react';
-import PageHeader from '@/components/PageHeader';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
-import { 
+import { useState } from "react";
+import PageHeader from "@/components/PageHeader";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import {
   Form,
   FormControl,
   FormDescription,
@@ -15,39 +20,39 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { 
+} from "@/components/ui/form";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { toast } from 'sonner';
-import { 
-  Bell, 
-  Mail, 
-  Shield, 
-  User, 
-  Building, 
+} from "@/components/ui/select";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { toast } from "sonner";
+import {
+  Bell,
+  Mail,
+  Shield,
+  User,
+  Building,
   Settings as SettingsIcon,
   Save,
-} from 'lucide-react';
+} from "lucide-react";
 
 // University settings form schema
 const universityFormSchema = z.object({
-  name: z.string().min(2, { message: 'University name is required' }),
-  address: z.string().min(5, { message: 'Address is required' }),
-  city: z.string().min(2, { message: 'City is required' }),
-  state: z.string().min(2, { message: 'State is required' }),
-  country: z.string().min(2, { message: 'Country is required' }),
-  zipCode: z.string().min(1, { message: 'Zip code is required' }),
-  phone: z.string().min(5, { message: 'Phone is required' }),
-  email: z.string().email({ message: 'Please enter a valid email address' }),
-  website: z.string().url({ message: 'Please enter a valid URL' }),
+  name: z.string().min(2, { message: "University name is required" }),
+  address: z.string().min(5, { message: "Address is required" }),
+  city: z.string().min(2, { message: "City is required" }),
+  state: z.string().min(2, { message: "State is required" }),
+  country: z.string().min(2, { message: "Country is required" }),
+  zipCode: z.string().min(1, { message: "Zip code is required" }),
+  phone: z.string().min(5, { message: "Phone is required" }),
+  email: z.string().email({ message: "Please enter a valid email address" }),
+  website: z.string().url({ message: "Please enter a valid URL" }),
 });
 
 // Notifications settings form schema
@@ -81,15 +86,15 @@ const SettingsPage = () => {
   const universityForm = useForm<z.infer<typeof universityFormSchema>>({
     resolver: zodResolver(universityFormSchema),
     defaultValues: {
-      name: 'University of Knowledge',
-      address: '123 University Lane',
-      city: 'Academic City',
-      state: 'Learning State',
-      country: 'Education Nation',
-      zipCode: '12345',
-      phone: '123-456-7890',
-      email: 'admin@university.edu',
-      website: 'https://www.university.edu',
+      name: "University of Knowledge",
+      address: "123 University Lane",
+      city: "Academic City",
+      state: "Learning State",
+      country: "Education Nation",
+      zipCode: "12345",
+      phone: "123-456-7890",
+      email: "admin@university.edu",
+      website: "https://www.university.edu",
     },
   });
 
@@ -110,10 +115,10 @@ const SettingsPage = () => {
   const securityForm = useForm<z.infer<typeof securityFormSchema>>({
     resolver: zodResolver(securityFormSchema),
     defaultValues: {
-      passwordExpiry: '90',
+      passwordExpiry: "90",
       twoFactorAuth: false,
-      loginAttempts: '5',
-      sessionTimeout: '30',
+      loginAttempts: "5",
+      sessionTimeout: "30",
     },
   });
 
@@ -121,32 +126,34 @@ const SettingsPage = () => {
   const systemForm = useForm<z.infer<typeof systemFormSchema>>({
     resolver: zodResolver(systemFormSchema),
     defaultValues: {
-      theme: 'light',
-      language: 'en',
-      timezone: 'UTC',
-      dateFormat: 'MM/DD/YYYY',
+      theme: "light",
+      language: "en",
+      timezone: "UTC",
+      dateFormat: "MM/DD/YYYY",
     },
   });
 
   // Form submission handlers
   const onUniversitySubmit = (data: z.infer<typeof universityFormSchema>) => {
-    console.log('University settings:', data);
-    toast.success('University information saved successfully');
+    console.log("University settings:", data);
+    toast.success("University information saved successfully");
   };
 
-  const onNotificationSubmit = (data: z.infer<typeof notificationFormSchema>) => {
-    console.log('Notification settings:', data);
-    toast.success('Notification settings saved successfully');
+  const onNotificationSubmit = (
+    data: z.infer<typeof notificationFormSchema>,
+  ) => {
+    console.log("Notification settings:", data);
+    toast.success("Notification settings saved successfully");
   };
 
   const onSecuritySubmit = (data: z.infer<typeof securityFormSchema>) => {
-    console.log('Security settings:', data);
-    toast.success('Security settings saved successfully');
+    console.log("Security settings:", data);
+    toast.success("Security settings saved successfully");
   };
 
   const onSystemSubmit = (data: z.infer<typeof systemFormSchema>) => {
-    console.log('System settings:', data);
-    toast.success('System settings saved successfully');
+    console.log("System settings:", data);
+    toast.success("System settings saved successfully");
   };
 
   return (
@@ -162,7 +169,10 @@ const SettingsPage = () => {
             <Building className="h-4 w-4" />
             <span>University</span>
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex gap-2 items-center">
+          <TabsTrigger
+            value="notifications"
+            className="flex gap-2 items-center"
+          >
             <Bell className="h-4 w-4" />
             <span>Notifications</span>
           </TabsTrigger>
@@ -175,18 +185,22 @@ const SettingsPage = () => {
             <span>System</span>
           </TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="university">
           <Card>
             <CardHeader>
               <CardTitle>University Information</CardTitle>
               <CardDescription>
-                Manage basic university information that appears throughout the system
+                Manage basic university information that appears throughout the
+                system
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...universityForm}>
-                <form onSubmit={universityForm.handleSubmit(onUniversitySubmit)} className="space-y-6">
+                <form
+                  onSubmit={universityForm.handleSubmit(onUniversitySubmit)}
+                  className="space-y-6"
+                >
                   <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <FormField
                       control={universityForm.control}
@@ -201,7 +215,7 @@ const SettingsPage = () => {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={universityForm.control}
                       name="website"
@@ -215,7 +229,7 @@ const SettingsPage = () => {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={universityForm.control}
                       name="address"
@@ -229,7 +243,7 @@ const SettingsPage = () => {
                         </FormItem>
                       )}
                     />
-                    
+
                     <div className="grid grid-cols-2 gap-4">
                       <FormField
                         control={universityForm.control}
@@ -244,7 +258,7 @@ const SettingsPage = () => {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={universityForm.control}
                         name="state"
@@ -259,7 +273,7 @@ const SettingsPage = () => {
                         )}
                       />
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-4">
                       <FormField
                         control={universityForm.control}
@@ -274,7 +288,7 @@ const SettingsPage = () => {
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={universityForm.control}
                         name="zipCode"
@@ -289,7 +303,7 @@ const SettingsPage = () => {
                         )}
                       />
                     </div>
-                    
+
                     <FormField
                       control={universityForm.control}
                       name="phone"
@@ -303,7 +317,7 @@ const SettingsPage = () => {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={universityForm.control}
                       name="email"
@@ -318,7 +332,7 @@ const SettingsPage = () => {
                       )}
                     />
                   </div>
-                  
+
                   <Button type="submit" className="flex items-center gap-2">
                     <Save className="h-4 w-4" />
                     Save Changes
@@ -328,7 +342,7 @@ const SettingsPage = () => {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="notifications">
           <Card>
             <CardHeader>
@@ -339,10 +353,15 @@ const SettingsPage = () => {
             </CardHeader>
             <CardContent>
               <Form {...notificationForm}>
-                <form onSubmit={notificationForm.handleSubmit(onNotificationSubmit)} className="space-y-6">
+                <form
+                  onSubmit={notificationForm.handleSubmit(onNotificationSubmit)}
+                  className="space-y-6"
+                >
                   <div className="space-y-4">
                     <div className="border rounded-md p-4">
-                      <h3 className="text-lg font-medium mb-2">Notification Methods</h3>
+                      <h3 className="text-lg font-medium mb-2">
+                        Notification Methods
+                      </h3>
                       <div className="space-y-4">
                         <FormField
                           control={notificationForm.control}
@@ -356,15 +375,15 @@ const SettingsPage = () => {
                                 </FormDescription>
                               </div>
                               <FormControl>
-                                <Switch 
-                                  checked={field.value} 
-                                  onCheckedChange={field.onChange} 
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
                                 />
                               </FormControl>
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={notificationForm.control}
                           name="smsNotifications"
@@ -377,9 +396,9 @@ const SettingsPage = () => {
                                 </FormDescription>
                               </div>
                               <FormControl>
-                                <Switch 
-                                  checked={field.value} 
-                                  onCheckedChange={field.onChange} 
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
                                 />
                               </FormControl>
                             </FormItem>
@@ -387,9 +406,11 @@ const SettingsPage = () => {
                         />
                       </div>
                     </div>
-                    
+
                     <div className="border rounded-md p-4">
-                      <h3 className="text-lg font-medium mb-2">Notification Events</h3>
+                      <h3 className="text-lg font-medium mb-2">
+                        Notification Events
+                      </h3>
                       <div className="space-y-4">
                         <FormField
                           control={notificationForm.control}
@@ -403,15 +424,15 @@ const SettingsPage = () => {
                                 </FormDescription>
                               </div>
                               <FormControl>
-                                <Switch 
-                                  checked={field.value} 
-                                  onCheckedChange={field.onChange} 
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
                                 />
                               </FormControl>
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={notificationForm.control}
                           name="gradingNotify"
@@ -424,15 +445,15 @@ const SettingsPage = () => {
                                 </FormDescription>
                               </div>
                               <FormControl>
-                                <Switch 
-                                  checked={field.value} 
-                                  onCheckedChange={field.onChange} 
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
                                 />
                               </FormControl>
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={notificationForm.control}
                           name="paymentNotify"
@@ -445,15 +466,15 @@ const SettingsPage = () => {
                                 </FormDescription>
                               </div>
                               <FormControl>
-                                <Switch 
-                                  checked={field.value} 
-                                  onCheckedChange={field.onChange} 
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
                                 />
                               </FormControl>
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={notificationForm.control}
                           name="maintenanceNotify"
@@ -466,9 +487,9 @@ const SettingsPage = () => {
                                 </FormDescription>
                               </div>
                               <FormControl>
-                                <Switch 
-                                  checked={field.value} 
-                                  onCheckedChange={field.onChange} 
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
                                 />
                               </FormControl>
                             </FormItem>
@@ -477,7 +498,7 @@ const SettingsPage = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <Button type="submit" className="flex items-center gap-2">
                     <Save className="h-4 w-4" />
                     Save Notification Settings
@@ -487,7 +508,7 @@ const SettingsPage = () => {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="security">
           <Card>
             <CardHeader>
@@ -498,7 +519,10 @@ const SettingsPage = () => {
             </CardHeader>
             <CardContent>
               <Form {...securityForm}>
-                <form onSubmit={securityForm.handleSubmit(onSecuritySubmit)} className="space-y-6">
+                <form
+                  onSubmit={securityForm.handleSubmit(onSecuritySubmit)}
+                  className="space-y-6"
+                >
                   <div className="space-y-4">
                     <FormField
                       control={securityForm.control}
@@ -510,13 +534,14 @@ const SettingsPage = () => {
                             <Input {...field} type="number" min="0" />
                           </FormControl>
                           <FormDescription>
-                            How often users need to change their password (0 for never)
+                            How often users need to change their password (0 for
+                            never)
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={securityForm.control}
                       name="twoFactorAuth"
@@ -529,15 +554,15 @@ const SettingsPage = () => {
                             </FormDescription>
                           </div>
                           <FormControl>
-                            <Switch 
-                              checked={field.value} 
-                              onCheckedChange={field.onChange} 
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
                             />
                           </FormControl>
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={securityForm.control}
                       name="loginAttempts"
@@ -548,13 +573,14 @@ const SettingsPage = () => {
                             <Input {...field} type="number" min="1" />
                           </FormControl>
                           <FormDescription>
-                            Number of failed login attempts before account lockout
+                            Number of failed login attempts before account
+                            lockout
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={securityForm.control}
                       name="sessionTimeout"
@@ -572,7 +598,7 @@ const SettingsPage = () => {
                       )}
                     />
                   </div>
-                  
+
                   <Button type="submit" className="flex items-center gap-2">
                     <Save className="h-4 w-4" />
                     Save Security Settings
@@ -582,7 +608,7 @@ const SettingsPage = () => {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="system">
           <Card>
             <CardHeader>
@@ -593,7 +619,10 @@ const SettingsPage = () => {
             </CardHeader>
             <CardContent>
               <Form {...systemForm}>
-                <form onSubmit={systemForm.handleSubmit(onSystemSubmit)} className="space-y-6">
+                <form
+                  onSubmit={systemForm.handleSubmit(onSystemSubmit)}
+                  className="space-y-6"
+                >
                   <div className="grid gap-6 md:grid-cols-2">
                     <FormField
                       control={systemForm.control}
@@ -601,8 +630,8 @@ const SettingsPage = () => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Theme</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
+                          <Select
+                            onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
                             <FormControl>
@@ -623,15 +652,15 @@ const SettingsPage = () => {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={systemForm.control}
                       name="language"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Language</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
+                          <Select
+                            onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
                             <FormControl>
@@ -654,15 +683,15 @@ const SettingsPage = () => {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={systemForm.control}
                       name="timezone"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Timezone</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
+                          <Select
+                            onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
                             <FormControl>
@@ -674,7 +703,9 @@ const SettingsPage = () => {
                               <SelectItem value="UTC">UTC</SelectItem>
                               <SelectItem value="EST">Eastern (EST)</SelectItem>
                               <SelectItem value="CST">Central (CST)</SelectItem>
-                              <SelectItem value="MST">Mountain (MST)</SelectItem>
+                              <SelectItem value="MST">
+                                Mountain (MST)
+                              </SelectItem>
                               <SelectItem value="PST">Pacific (PST)</SelectItem>
                             </SelectContent>
                           </Select>
@@ -685,15 +716,15 @@ const SettingsPage = () => {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={systemForm.control}
                       name="dateFormat"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Date Format</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
+                          <Select
+                            onValueChange={field.onChange}
                             defaultValue={field.value}
                           >
                             <FormControl>
@@ -702,9 +733,15 @@ const SettingsPage = () => {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
-                              <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
-                              <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
+                              <SelectItem value="MM/DD/YYYY">
+                                MM/DD/YYYY
+                              </SelectItem>
+                              <SelectItem value="DD/MM/YYYY">
+                                DD/MM/YYYY
+                              </SelectItem>
+                              <SelectItem value="YYYY-MM-DD">
+                                YYYY-MM-DD
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                           <FormDescription>
@@ -715,7 +752,7 @@ const SettingsPage = () => {
                       )}
                     />
                   </div>
-                  
+
                   <Button type="submit" className="flex items-center gap-2">
                     <Save className="h-4 w-4" />
                     Save System Settings

@@ -1,16 +1,16 @@
-import { useState } from "react"
-import PageHeader from "@/components/PageHeader"
+import { useState } from "react";
+import PageHeader from "@/components/PageHeader";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
@@ -19,16 +19,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
+} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { DataTable } from "@/components/DataTable"
-import { ColumnDef } from "@tanstack/react-table"
+} from "@/components/ui/select";
+import { DataTable } from "@/components/DataTable";
+import { ColumnDef } from "@tanstack/react-table";
 import {
   Plus,
   Edit,
@@ -36,11 +36,11 @@ import {
   Download,
   Calendar as CalendarIcon,
   Filter,
-} from "lucide-react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { toast } from "sonner"
+} from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -48,28 +48,28 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { format } from "date-fns"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import { Textarea } from "@/components/ui/textarea";
 
 // Define event types for the calendar
-type EventType = "academic" | "exam" | "holiday" | "registration"
+type EventType = "academic" | "exam" | "holiday" | "registration";
 
 // Define the CalendarEvent interface
 interface CalendarEvent {
-  id: string
-  title: string
-  startDate: Date
-  endDate: Date
-  type: EventType
-  description: string
-  academicYear: string
-  semester: string
+  id: string;
+  title: string;
+  startDate: Date;
+  endDate: Date;
+  type: EventType;
+  description: string;
+  academicYear: string;
+  semester: string;
 }
 
 // Sample data
@@ -124,12 +124,12 @@ const initialEvents: CalendarEvent[] = [
     academicYear: "2023-2024",
     semester: "Spring",
   },
-]
+];
 
 // Formatter for table dates
 const formatDate = (date: Date) => {
-  return format(date, "MMM d, yyyy")
-}
+  return format(date, "MMM d, yyyy");
+};
 
 // Define form schema for calendar events
 const eventFormSchema = z.object({
@@ -142,18 +142,18 @@ const eventFormSchema = z.object({
     .min(5, { message: "Description must be at least 5 characters" }),
   academicYear: z.string().min(2, { message: "Academic year is required" }),
   semester: z.string().min(2, { message: "Semester is required" }),
-})
+});
 
-type EventFormValues = z.infer<typeof eventFormSchema>
+type EventFormValues = z.infer<typeof eventFormSchema>;
 
 const CalendarPage = () => {
-  const [events, setEvents] = useState<CalendarEvent[]>(initialEvents)
-  const [isOpen, setIsOpen] = useState(false)
-  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null)
-  const [filterYear, setFilterYear] = useState("all")
-  const [filterSemester, setFilterSemester] = useState("all")
-  const [filterType, setFilterType] = useState("all")
-  const [date, setDate] = useState<Date>(new Date())
+  const [events, setEvents] = useState<CalendarEvent[]>(initialEvents);
+  const [isOpen, setIsOpen] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
+  const [filterYear, setFilterYear] = useState("all");
+  const [filterSemester, setFilterSemester] = useState("all");
+  const [filterType, setFilterType] = useState("all");
+  const [date, setDate] = useState<Date>(new Date());
 
   // Setup form
   const form = useForm<EventFormValues>({
@@ -167,41 +167,41 @@ const CalendarPage = () => {
       academicYear: "2023-2024",
       semester: "Fall",
     },
-  })
+  });
 
   // Reset form when dialog closes
   const handleDialogOpenChange = (open: boolean) => {
     if (!open) {
-      form.reset()
-      setEditingEvent(null)
+      form.reset();
+      setEditingEvent(null);
     }
-    setIsOpen(open)
-  }
+    setIsOpen(open);
+  };
 
   // Handle form submission
   const onSubmit = (data: EventFormValues) => {
     if (editingEvent) {
       // Update existing event
       const updatedEvents = events.map((event) =>
-        event.id === editingEvent.id ? { ...event, ...data } : event
-      )
-      setEvents(updatedEvents)
-      toast.success("Event updated successfully")
+        event.id === editingEvent.id ? { ...event, ...data } : event,
+      );
+      setEvents(updatedEvents);
+      toast.success("Event updated successfully");
     } else {
       // Add new event
       const newEvent: CalendarEvent = {
         id: String(Date.now()),
         ...data,
-      }
-      setEvents([...events, newEvent])
-      toast.success("Event added successfully")
+      };
+      setEvents([...events, newEvent]);
+      toast.success("Event added successfully");
     }
-    handleDialogOpenChange(false)
-  }
+    handleDialogOpenChange(false);
+  };
 
   // Handle edit event
   const handleEdit = (event: CalendarEvent) => {
-    setEditingEvent(event)
+    setEditingEvent(event);
     form.reset({
       title: event.title,
       startDate: event.startDate,
@@ -210,16 +210,16 @@ const CalendarPage = () => {
       description: event.description,
       academicYear: event.academicYear,
       semester: event.semester,
-    })
-    setIsOpen(true)
-  }
+    });
+    setIsOpen(true);
+  };
 
   // Handle delete event
   const handleDelete = (id: string) => {
-    const updatedEvents = events.filter((event) => event.id !== id)
-    setEvents(updatedEvents)
-    toast.success("Event deleted successfully")
-  }
+    const updatedEvents = events.filter((event) => event.id !== id);
+    setEvents(updatedEvents);
+    toast.success("Event deleted successfully");
+  };
 
   // Filter events
   const filteredEvents = events.filter((event) => {
@@ -227,24 +227,24 @@ const CalendarPage = () => {
       (filterYear === "all" || event.academicYear === filterYear) &&
       (filterSemester === "all" || event.semester === filterSemester) &&
       (filterType === "all" || event.type === filterType)
-    )
-  })
+    );
+  });
 
   // Get event type badge class
   const getEventTypeClass = (type: EventType) => {
     switch (type) {
       case "academic":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       case "exam":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 text-red-800";
       case "holiday":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "registration":
-        return "bg-purple-100 text-purple-800"
+        return "bg-purple-100 text-purple-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   // Define columns
   const columns: ColumnDef<CalendarEvent>[] = [
@@ -256,16 +256,16 @@ const CalendarPage = () => {
       id: "type",
       header: "Type",
       cell: ({ row }) => {
-        const event = row.original
+        const event = row.original;
         return (
           <span
             className={`px-2 py-1 rounded-full text-xs font-semibold ${getEventTypeClass(
-              event.type
+              event.type,
             )}`}
           >
             {event.type.charAt(0).toUpperCase() + event.type.slice(1)}
           </span>
-        )
+        );
       },
     },
     {
@@ -289,7 +289,7 @@ const CalendarPage = () => {
     {
       id: "actions",
       cell: ({ row }) => {
-        const event = row.original
+        const event = row.original;
         return (
           <div className="flex space-x-2">
             <Button
@@ -309,35 +309,35 @@ const CalendarPage = () => {
               <span className="sr-only">Delete</span>
             </Button>
           </div>
-        )
+        );
       },
     },
-  ]
+  ];
 
   // Helper to get event date class for the calendar
   const getDayClass = (day: Date) => {
-    const dayStr = format(day, "yyyy-MM-dd")
+    const dayStr = format(day, "yyyy-MM-dd");
     for (const event of events) {
       // Check if the day falls between startDate and endDate
-      const eventStart = format(event.startDate, "yyyy-MM-dd")
-      const eventEnd = format(event.endDate, "yyyy-MM-dd")
+      const eventStart = format(event.startDate, "yyyy-MM-dd");
+      const eventEnd = format(event.endDate, "yyyy-MM-dd");
 
       if (dayStr >= eventStart && dayStr <= eventEnd) {
         switch (event.type) {
           case "academic":
-            return "bg-blue-100 text-blue-800 hover:bg-blue-200"
+            return "bg-blue-100 text-blue-800 hover:bg-blue-200";
           case "exam":
-            return "bg-red-100 text-red-800 hover:bg-red-200"
+            return "bg-red-100 text-red-800 hover:bg-red-200";
           case "holiday":
-            return "bg-green-100 text-green-800 hover:bg-green-200"
+            return "bg-green-100 text-green-800 hover:bg-green-200";
           case "registration":
-            return "bg-purple-100 text-purple-800 hover:bg-purple-200"
+            return "bg-purple-100 text-purple-800 hover:bg-purple-200";
         }
       }
     }
 
-    return ""
-  }
+    return "";
+  };
 
   return (
     <div className="space-y-6">
@@ -438,19 +438,19 @@ const CalendarPage = () => {
                     }}
                     modifiers={{
                       event: (date) => {
-                        const dayStr = format(date, "yyyy-MM-dd")
+                        const dayStr = format(date, "yyyy-MM-dd");
                         return events.some((event) => {
-                          const start = format(event.startDate, "yyyy-MM-dd")
-                          const end = format(event.endDate, "yyyy-MM-dd")
-                          return dayStr >= start && dayStr <= end
-                        })
+                          const start = format(event.startDate, "yyyy-MM-dd");
+                          const end = format(event.endDate, "yyyy-MM-dd");
+                          return dayStr >= start && dayStr <= end;
+                        });
                       },
                     }}
                     styles={{
                       day: (date) => {
                         return {
                           className: getDayClass(date),
-                        }
+                        };
                       },
                     }}
                   />
@@ -486,10 +486,10 @@ const CalendarPage = () => {
                   <div className="space-y-4">
                     {events
                       .filter((event) => {
-                        const selectedDate = format(date, "yyyy-MM-dd")
-                        const start = format(event.startDate, "yyyy-MM-dd")
-                        const end = format(event.endDate, "yyyy-MM-dd")
-                        return selectedDate >= start && selectedDate <= end
+                        const selectedDate = format(date, "yyyy-MM-dd");
+                        const start = format(event.startDate, "yyyy-MM-dd");
+                        const end = format(event.endDate, "yyyy-MM-dd");
+                        return selectedDate >= start && selectedDate <= end;
                       })
                       .map((event) => (
                         <Card
@@ -515,7 +515,7 @@ const CalendarPage = () => {
                             </div>
                             <span
                               className={`px-2 py-1 rounded-full text-xs font-semibold ${getEventTypeClass(
-                                event.type
+                                event.type,
                               )}`}
                             >
                               {event.type.charAt(0).toUpperCase() +
@@ -526,10 +526,10 @@ const CalendarPage = () => {
                       ))}
 
                     {events.filter((event) => {
-                      const selectedDate = format(date, "yyyy-MM-dd")
-                      const start = format(event.startDate, "yyyy-MM-dd")
-                      const end = format(event.endDate, "yyyy-MM-dd")
-                      return selectedDate >= start && selectedDate <= end
+                      const selectedDate = format(date, "yyyy-MM-dd");
+                      const start = format(event.startDate, "yyyy-MM-dd");
+                      const end = format(event.endDate, "yyyy-MM-dd");
+                      return selectedDate >= start && selectedDate <= end;
                     }).length === 0 && (
                       <div className="text-center py-4 text-muted-foreground">
                         No events for this day
@@ -757,7 +757,7 @@ const CalendarPage = () => {
         </DialogContent>
       </Dialog>
     </div>
-  )
-}
+  );
+};
 
-export default CalendarPage
+export default CalendarPage;

@@ -1,10 +1,9 @@
-
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { DataTable } from '@/components/DataTable';
-import { ColumnDef } from '@tanstack/react-table';
-import { Plus, Edit, Trash2 } from 'lucide-react';
-import PageHeader from '@/components/PageHeader';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { DataTable } from "@/components/DataTable";
+import { ColumnDef } from "@tanstack/react-table";
+import { Plus, Edit, Trash2 } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 import {
   Dialog,
   DialogContent,
@@ -13,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -21,13 +20,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { toast } from 'sonner';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { toast } from "sonner";
 
 // Define the Faculty interface
 interface Faculty {
@@ -42,38 +41,42 @@ interface Faculty {
 // Sample data
 const initialFaculties: Faculty[] = [
   {
-    id: '1',
-    name: 'Faculty of Science',
-    description: 'Provides education in various scientific disciplines',
-    dean: 'Dr. John Smith',
-    location: 'Block A, Floor 2',
-    established: '1990',
+    id: "1",
+    name: "Faculty of Science",
+    description: "Provides education in various scientific disciplines",
+    dean: "Dr. John Smith",
+    location: "Block A, Floor 2",
+    established: "1990",
   },
   {
-    id: '2',
-    name: 'Faculty of Business',
-    description: 'Offers programs in business administration and economics',
-    dean: 'Prof. Sarah Johnson',
-    location: 'Block B, Floor 1',
-    established: '1995',
+    id: "2",
+    name: "Faculty of Business",
+    description: "Offers programs in business administration and economics",
+    dean: "Prof. Sarah Johnson",
+    location: "Block B, Floor 1",
+    established: "1995",
   },
   {
-    id: '3',
-    name: 'Faculty of Engineering',
-    description: 'Specializes in engineering disciplines and technology',
-    dean: 'Dr. Michael Lee',
-    location: 'Block C, Floor 3',
-    established: '1992',
+    id: "3",
+    name: "Faculty of Engineering",
+    description: "Specializes in engineering disciplines and technology",
+    dean: "Dr. Michael Lee",
+    location: "Block C, Floor 3",
+    established: "1992",
   },
 ];
 
 // Form schema
 const facultyFormSchema = z.object({
-  name: z.string().min(2, { message: 'Faculty name is required' }),
-  description: z.string().min(10, { message: 'Description must be at least 10 characters' }),
-  dean: z.string().min(2, { message: 'Dean name is required' }),
-  location: z.string().min(2, { message: 'Location is required' }),
-  established: z.string().regex(/^\d{4}$/, { message: 'Year must be a 4-digit number' }),
+  name: z.string().min(2, { message: "Faculty name is required" }),
+  description: z
+    .string()
+    .min(10, { message: "Description must be at least 10 characters" }),
+  dean: z.string().min(2, { message: "Dean name is required" }),
+  location: z.string().min(2, { message: "Location is required" }),
+  established: z
+    .string()
+    .regex(/^\d{4}$/, { message: "Year must be a 4-digit number" }),
 });
 
 type FacultyFormValues = z.infer<typeof facultyFormSchema>;
@@ -87,11 +90,11 @@ const FacultiesPage = () => {
   const form = useForm<FacultyFormValues>({
     resolver: zodResolver(facultyFormSchema),
     defaultValues: {
-      name: '',
-      description: '',
-      dean: '',
-      location: '',
-      established: '',
+      name: "",
+      description: "",
+      dean: "",
+      location: "",
+      established: "",
     },
   });
 
@@ -108,11 +111,11 @@ const FacultiesPage = () => {
   const onSubmit = (data: FacultyFormValues) => {
     if (editingFaculty) {
       // Update existing faculty
-      const updatedFaculties = faculties.map(faculty => 
-        faculty.id === editingFaculty.id ? { ...faculty, ...data } : faculty
+      const updatedFaculties = faculties.map((faculty) =>
+        faculty.id === editingFaculty.id ? { ...faculty, ...data } : faculty,
       );
       setFaculties(updatedFaculties);
-      toast.success('Faculty updated successfully');
+      toast.success("Faculty updated successfully");
     } else {
       // Add new faculty
       const newFaculty: Faculty = {
@@ -124,7 +127,7 @@ const FacultiesPage = () => {
         established: data.established,
       };
       setFaculties([...faculties, newFaculty]);
-      toast.success('Faculty added successfully');
+      toast.success("Faculty added successfully");
     }
     handleDialogOpenChange(false);
   };
@@ -144,46 +147,46 @@ const FacultiesPage = () => {
 
   // Handle delete faculty
   const handleDelete = (id: string) => {
-    const updatedFaculties = faculties.filter(faculty => faculty.id !== id);
+    const updatedFaculties = faculties.filter((faculty) => faculty.id !== id);
     setFaculties(updatedFaculties);
-    toast.success('Faculty deleted successfully');
+    toast.success("Faculty deleted successfully");
   };
 
   // Define columns
   const columns: ColumnDef<Faculty>[] = [
     {
-      accessorKey: 'name',
-      header: 'Name',
+      accessorKey: "name",
+      header: "Name",
     },
     {
-      accessorKey: 'dean',
-      header: 'Dean',
+      accessorKey: "dean",
+      header: "Dean",
     },
     {
-      accessorKey: 'location',
-      header: 'Location',
+      accessorKey: "location",
+      header: "Location",
     },
     {
-      accessorKey: 'established',
-      header: 'Established',
+      accessorKey: "established",
+      header: "Established",
     },
     {
-      id: 'actions',
+      id: "actions",
       cell: ({ row }) => {
         const faculty = row.original;
         return (
           <div className="flex space-x-2">
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => handleEdit(faculty)}
             >
               <Edit className="h-4 w-4" />
               <span className="sr-only">Edit</span>
             </Button>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => handleDelete(faculty.id)}
             >
               <Trash2 className="h-4 w-4 text-destructive" />
@@ -201,7 +204,7 @@ const FacultiesPage = () => {
         title="Faculties"
         description="Manage university faculties"
         action={{
-          label: 'Add Faculty',
+          label: "Add Faculty",
           icon: Plus,
           onClick: () => setIsOpen(true),
         }}
@@ -212,11 +215,13 @@ const FacultiesPage = () => {
       <Dialog open={isOpen} onOpenChange={handleDialogOpenChange}>
         <DialogContent className="sm:max-w-[550px]">
           <DialogHeader>
-            <DialogTitle>{editingFaculty ? 'Edit Faculty' : 'Add New Faculty'}</DialogTitle>
+            <DialogTitle>
+              {editingFaculty ? "Edit Faculty" : "Add New Faculty"}
+            </DialogTitle>
             <DialogDescription>
-              {editingFaculty 
-                ? 'Update faculty information in the form below.' 
-                : 'Fill in the details to create a new faculty.'}
+              {editingFaculty
+                ? "Update faculty information in the form below."
+                : "Fill in the details to create a new faculty."}
             </DialogDescription>
           </DialogHeader>
 
@@ -243,10 +248,10 @@ const FacultiesPage = () => {
                   <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        placeholder="Enter faculty description" 
-                        className="min-h-[80px]" 
-                        {...field} 
+                      <Textarea
+                        placeholder="Enter faculty description"
+                        className="min-h-[80px]"
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -276,7 +281,10 @@ const FacultiesPage = () => {
                     <FormItem>
                       <FormLabel>Location</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter faculty location" {...field} />
+                        <Input
+                          placeholder="Enter faculty location"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -300,7 +308,7 @@ const FacultiesPage = () => {
 
               <DialogFooter>
                 <Button type="submit">
-                  {editingFaculty ? 'Update Faculty' : 'Add Faculty'}
+                  {editingFaculty ? "Update Faculty" : "Add Faculty"}
                 </Button>
               </DialogFooter>
             </form>

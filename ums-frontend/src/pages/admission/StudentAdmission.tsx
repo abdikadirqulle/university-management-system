@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react"
-import { useAuthGuard } from "@/hooks/useAuthGuard"
-import { useAuth } from "@/context/AuthContext"
-import { useUserStore } from "@/store/useUserStore"
-import { useStudentApplicationStore } from "@/store/useStudentApplicationStore"
-import { StudentApplication } from "@/types/admission"
-import PageHeader from "@/components/PageHeader"
-import { DataTable } from "@/components/DataTable"
-import { ColumnDef } from "@tanstack/react-table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { useAuth } from "@/context/AuthContext";
+import { useUserStore } from "@/store/useUserStore";
+import { useStudentApplicationStore } from "@/store/useStudentApplicationStore";
+import { StudentApplication } from "@/types/admission";
+import PageHeader from "@/components/PageHeader";
+import { DataTable } from "@/components/DataTable";
+import { ColumnDef } from "@tanstack/react-table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import {
   Check,
   X,
@@ -19,7 +19,7 @@ import {
   Search,
   Filter,
   RefreshCw,
-} from "lucide-react"
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,7 +27,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -35,21 +35,21 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { toast } from "sonner"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import StudentApplicationForm from "@/components/admission/StudentApplicationForm"
-import { Textarea } from "@/components/ui/textarea"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import StudentApplicationForm from "@/components/admission/StudentApplicationForm";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
 // Define available departments
 const departments = [
@@ -68,43 +68,43 @@ const departments = [
   "English Literature",
   "History",
   "Political Science",
-]
+];
 
 const StudentAdmission = () => {
   // Auth guard to ensure only admins can access this page
-  useAuthGuard(["admission"])
+  useAuthGuard(["admission"]);
 
-  const { user } = useAuth()
-  const { addUser } = useUserStore()
+  const { user } = useAuth();
+  const { addUser } = useUserStore();
   const {
     applications,
     isLoading,
     fetchApplications,
     approveApplication,
     rejectApplication,
-  } = useStudentApplicationStore()
+  } = useStudentApplicationStore();
 
   // Search and filtering
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<
     "all" | "pending" | "approved" | "rejected"
-  >("all")
+  >("all");
 
   // Dialog states
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
-  const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false)
-  const [isApproveDialogOpen, setIsApproveDialogOpen] = useState(false)
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
+  const [isApproveDialogOpen, setIsApproveDialogOpen] = useState(false);
   const [currentApplication, setCurrentApplication] =
-    useState<StudentApplication | null>(null)
-  const [rejectionReason, setRejectionReason] = useState("")
-  const [assignedDepartment, setAssignedDepartment] = useState("")
-  const [assignedClass, setAssignedClass] = useState("")
-  const [assignedSession, setAssignedSession] = useState("")
+    useState<StudentApplication | null>(null);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [assignedDepartment, setAssignedDepartment] = useState("");
+  const [assignedClass, setAssignedClass] = useState("");
+  const [assignedSession, setAssignedSession] = useState("");
 
   // Fetch applications on component mount
   useEffect(() => {
-    fetchApplications()
-  }, [fetchApplications])
+    fetchApplications();
+  }, [fetchApplications]);
 
   // Filter applications based on search term and status
   const filteredApplications = applications.filter((app) => {
@@ -112,46 +112,46 @@ const StudentAdmission = () => {
     const searchMatch =
       app.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       app.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.desiredDepartment.toLowerCase().includes(searchTerm.toLowerCase())
+      app.desiredDepartment.toLowerCase().includes(searchTerm.toLowerCase());
 
     // Check if the application matches the status filter
-    const statusMatch = statusFilter === "all" || app.status === statusFilter
+    const statusMatch = statusFilter === "all" || app.status === statusFilter;
 
-    return searchMatch && statusMatch
-  })
+    return searchMatch && statusMatch;
+  });
 
   // Handle viewing an application
   const handleViewApplication = (application: StudentApplication) => {
-    setCurrentApplication(application)
-    setIsViewDialogOpen(true)
-  }
+    setCurrentApplication(application);
+    setIsViewDialogOpen(true);
+  };
 
   // Handle approving an application
   const handleApprovePrompt = (application: StudentApplication) => {
-    setCurrentApplication(application)
-    setAssignedDepartment(application.desiredDepartment)
-    setAssignedClass("1st Year") // Default value
-    setAssignedSession(new Date().getFullYear().toString()) // Default to current year
-    setIsApproveDialogOpen(true)
-  }
+    setCurrentApplication(application);
+    setAssignedDepartment(application.desiredDepartment);
+    setAssignedClass("1st Year"); // Default value
+    setAssignedSession(new Date().getFullYear().toString()); // Default to current year
+    setIsApproveDialogOpen(true);
+  };
 
   // Handle rejecting an application
   const handleRejectPrompt = (application: StudentApplication) => {
-    setCurrentApplication(application)
-    setRejectionReason("")
-    setIsRejectDialogOpen(true)
-  }
+    setCurrentApplication(application);
+    setRejectionReason("");
+    setIsRejectDialogOpen(true);
+  };
 
   // Final approval action
   const handleApproveApplication = async () => {
-    if (!currentApplication || !user) return
+    if (!currentApplication || !user) return;
 
     try {
       // Approve the application and get the generated student ID
       const studentId = await approveApplication(
         currentApplication.id,
-        user.name
-      )
+        user.name,
+      );
 
       // Create a new user with student role
       await addUser({
@@ -161,39 +161,43 @@ const StudentAdmission = () => {
         role: "student",
         department: assignedDepartment,
         studentId: studentId,
-      })
+      });
 
       toast.success(
-        `Application approved and user account created for ${currentApplication.fullName}`
-      )
-      setIsApproveDialogOpen(false)
+        `Application approved and user account created for ${currentApplication.fullName}`,
+      );
+      setIsApproveDialogOpen(false);
     } catch (error) {
-      toast.error("Failed to approve application")
-      console.error(error)
+      toast.error("Failed to approve application");
+      console.error(error);
     }
-  }
+  };
 
   // Final reject action
   const handleRejectApplication = async () => {
-    if (!currentApplication || !user) return
+    if (!currentApplication || !user) return;
 
     try {
-      await rejectApplication(currentApplication.id, user.name, rejectionReason)
+      await rejectApplication(
+        currentApplication.id,
+        user.name,
+        rejectionReason,
+      );
       toast.success(
-        `Application from ${currentApplication.fullName} has been rejected`
-      )
-      setIsRejectDialogOpen(false)
+        `Application from ${currentApplication.fullName} has been rejected`,
+      );
+      setIsRejectDialogOpen(false);
     } catch (error) {
-      toast.error("Failed to reject application")
-      console.error(error)
+      toast.error("Failed to reject application");
+      console.error(error);
     }
-  }
+  };
 
   // Status badge component
   const StatusBadge = ({
     status,
   }: {
-    status: StudentApplication["status"]
+    status: StudentApplication["status"];
   }) => {
     switch (status) {
       case "pending":
@@ -204,7 +208,7 @@ const StudentAdmission = () => {
           >
             Pending
           </Badge>
-        )
+        );
       case "approved":
         return (
           <Badge
@@ -213,7 +217,7 @@ const StudentAdmission = () => {
           >
             Approved
           </Badge>
-        )
+        );
       case "rejected":
         return (
           <Badge
@@ -222,11 +226,11 @@ const StudentAdmission = () => {
           >
             Rejected
           </Badge>
-        )
+        );
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   // Table columns
   const columns: ColumnDef<StudentApplication>[] = [
@@ -250,13 +254,13 @@ const StudentAdmission = () => {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => {
-        return <StatusBadge status={row.getValue("status")} />
+        return <StatusBadge status={row.getValue("status")} />;
       },
     },
     {
       id: "actions",
       cell: ({ row }) => {
-        const application = row.original
+        const application = row.original;
 
         return (
           <DropdownMenu>
@@ -293,10 +297,10 @@ const StudentAdmission = () => {
               )}
             </DropdownMenuContent>
           </DropdownMenu>
-        )
+        );
       },
     },
-  ]
+  ];
 
   return (
     <div className="space-y-6">
@@ -337,7 +341,7 @@ const StudentAdmission = () => {
               <Select
                 value={statusFilter}
                 onValueChange={(
-                  value: "all" | "pending" | "approved" | "rejected"
+                  value: "all" | "pending" | "approved" | "rejected",
                 ) => setStatusFilter(value)}
               >
                 <SelectTrigger id="status-filter" className="w-full">
@@ -364,7 +368,7 @@ const StudentAdmission = () => {
         <TabsContent value="create">
           <StudentApplicationForm
             onSuccess={() => {
-              toast.success("Application created successfully")
+              toast.success("Application created successfully");
             }}
           />
         </TabsContent>
@@ -535,12 +539,12 @@ const StudentAdmission = () => {
                       </SelectTrigger>
                       <SelectContent>
                         {[0, 1, 2].map((offset) => {
-                          const year = new Date().getFullYear() + offset
+                          const year = new Date().getFullYear() + offset;
                           return (
                             <SelectItem key={year} value={year.toString()}>
                               {year}-{year + 1}
                             </SelectItem>
-                          )
+                          );
                         })}
                       </SelectContent>
                     </Select>
@@ -612,7 +616,7 @@ const StudentAdmission = () => {
         </DialogContent>
       </Dialog>
     </div>
-  )
-}
+  );
+};
 
-export default StudentAdmission
+export default StudentAdmission;

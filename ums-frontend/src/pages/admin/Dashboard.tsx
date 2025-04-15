@@ -1,11 +1,11 @@
-import { useEffect } from "react"
-import { useAuth } from "@/context/AuthContext"
-import { useAuthGuard } from "@/hooks/useAuthGuard"
-import PageHeader from "@/components/PageHeader"
-import StatsCard from "@/components/StatsCard"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
-import { Users, GraduationCap, School, BookOpen, Plus } from "lucide-react"
+import { useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import PageHeader from "@/components/PageHeader";
+import StatsCard from "@/components/StatsCard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { Users, GraduationCap, School, BookOpen, Plus } from "lucide-react";
 
 // Sample data for the dashboard
 const overviewStats = [
@@ -37,7 +37,7 @@ const overviewStats = [
     iconColor: "text-emerald-600",
     trend: { value: 3, isPositive: true },
   },
-]
+];
 
 const enrollmentData = [
   { name: "Jan", students: 2500 },
@@ -52,16 +52,16 @@ const enrollmentData = [
   { name: "Oct", students: 4800 },
   { name: "Nov", students: 4600 },
   { name: "Dec", students: 4400 },
-]
+];
 
 const Dashboard = () => {
-  const { user } = useAuth()
-  useAuthGuard(["academic"])
+  const { user } = useAuth();
+  useAuthGuard(["academic"]);
 
   useEffect(() => {
     // This could fetch dashboard data from an API
-    console.log("Admin dashboard loaded")
-  }, [])
+    console.log("Admin dashboard loaded");
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -171,7 +171,7 @@ const Dashboard = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;

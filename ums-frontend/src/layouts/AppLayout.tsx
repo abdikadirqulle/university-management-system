@@ -1,13 +1,13 @@
-import React from "react"
-import { Outlet } from "react-router-dom"
-import { SidebarProvider } from "@/components/ui/sidebar"
-import AppSidebar from "./AppSidebar"
-import Header from "./Header"
-import { useAuth } from "@/context/AuthContext"
-import { Loader2 } from "lucide-react"
+import React from "react";
+import { Outlet } from "react-router-dom";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import AppSidebar from "./AppSidebar";
+import Header from "./Header";
+import { useAuth } from "@/context/AuthContext";
+import { Loader2 } from "lucide-react";
 
 const AppLayout: React.FC = () => {
-  const { isLoading } = useAuth()
+  const { isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -15,7 +15,7 @@ const AppLayout: React.FC = () => {
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
         <span className="ml-2 text-lg font-medium">Loading...</span>
       </div>
-    )
+    );
   }
 
   return (
@@ -30,7 +30,7 @@ const AppLayout: React.FC = () => {
         </div>
       </div>
     </SidebarProvider>
-  )
-}
+  );
+};
 
-export default AppLayout
+export default AppLayout;

@@ -1,4 +1,3 @@
-
 import {
   ColumnDef,
   flexRender,
@@ -7,11 +6,23 @@ import {
   getSortedRowModel,
   SortingState,
   useReactTable,
-} from '@tanstack/react-table';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { useState } from 'react';
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+} from "@tanstack/react-table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -25,7 +36,7 @@ export function DataTable<TData, TValue>({
   loading = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  
+
   const table = useReactTable({
     data,
     columns,
@@ -37,7 +48,7 @@ export function DataTable<TData, TValue>({
       sorting,
     },
   });
-  
+
   return (
     <div className="space-y-4">
       <div className="rounded-md border">
@@ -52,7 +63,7 @@ export function DataTable<TData, TValue>({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
@@ -80,7 +91,7 @@ export function DataTable<TData, TValue>({
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -99,7 +110,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      
+
       <div className="flex items-center justify-end space-x-2">
         <Button
           variant="outline"

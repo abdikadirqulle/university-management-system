@@ -1,20 +1,19 @@
-
 // This component is no longer used in the dashboard
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Check } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Check } from "lucide-react";
 
 interface RequirementItem {
-  id: string
-  text: string
+  id: string;
+  text: string;
 }
 
 interface RequirementCategory {
-  title: string
-  items: RequirementItem[]
+  title: string;
+  items: RequirementItem[];
 }
 
 interface AdmissionRequirementsProps {
-  categories: RequirementCategory[]
+  categories: RequirementCategory[];
 }
 
 const AdmissionRequirements: React.FC<AdmissionRequirementsProps> = ({
@@ -41,7 +40,7 @@ const AdmissionRequirements: React.FC<AdmissionRequirementsProps> = ({
         ))}
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default AdmissionRequirements
+export default AdmissionRequirements;

@@ -1,15 +1,15 @@
-import { useEffect } from "react"
-import { useAuth } from "@/context/AuthContext"
-import { useAuthGuard } from "@/hooks/useAuthGuard"
-import PageHeader from "@/components/PageHeader"
-import StatsCard from "@/components/StatsCard"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { BookCheck, GraduationCap, Clock, UserPlus } from "lucide-react"
-import { DataTable } from "@/components/DataTable"
-import { ColumnDef } from "@tanstack/react-table"
-import { useStudentApplicationStore } from "@/store/useStudentApplicationStore"
-import { Button } from "@/components/ui/button"
-import { useNavigate } from "react-router-dom"
+import { useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import PageHeader from "@/components/PageHeader";
+import StatsCard from "@/components/StatsCard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BookCheck, GraduationCap, Clock, UserPlus } from "lucide-react";
+import { DataTable } from "@/components/DataTable";
+import { ColumnDef } from "@tanstack/react-table";
+import { useStudentApplicationStore } from "@/store/useStudentApplicationStore";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 // Define admission requirements data - keeping this for reference though not displayed anymore
 const admissionRequirements = [
@@ -72,7 +72,7 @@ const admissionRequirements = [
       },
     ],
   },
-]
+];
 
 // Sample stats for admission dashboard - removed "My Courses"
 const admissionStats = [
@@ -94,16 +94,16 @@ const admissionStats = [
     icon: BookCheck,
     iconColor: "text-green-600",
   },
-]
+];
 
 // Sample student data for the table
 interface Student {
-  id: string
-  name: string
-  email: string
-  course: string
-  enrollmentDate: string
-  status: string
+  id: string;
+  name: string;
+  email: string;
+  course: string;
+  enrollmentDate: string;
+  status: string;
 }
 
 const studentsData: Student[] = [
@@ -147,7 +147,7 @@ const studentsData: Student[] = [
     enrollmentDate: "2023-09-03",
     status: "On Leave",
   },
-]
+];
 
 // Define table columns
 const columns: ColumnDef<Student>[] = [
@@ -175,40 +175,40 @@ const columns: ColumnDef<Student>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("status") as string
+      const status = row.getValue("status") as string;
       return (
         <span
           className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
             status === "Active"
               ? "bg-green-100 text-green-800"
               : status === "On Leave"
-              ? "bg-amber-100 text-amber-800"
-              : "bg-gray-100 text-gray-800"
+                ? "bg-amber-100 text-amber-800"
+                : "bg-gray-100 text-gray-800"
           }`}
         >
           {status}
         </span>
-      )
+      );
     },
   },
-]
+];
 
 const AdmissionDashboard = () => {
-  const { user } = useAuth()
-  const navigate = useNavigate()
-  const { applications, fetchApplications } = useStudentApplicationStore()
-  useAuthGuard(["admission"])
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { applications, fetchApplications } = useStudentApplicationStore();
+  useAuthGuard(["admission"]);
 
   useEffect(() => {
     // Fetch applications data when dashboard loads
-    fetchApplications()
-    console.log("admission dashboard loaded")
-  }, [fetchApplications])
+    fetchApplications();
+    console.log("admission dashboard loaded");
+  }, [fetchApplications]);
 
   // Count pending applications
   const pendingApplicationsCount = applications.filter(
-    (app) => app.status === "pending"
-  ).length
+    (app) => app.status === "pending",
+  ).length;
 
   // Updated stats with real data - removed "My Courses" stats
   const updatedStats = [
@@ -222,7 +222,7 @@ const AdmissionDashboard = () => {
     {
       ...admissionStats[2],
     },
-  ]
+  ];
 
   return (
     <div className="space-y-6">
@@ -253,8 +253,8 @@ const AdmissionDashboard = () => {
           <CardHeader>
             <CardTitle className="flex justify-between items-center">
               <span>Recent Applications</span>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => navigate("/admission/student-admission")}
               >
@@ -282,11 +282,12 @@ const AdmissionDashboard = () => {
                           app.status === "pending"
                             ? "bg-yellow-100 text-yellow-800"
                             : app.status === "approved"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
+                        {app.status.charAt(0).toUpperCase() +
+                          app.status.slice(1)}
                       </span>
                     </div>
                   </div>
@@ -295,7 +296,7 @@ const AdmissionDashboard = () => {
                   </p>
                 </div>
               ))}
-              
+
               {applications.length === 0 && (
                 <div className="text-center py-4 text-muted-foreground">
                   No applications found
@@ -391,7 +392,8 @@ const AdmissionDashboard = () => {
               <div className="rounded-lg border p-3">
                 <p className="font-medium">Admission Deadline Extension</p>
                 <p className="text-sm text-muted-foreground">
-                  Fall semester admission application deadline extended to August 15th. Please inform all prospective students.
+                  Fall semester admission application deadline extended to
+                  August 15th. Please inform all prospective students.
                 </p>
                 <p className="mt-2 text-xs text-muted-foreground">
                   Posted on: July 25, 2023
@@ -399,9 +401,12 @@ const AdmissionDashboard = () => {
               </div>
 
               <div className="rounded-lg border p-3">
-                <p className="font-medium">Updated Documentation Requirements</p>
+                <p className="font-medium">
+                  Updated Documentation Requirements
+                </p>
                 <p className="text-sm text-muted-foreground">
-                  All international students now required to submit proof of financial support with their applications.
+                  All international students now required to submit proof of
+                  financial support with their applications.
                 </p>
                 <p className="mt-2 text-xs text-muted-foreground">
                   Posted on: July 18, 2023
@@ -411,7 +416,8 @@ const AdmissionDashboard = () => {
               <div className="rounded-lg border p-3">
                 <p className="font-medium">Admission Committee Meeting</p>
                 <p className="text-sm text-muted-foreground">
-                  Quarterly admission committee meeting scheduled for August 5th. Please prepare application summaries.
+                  Quarterly admission committee meeting scheduled for August
+                  5th. Please prepare application summaries.
                 </p>
                 <p className="mt-2 text-xs text-muted-foreground">
                   Posted on: July 10, 2023
@@ -427,7 +433,7 @@ const AdmissionDashboard = () => {
         <DataTable columns={columns} data={studentsData} />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AdmissionDashboard
+export default AdmissionDashboard;

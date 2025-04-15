@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react"
-import { useAuthGuard } from "@/hooks/useAuthGuard"
-import PageHeader from "@/components/PageHeader"
-import { useStudentStore } from "@/store/useStudentStore"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useEffect, useState } from "react";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import PageHeader from "@/components/PageHeader";
+import { useStudentStore } from "@/store/useStudentStore";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -12,14 +12,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,7 +27,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   Card,
   CardContent,
@@ -35,10 +35,10 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Student } from "@/types/student"
-import { toast } from "sonner"
-import StudentDetailDialog from "@/components/admission/StudentDetailDialog"
+} from "@/components/ui/card";
+import { Student } from "@/types/student";
+import { toast } from "sonner";
+import StudentDetailDialog from "@/components/admission/StudentDetailDialog";
 import {
   MoreHorizontal,
   Search,
@@ -50,8 +50,8 @@ import {
   X,
   UploadCloud,
   Download,
-} from "lucide-react"
-import { Badge } from "@/components/ui/badge"
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 // Define available semesters for filtering
 const semesters = [
@@ -60,68 +60,68 @@ const semesters = [
   "Summer 2023",
   "Fall 2023",
   "Spring 2024",
-]
+];
 
 // Define available sessions for filtering
-const sessions = ["2021-2022", "2022-2023", "2023-2024", "2024-2025"]
+const sessions = ["2021-2022", "2022-2023", "2023-2024", "2024-2025"];
 
 const StudentManager = () => {
-  useAuthGuard(["admission"])
+  useAuthGuard(["admission"]);
 
   const { students, isLoading, fetchStudents, updateStudent } =
-    useStudentStore()
+    useStudentStore();
 
   // State for search and filters
-  const [searchTerm, setSearchTerm] = useState("")
-  const [idFilter, setIdFilter] = useState("")
-  const [semesterFilter, setSemesterFilter] = useState<string>("")
-  const [statusFilter, setStatusFilter] = useState<string>("")
+  const [searchTerm, setSearchTerm] = useState("");
+  const [idFilter, setIdFilter] = useState("");
+  const [semesterFilter, setSemesterFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
 
   // State for student detail dialog
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   // Fetch students on component mount
   useEffect(() => {
-    fetchStudents()
-  }, [fetchStudents])
+    fetchStudents();
+  }, [fetchStudents]);
 
   // Handle opening view dialog
   const handleViewStudent = (student: Student) => {
-    setSelectedStudent(student)
-    setIsViewDialogOpen(true)
-  }
+    setSelectedStudent(student);
+    setIsViewDialogOpen(true);
+  };
 
   // Handle opening edit dialog
   const handleEditStudent = (student: Student) => {
-    setSelectedStudent(student)
-    setIsEditDialogOpen(true)
-  }
+    setSelectedStudent(student);
+    setIsEditDialogOpen(true);
+  };
 
   // Handle saving edited student
   const handleSaveStudent = (updatedStudent: Student) => {
-    updateStudent(updatedStudent.id, updatedStudent)
-    toast.success("Student information updated successfully")
-  }
+    updateStudent(updatedStudent.id, updatedStudent);
+    toast.success("Student information updated successfully");
+  };
 
   // Filter students based on search term and filters
   const filteredStudents = students.filter((student) => {
     const matchesSearch =
       student.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.department.toLowerCase().includes(searchTerm.toLowerCase())
+      student.department.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesId = idFilter ? student.studentId.includes(idFilter) : true
+    const matchesId = idFilter ? student.studentId.includes(idFilter) : true;
 
     const matchesSemester = semesterFilter
       ? student.semester === semesterFilter
-      : true
+      : true;
 
-    const matchesStatus = statusFilter ? student.status === statusFilter : true
+    const matchesStatus = statusFilter ? student.status === statusFilter : true;
 
-    return matchesSearch && matchesId && matchesSemester && matchesStatus
-  })
+    return matchesSearch && matchesId && matchesSemester && matchesStatus;
+  });
 
   // Function to render the status badge
   const renderStatusBadge = (status: Student["status"]) => {
@@ -134,7 +134,7 @@ const StudentManager = () => {
           >
             Active
           </Badge>
-        )
+        );
       case "inactive":
         return (
           <Badge
@@ -143,7 +143,7 @@ const StudentManager = () => {
           >
             Inactive
           </Badge>
-        )
+        );
       case "graduated":
         return (
           <Badge
@@ -152,7 +152,7 @@ const StudentManager = () => {
           >
             Graduated
           </Badge>
-        )
+        );
       case "suspended":
         return (
           <Badge
@@ -161,19 +161,19 @@ const StudentManager = () => {
           >
             Suspended
           </Badge>
-        )
+        );
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   // Function to clear all filters
   const clearFilters = () => {
-    setSearchTerm("")
-    setIdFilter("")
-    setSemesterFilter("")
-    setStatusFilter("")
-  }
+    setSearchTerm("");
+    setIdFilter("");
+    setSemesterFilter("");
+    setStatusFilter("");
+  };
 
   return (
     <div className="space-y-6">
@@ -191,8 +191,8 @@ const StudentManager = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  fetchStudents()
-                  toast.success("Student data refreshed")
+                  fetchStudents();
+                  toast.success("Student data refreshed");
                 }}
               >
                 <RefreshCw className="h-4 w-4 mr-1" /> Refresh
@@ -417,7 +417,7 @@ const StudentManager = () => {
         onSave={handleSaveStudent}
       />
     </div>
-  )
-}
+  );
+};
 
-export default StudentManager
+export default StudentManager;

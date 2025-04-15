@@ -1,6 +1,6 @@
-import { useState } from "react"
-import { Link } from "react-router-dom"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import {
   School,
   Users,
@@ -8,27 +8,27 @@ import {
   Calendar,
   Settings,
   ArrowRight,
-} from "lucide-react"
+} from "lucide-react";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel"
-import { StarsBackground } from "@/components/ui/stars-background"
-import { LandingNav } from "@/components/landing-nav"
+} from "@/components/ui/carousel";
+import { StarsBackground } from "@/components/ui/stars-background";
+import { LandingNav } from "@/components/landing-nav";
 
 const Index = () => {
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(false);
 
   // Simulate a loading effect
   useState(() => {
     const timer = setTimeout(() => {
-      setIsVisible(true)
-    }, 100)
-    return () => clearTimeout(timer)
-  })
+      setIsVisible(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  });
 
   const features = [
     {
@@ -61,7 +61,7 @@ const Index = () => {
       description:
         "Handle tuition, scholarships, payroll, and financial reporting.",
     },
-  ]
+  ];
 
   const testimonials = [
     {
@@ -85,14 +85,14 @@ const Index = () => {
         "As an instructor, I appreciate how easy it is to track student progress and manage course materials.",
       avatar: "MG",
     },
-  ]
+  ];
 
   const stats = [
     { value: "98%", label: "User Satisfaction" },
     { value: "45%", label: "Increase in Productivity" },
     { value: "30+", label: "University Partners" },
     { value: "10k+", label: "Active Users" },
-  ]
+  ];
 
   return (
     <StarsBackground>
@@ -322,7 +322,7 @@ const Index = () => {
         </div>
       </footer>
     </StarsBackground>
-  )
-}
+  );
+};
 
-export default Index
+export default Index;

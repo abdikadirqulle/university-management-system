@@ -1,7 +1,7 @@
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Card,
   CardContent,
@@ -9,7 +9,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -18,29 +18,29 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { toast } from "sonner"
-import { useStudentApplicationStore } from "@/store/useStudentApplicationStore"
-import { Calendar } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { format } from "date-fns"
-import { Calendar as CalendarComponent } from "@/components/ui/calendar"
+} from "@/components/ui/select";
+import { toast } from "sonner";
+import { useStudentApplicationStore } from "@/store/useStudentApplicationStore";
+import { Calendar } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 
 // List of departments - in a real app, this would be fetched from an API
 const departments = [
@@ -64,7 +64,7 @@ const departments = [
   "Philosophy",
   "Fine Arts",
   "Education",
-]
+];
 
 // Form validation schema
 const formSchema = z.object({
@@ -82,17 +82,17 @@ const formSchema = z.object({
     .string()
     .min(1, { message: "Please select a department" }),
   additionalInfo: z.string().optional(),
-})
+});
 
-type FormValues = z.infer<typeof formSchema>
+type FormValues = z.infer<typeof formSchema>;
 
 interface StudentApplicationFormProps {
-  onSuccess?: () => void
+  onSuccess?: () => void;
 }
 
 const StudentApplicationForm = ({ onSuccess }: StudentApplicationFormProps) => {
-  const { addApplication } = useStudentApplicationStore()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { addApplication } = useStudentApplicationStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -103,10 +103,10 @@ const StudentApplicationForm = ({ onSuccess }: StudentApplicationFormProps) => {
       desiredDepartment: "",
       additionalInfo: "",
     },
-  })
+  });
 
   const onSubmit = async (values: FormValues) => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       await addApplication({
         fullName: values.fullName,
@@ -115,21 +115,21 @@ const StudentApplicationForm = ({ onSuccess }: StudentApplicationFormProps) => {
         dateOfBirth: format(values.dateOfBirth, "yyyy-MM-dd"),
         desiredDepartment: values.desiredDepartment,
         notes: values.additionalInfo,
-      })
+      });
 
-      toast.success("Application submitted successfully")
-      form.reset()
+      toast.success("Application submitted successfully");
+      form.reset();
 
       if (onSuccess) {
-        onSuccess()
+        onSuccess();
       }
     } catch (error) {
-      toast.error("Failed to submit application")
-      console.error(error)
+      toast.error("Failed to submit application");
+      console.error(error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Card className="w-full">
@@ -214,7 +214,7 @@ const StudentApplicationForm = ({ onSuccess }: StudentApplicationFormProps) => {
                           variant={"outline"}
                           className={cn(
                             "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
+                            !field.value && "text-muted-foreground",
                           )}
                         >
                           {field.value ? (
@@ -312,7 +312,7 @@ const StudentApplicationForm = ({ onSuccess }: StudentApplicationFormProps) => {
         </Button>
       </CardFooter>
     </Card>
-  )
-}
+  );
+};
 
-export default StudentApplicationForm
+export default StudentApplicationForm;

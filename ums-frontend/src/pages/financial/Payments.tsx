@@ -1,18 +1,18 @@
-import { useState } from "react"
-import { useAuthGuard } from "@/hooks/useAuthGuard"
-import { useQuery } from "@tanstack/react-query"
-import PageHeader from "@/components/PageHeader"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useState } from "react";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { useQuery } from "@tanstack/react-query";
+import PageHeader from "@/components/PageHeader";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -21,60 +21,60 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { DataTable } from "@/components/DataTable"
-import { ColumnDef } from "@tanstack/react-table"
-import { CreditCard, Download, FileText, Plus, Search } from "lucide-react"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+} from "@/components/ui/dialog";
+import { DataTable } from "@/components/DataTable";
+import { ColumnDef } from "@tanstack/react-table";
+import { CreditCard, Download, FileText, Plus, Search } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 // Define the Payment interface
 interface Payment {
-  id: string
-  studentId: string
-  studentName: string
-  amount: number
-  paymentDate: string
-  dueDate: string
-  status: "paid" | "pending" | "overdue" | "partial"
-  type: "tuition" | "accommodation" | "library" | "other"
-  semester: string
-  academicYear: string
-  referenceNumber: string
+  id: string;
+  studentId: string;
+  studentName: string;
+  amount: number;
+  paymentDate: string;
+  dueDate: string;
+  status: "paid" | "pending" | "overdue" | "partial";
+  type: "tuition" | "accommodation" | "library" | "other";
+  semester: string;
+  academicYear: string;
+  referenceNumber: string;
 }
 
 // Mock data
 const mockPayments: Payment[] = Array.from({ length: 30 }).map((_, i) => {
-  const statuses = ["paid", "pending", "overdue", "partial"] as const
-  const types = ["tuition", "accommodation", "library", "other"] as const
+  const statuses = ["paid", "pending", "overdue", "partial"] as const;
+  const types = ["tuition", "accommodation", "library", "other"] as const;
 
   // Create random dates
-  const today = new Date()
-  const randomPastDays = Math.floor(Math.random() * 60)
-  const randomFutureDays = Math.floor(Math.random() * 60)
+  const today = new Date();
+  const randomPastDays = Math.floor(Math.random() * 60);
+  const randomFutureDays = Math.floor(Math.random() * 60);
 
-  const paymentDate = new Date(today)
-  paymentDate.setDate(today.getDate() - randomPastDays)
+  const paymentDate = new Date(today);
+  paymentDate.setDate(today.getDate() - randomPastDays);
 
-  const dueDate = new Date(today)
-  const isOverdue = i % 5 === 0
+  const dueDate = new Date(today);
+  const isOverdue = i % 5 === 0;
   if (isOverdue) {
-    dueDate.setDate(today.getDate() - Math.floor(Math.random() * 15))
+    dueDate.setDate(today.getDate() - Math.floor(Math.random() * 15));
   } else {
-    dueDate.setDate(today.getDate() + randomFutureDays)
+    dueDate.setDate(today.getDate() + randomFutureDays);
   }
 
   // Generate a status based on dates
-  let status: Payment["status"]
+  let status: Payment["status"];
   if (isOverdue) {
-    status = "overdue"
+    status = "overdue";
   } else if (i % 4 === 0) {
-    status = "paid"
+    status = "paid";
   } else if (i % 6 === 0) {
-    status = "partial"
+    status = "partial";
   } else {
-    status = "pending"
+    status = "pending";
   }
 
   return {
@@ -105,24 +105,24 @@ const mockPayments: Payment[] = Array.from({ length: 30 }).map((_, i) => {
     semester: i % 2 === 0 ? "Fall 2023" : "Spring 2024",
     academicYear: "2023-2024",
     referenceNumber: `REF-${Math.floor(Math.random() * 100000)}`,
-  }
-})
+  };
+});
 
 const PaymentsPage = () => {
-  useAuthGuard(["financial"])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
-  const [selectedType, setSelectedType] = useState<string | null>(null)
-  const [openAddPaymentDialog, setOpenAddPaymentDialog] = useState(false)
+  useAuthGuard(["financial"]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [openAddPaymentDialog, setOpenAddPaymentDialog] = useState(false);
 
   // Simulate data loading with react-query
   const { data: payments = [], isLoading } = useQuery({
     queryKey: ["payments"],
     queryFn: () =>
       new Promise<Payment[]>((resolve) =>
-        setTimeout(() => resolve(mockPayments), 1000)
+        setTimeout(() => resolve(mockPayments), 1000),
       ),
-  })
+  });
 
   // Filter payments based on search and filters
   const filteredPayments = payments.filter((payment) => {
@@ -130,13 +130,13 @@ const PaymentsPage = () => {
       !searchTerm ||
       payment.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       payment.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.referenceNumber.toLowerCase().includes(searchTerm.toLowerCase())
+      payment.referenceNumber.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus = !selectedStatus || payment.status === selectedStatus
-    const matchesType = !selectedType || payment.type === selectedType
+    const matchesStatus = !selectedStatus || payment.status === selectedStatus;
+    const matchesType = !selectedType || payment.type === selectedType;
 
-    return matchesSearch && matchesStatus && matchesType
-  })
+    return matchesSearch && matchesStatus && matchesType;
+  });
 
   // Define table columns
   const columns: ColumnDef<Payment>[] = [
@@ -189,11 +189,11 @@ const PaymentsPage = () => {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => {
-        const status = row.getValue<string>("status")
+        const status = row.getValue<string>("status");
         const statusMap: Record<
           string,
           {
-            label: string
+            label: string;
             variant:
               | "default"
               | "destructive"
@@ -201,16 +201,16 @@ const PaymentsPage = () => {
               | "secondary"
               | "success"
               | null
-              | undefined
+              | undefined;
           }
         > = {
           paid: { label: "Paid", variant: "success" },
           pending: { label: "Pending", variant: "secondary" },
           overdue: { label: "Overdue", variant: "destructive" },
           partial: { label: "Partial", variant: "outline" },
-        }
-        const badgeVariant = statusMap[status]?.variant || "default"
-        const badgeLabel = statusMap[status]?.label || status
+        };
+        const badgeVariant = statusMap[status]?.variant || "default";
+        const badgeLabel = statusMap[status]?.label || status;
 
         return (
           <Badge
@@ -218,16 +218,16 @@ const PaymentsPage = () => {
           >
             {badgeLabel}
           </Badge>
-        )
+        );
       },
     },
     {
       accessorKey: "type",
       header: "Type",
       cell: ({ row }) => {
-        const type = row.getValue<string>("type")
-        const formattedType = type.charAt(0).toUpperCase() + type.slice(1)
-        return formattedType
+        const type = row.getValue<string>("type");
+        const formattedType = type.charAt(0).toUpperCase() + type.slice(1);
+        return formattedType;
       },
     },
     {
@@ -250,16 +250,16 @@ const PaymentsPage = () => {
               <span className="sr-only">View details</span>
             </Button>
           </div>
-        )
+        );
       },
     },
-  ]
+  ];
 
   const handleAddPayment = (formData: FormData) => {
     // In a real app, this would send the data to your API
-    console.log("New payment added:", Object.fromEntries(formData.entries()))
-    setOpenAddPaymentDialog(false)
-  }
+    console.log("New payment added:", Object.fromEntries(formData.entries()));
+    setOpenAddPaymentDialog(false);
+  };
 
   return (
     <div className="space-y-6">
@@ -429,7 +429,7 @@ const PaymentsPage = () => {
         </DialogContent>
       </Dialog>
     </div>
-  )
-}
+  );
+};
 
-export default PaymentsPage
+export default PaymentsPage;
