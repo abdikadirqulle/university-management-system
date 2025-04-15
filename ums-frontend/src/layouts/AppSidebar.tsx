@@ -203,7 +203,7 @@ const AppSidebar = () => {
         <SidebarTrigger className="absolute right-2 top-4 lg:hidden" />
       </SidebarHeader>
 
-      <div className="px-4 py-2">
+      {/* <div className="px-4 py-2">
         <div className="rounded-lg bg-sidebar-accent p-3">
           <div className="flex items-center space-x-3">
             <div className="flex h-10 w-10 items-center justify-center uppercase rounded-full bg-sidebar-primary text-sidebar-primary-foreground">
@@ -219,7 +219,7 @@ const AppSidebar = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <SidebarContent className="px-2">
         <SidebarMenu>

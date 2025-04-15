@@ -65,21 +65,21 @@ const Index = () => {
 
   const testimonials = [
     {
-      name: "Dr. Robert Chen",
+      name: "Eng.Abdikarin gelle",
       role: "Dean of Computer Science",
       content:
         "This system has transformed how we manage academic operations. The efficiency gains have been remarkable.",
       avatar: "RC",
     },
     {
-      name: "Sarah Johnson",
+      name: "usame abdiwahab",
       role: "Student Affairs Director",
       content:
         "The student management features have streamlined our processes and improved service delivery tremendously.",
       avatar: "SJ",
     },
     {
-      name: "Prof. Maria Garcia",
+      name: "Prof. maxamud",
       role: "Faculty Member",
       content:
         "As an instructor, I appreciate how easy it is to track student progress and manage course materials.",

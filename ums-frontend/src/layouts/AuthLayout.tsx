@@ -26,7 +26,7 @@ const AuthLayout = () => {
   }, [isAuthenticated, user, navigate])
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-blue-500 to-purple-500">
+    <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-university-500 via-university-900 to-university-800">
       <div className="w-full max-w-md">
         <Outlet />
       </div>
