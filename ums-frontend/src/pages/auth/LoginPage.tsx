@@ -91,7 +91,7 @@ const LoginPage = () => {
             </Button>
           </CardContent>
         </form>
-        {/* <CardFooter className="flex flex-col">
+        <CardFooter className="flex flex-col">
           <div className="text-center text-sm text-muted-foreground">
             <p className="mb-2">Demo Accounts (for testing)</p>
             <div className="space-y-2">
@@ -104,7 +104,7 @@ const LoginPage = () => {
               ))}
             </div>
           </div>
-        </CardFooter> */}
+        </CardFooter>
       </Card>
     </div>
   );

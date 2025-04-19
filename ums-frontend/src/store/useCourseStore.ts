@@ -45,7 +45,7 @@ export const useCourseStore = create<CourseState>((set) => ({
           description:
             "An introductory course covering the basics of computer science.",
           semester: "Fall 2023",
-          instructor: "Professor Johnson",
+          instructor: "Professor Mohamed isse",
         },
         {
           id: "2",
@@ -55,7 +55,7 @@ export const useCourseStore = create<CourseState>((set) => ({
           credits: 4,
           description: "Study of economic principles in business contexts.",
           semester: "Spring 2024",
-          instructor: "Dean Smith",
+          instructor: "Dean Jamac Salad",
         },
         {
           id: "3",
@@ -66,7 +66,7 @@ export const useCourseStore = create<CourseState>((set) => ({
           description:
             "Basic principles of mechanics for engineering applications.",
           semester: "Fall 2023",
-          instructor: "Dr. Martinez",
+          instructor: "Dr. Mohamed Hassan",
         },
         {
           id: "4",
@@ -77,7 +77,7 @@ export const useCourseStore = create<CourseState>((set) => ({
           description:
             "Advanced calculus topics including integration techniques.",
           semester: "Spring 2024",
-          instructor: "Dr. Lee",
+          instructor: "Dr. LIban Jamac",
         },
         {
           id: "5",
@@ -87,7 +87,7 @@ export const useCourseStore = create<CourseState>((set) => ({
           credits: 4,
           description: "Comprehensive introduction to classical physics.",
           semester: "Fall 2023",
-          instructor: "Professor Wilson",
+          instructor: "Professor Abdilahi Amin",
         },
       ];
 
