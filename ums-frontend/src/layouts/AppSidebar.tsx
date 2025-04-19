@@ -31,6 +31,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { Close } from "@radix-ui/react-toast";
 
 const AppSidebar = () => {
   const { user, logout } = useAuth();
@@ -190,7 +191,7 @@ const AppSidebar = () => {
     <Sidebar>
       <SidebarHeader className="p-4">
         <div className="flex items-center space-x-2">
-          <School className="h-8 w-8 text-sidebar-primary" />
+          <School className="h-8 w-8 " />
           <div>
             <h1 className="text-lg font-bold text-sidebar-foreground">
               Scholar Nexus
