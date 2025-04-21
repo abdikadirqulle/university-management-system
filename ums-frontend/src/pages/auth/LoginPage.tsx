@@ -91,20 +91,6 @@ const LoginPage = () => {
             </Button>
           </CardContent>
         </form>
-        <CardFooter className="flex flex-col">
-          <div className="text-center text-sm text-muted-foreground">
-            <p className="mb-2">Demo Accounts (for testing)</p>
-            <div className="space-y-2">
-              {demoAccounts.map((account, index) => (
-                <div key={index} className="rounded border p-2 text-xs">
-                  <p className="font-semibold">{account.role}</p>
-                  <p>Email: {account.email}</p>
-                  <p>Password: {account.password}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </CardFooter>
       </Card>
     </div>
   );
