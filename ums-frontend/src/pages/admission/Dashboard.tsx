@@ -77,23 +77,34 @@ const admissionRequirements = [
 // Sample stats for admission dashboard - removed "My Courses"
 const admissionStats = [
   {
+    title: "Total Students",
+    value: "543", // chage this qiimaha saxda ah from database
+    icon: GraduationCap,
+    iconColor: "text-blue-600",
+    bgColor: "bg-blue-600",
+    trend: { value: 12, isPositive: true },
+  },
+  {
     title: "Enrolled Students",
     value: "156",
     icon: GraduationCap,
     iconColor: "text-indigo-600",
+    bgColor: "bg-indigo-600",
   },
   {
     title: "Pending Applications",
     value: "18",
     icon: Clock,
     iconColor: "text-amber-600",
+    bgColor: "bg-amber-600",
   },
-  {
-    title: "Graded Work",
-    value: "42",
-    icon: BookCheck,
-    iconColor: "text-green-600",
-  },
+  //   {
+  //     title: "Graded Work",
+  //     value: "42",
+  //     icon: BookCheck,
+  //     iconColor: "text-green-600",
+  //     bgColor: "bg-green-600",
+  //   },
 ];
 
 // Sample student data for the table
@@ -227,13 +238,8 @@ const AdmissionDashboard = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={`Welcome, ${user?.name}`}
-        description="Manage student applications and admission processes"
-        action={{
-          label: "New Application",
-          icon: UserPlus,
-          onClick: () => navigate("/admission/student-admission"),
-        }}
+        title={`Welcome, Back`}
+        // description="Manage student applications and admission processes"
       />
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -244,12 +250,13 @@ const AdmissionDashboard = () => {
             value={stat.value}
             icon={stat.icon}
             iconColor={stat.iconColor}
+            bgColor={stat.bgColor}
           />
         ))}
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle className="flex justify-between items-center">
               <span>Recent Applications</span>
@@ -304,9 +311,9 @@ const AdmissionDashboard = () => {
               )}
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle>Upcoming Schedule</CardTitle>
           </CardHeader>
@@ -379,11 +386,11 @@ const AdmissionDashboard = () => {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle>Important Announcements</CardTitle>
           </CardHeader>
@@ -425,7 +432,7 @@ const AdmissionDashboard = () => {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
 
       <div className="space-y-4">
