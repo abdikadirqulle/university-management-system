@@ -8,8 +8,11 @@ import { BookCheck, GraduationCap, Clock, UserPlus } from "lucide-react";
 import { DataTable } from "@/components/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
 import { useStudentApplicationStore } from "@/store/useStudentApplicationStore";
-import { Button } from "@/components/ui/button";
+
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 // Define admission requirements data - keeping this for reference though not displayed anymore
 const admissionRequirements = [
@@ -204,6 +207,21 @@ const columns: ColumnDef<Student>[] = [
   },
 ];
 
+const enrollmentData = [
+  { name: "Jan", students: 2500 },
+  { name: "Feb", students: 3200 },
+  { name: "Mar", students: 3000 },
+  { name: "Apr", students: 4000 },
+  { name: "May", students: 3800 },
+  { name: "Jun", students: 3500 },
+  { name: "Jul", students: 3300 },
+  { name: "Aug", students: 4200 },
+  { name: "Sep", students: 5000 },
+  { name: "Oct", students: 4800 },
+  { name: "Nov", students: 4600 },
+  { name: "Dec", students: 4400 },
+];
+
 const AdmissionDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -256,7 +274,27 @@ const AdmissionDashboard = () => {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        {/* <Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Student Enrollment Trends</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={enrollmentData}>
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Bar
+                    dataKey="students"
+                    fill="#6366f1"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
           <CardHeader>
             <CardTitle className="flex justify-between items-center">
               <span>Recent Applications</span>
@@ -311,7 +349,7 @@ const AdmissionDashboard = () => {
               )}
             </div>
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/* <Card>
           <CardHeader>
