@@ -28,10 +28,10 @@ import {
 
 // Mock financial data for demonstration
 const mockFinancialStats = {
-  totalRevenue: "$1,245,890",
-  pendingPayments: "$78,250",
-  completedTransactions: 1245,
-  outstandingFees: "$125,450",
+  totalRevenue: "$5,890",
+  pendingPayments: "$250",
+  completedTransactions: 125,
+  outstandingFees: "$450",
 };
 
 const mockMonthlyRevenue = [
@@ -74,8 +74,8 @@ const FinancialDashboard = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Financial Dashboard"
-        description="Overview of university financial metrics and operations"
+        title="Welcome, Back!"
+        // description="Overview of university financial metrics and operations"
       />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -97,6 +97,7 @@ const FinancialDashboard = () => {
               value={stats.totalRevenue}
               icon={BadgeDollarSign}
               iconColor="text-emerald-500"
+              bgColor="bg-emerald-500"
               trend={{ value: 12, isPositive: true }}
             />
             <StatsCard
@@ -104,6 +105,7 @@ const FinancialDashboard = () => {
               value={stats.pendingPayments}
               icon={CreditCard}
               iconColor="text-orange-500"
+              bgColor="bg-orange-500"
               trend={{ value: 5, isPositive: false }}
             />
             <StatsCard
@@ -111,6 +113,7 @@ const FinancialDashboard = () => {
               value={stats.completedTransactions}
               icon={BarChart3}
               iconColor="text-purple-500"
+              bgColor="bg-purple-500"
               trend={{ value: 8, isPositive: true }}
             />
             <StatsCard
@@ -118,6 +121,7 @@ const FinancialDashboard = () => {
               value={stats.outstandingFees}
               icon={Users}
               iconColor="text-red-500"
+              bgColor="bg-red-500"
               trend={{ value: 3, isPositive: false }}
             />
           </>
@@ -192,7 +196,7 @@ const FinancialDashboard = () => {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {/* <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card className="shadow-sm">
           <CardHeader>
             <CardTitle>Recent Transactions</CardTitle>
@@ -299,7 +303,7 @@ const FinancialDashboard = () => {
             </ul>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
     </div>
   );
 };
