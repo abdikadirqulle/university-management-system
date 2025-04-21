@@ -13,6 +13,7 @@ import {
   Plus,
   HomeIcon,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // Sample data for the dashboard
 const overviewStats = [
@@ -68,6 +69,8 @@ const enrollmentData = [
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
   useAuthGuard(["academic"]);
 
   useEffect(() => {
@@ -126,20 +129,29 @@ const Dashboard = () => {
             <CardContent>
               <div className="grid grid-cols-2 gap-2">
                 <Card className="cursor-pointer border border-dashed p-3 hover:border-primary hover:text-primary">
-                  <div className="flex flex-col items-center justify-center">
+                  <div
+                    className="flex flex-col items-center justify-center"
+                    onClick={() => navigate("/admin/courses")}
+                  >
                     <BookOpen size={20} />
                     <span className="mt-1 text-sm">Add Course</span>
                   </div>
                 </Card>
                 <Card className="cursor-pointer border border-dashed p-3 hover:border-primary hover:text-primary">
-                  <div className="flex flex-col items-center justify-center">
+                  <div
+                    className="flex flex-col items-center justify-center"
+                    onClick={() => navigate("/admin/departments")}
+                  >
                     <GraduationCap size={20} />
                     <span className="mt-1 text-sm">Add Department</span>
                   </div>
                 </Card>
 
                 <Card className="cursor-pointer border border-dashed p-3 hover:border-primary hover:text-primary">
-                  <div className="flex flex-col items-center justify-center">
+                  <div
+                    className="flex flex-col items-center justify-center"
+                    onClick={() => navigate("/admin/faculties")}
+                  >
                     <School size={20} />
                     <span className="mt-1 text-sm">Add Faculty</span>
                   </div>
