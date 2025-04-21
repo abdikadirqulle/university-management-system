@@ -29,6 +29,7 @@ import {
   DollarSign,
   UserPlus,
   UsersRound,
+  Wallet2Icon,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Close } from "@radix-ui/react-toast";
@@ -97,7 +98,7 @@ const AppSidebar = () => {
         path: "/financial/dashboard",
       },
       {
-        title: "Payments",
+        title: "Student Payments",
         icon: CreditCard,
         path: "/financial/payments",
       },
@@ -106,6 +107,12 @@ const AppSidebar = () => {
         icon: DollarSign,
         path: "/financial/budget",
       },
+      {
+        title: "Expenses",
+        icon: Wallet2Icon,
+        path: "/financial/expenses",
+      },
+
       {
         title: "Reports",
         icon: BarChart,
