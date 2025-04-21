@@ -17,8 +17,8 @@ import {
 // Sample data for the dashboard
 const overviewStats = [
   {
-    title: "Total Active Students",
-    value: "543",
+    title: "Total Students",
+    value: "543", // chage this qiimaha saxda ah from database
     icon: GraduationCap,
     iconColor: "text-blue-600",
     bgColor: "bg-blue-600",
@@ -119,35 +119,6 @@ const Dashboard = () => {
         </Card>
 
         <div className="grid gap-6">
-          {/* <Card>
-            <CardHeader>
-              <CardTitle>Recent Announcements</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                <li className="rounded-lg border p-3">
-                  <p className="font-semibold">New Faculty Orientation</p>
-                  <p className="text-sm text-muted-foreground">
-                    Orientation for new faculty members will be held on Oct 15th
-                    at 9:00 AM.
-                  </p>
-                </li>
-                <li className="rounded-lg border p-3">
-                  <p className="font-semibold">Fall Semester Registration</p>
-                  <p className="text-sm text-muted-foreground">
-                    Registration for Fall 2023 semester starts on August 1st.
-                  </p>
-                </li>
-                <li className="rounded-lg border p-3">
-                  <p className="font-semibold">System Maintenance</p>
-                  <p className="text-sm text-muted-foreground">
-                    Scheduled maintenance on July 15th from 11:00 PM to 2:00 AM.
-                  </p>
-                </li>
-              </ul>
-            </CardContent>
-          </Card> */}
-
           <Card>
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
@@ -156,22 +127,17 @@ const Dashboard = () => {
               <div className="grid grid-cols-2 gap-2">
                 <Card className="cursor-pointer border border-dashed p-3 hover:border-primary hover:text-primary">
                   <div className="flex flex-col items-center justify-center">
-                    <Users size={20} />
-                    <span className="mt-1 text-sm">Add admission</span>
+                    <BookOpen size={20} />
+                    <span className="mt-1 text-sm">Add Course</span>
                   </div>
                 </Card>
                 <Card className="cursor-pointer border border-dashed p-3 hover:border-primary hover:text-primary">
                   <div className="flex flex-col items-center justify-center">
                     <GraduationCap size={20} />
-                    <span className="mt-1 text-sm">Add Student</span>
+                    <span className="mt-1 text-sm">Add Department</span>
                   </div>
                 </Card>
-                <Card className="cursor-pointer border border-dashed p-3 hover:border-primary hover:text-primary">
-                  <div className="flex flex-col items-center justify-center">
-                    <BookOpen size={20} />
-                    <span className="mt-1 text-sm">Add Course</span>
-                  </div>
-                </Card>
+
                 <Card className="cursor-pointer border border-dashed p-3 hover:border-primary hover:text-primary">
                   <div className="flex flex-col items-center justify-center">
                     <School size={20} />
