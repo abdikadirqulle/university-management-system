@@ -27,7 +27,7 @@ import CalendarPage from "./pages/admin/Calendar";
 import AdmissionDashboard from "./pages/admission/Dashboard";
 import StudentEnrollment from "./pages/admission/StudentEnrollment";
 import StudentAdmission from "./pages/admission/StudentAdmission";
-import StudentManager from "./pages/admission/StudentManager";
+import StudentManager from "./pages/admission/StudentList";
 import AdmissionSettings from "./pages/admission/Settings";
 
 // Student Pages
@@ -78,6 +78,9 @@ const App = () => (
               <Route path="reports" element={<ReportsPage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="calendar" element={<CalendarPage />} />
+
+              {/* 404 Page */}
+              <Route path="*" element={<NotFound />} />
             </Route>
 
             {/* admission routes */}
@@ -90,12 +93,18 @@ const App = () => (
               <Route path="student-admission" element={<StudentAdmission />} />
               <Route path="students" element={<StudentManager />} />
               <Route path="settings" element={<AdmissionSettings />} />
+
+              {/* 404 Page */}
+              <Route path="*" element={<NotFound />} />
             </Route>
 
             {/* Student routes */}
             <Route path="/student" element={<AppLayout />}>
               <Route path="dashboard" element={<StudentDashboard />} />
               {/* Add other student routes as needed */}
+
+              {/* 404 Page */}
+              <Route path="*" element={<NotFound />} />
             </Route>
 
             {/* Financial Admin routes */}
@@ -105,6 +114,9 @@ const App = () => (
               <Route path="budget" element={<BudgetPage />} />
               <Route path="reports" element={<FinancialReportsPage />} />
               <Route path="settings" element={<FinancialSettingsPage />} />
+
+              {/* 404 Page */}
+              <Route path="*" element={<NotFound />} />
             </Route>
 
             {/* Root redirect to login */}

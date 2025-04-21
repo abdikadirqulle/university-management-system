@@ -127,14 +127,14 @@ const AppSidebar = () => {
       },
 
       {
-        title: "Students",
-        icon: UsersRound,
-        path: "/admission/students",
-      },
-      {
-        title: "Student Enrollment",
+        title: "Registration",
         icon: UserPlus,
         path: "/admission/student-enrollment",
+      },
+      {
+        title: "All Students",
+        icon: UsersRound,
+        path: "/admission/students",
       },
       {
         title: "Student Admission",

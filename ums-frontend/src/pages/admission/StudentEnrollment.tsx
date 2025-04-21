@@ -81,6 +81,10 @@ const enrollmentSchema = z.object({
   department: z.string().min(1, "Department is required"),
   session: z.string().min(1, "Session is required"),
   class: z.string().min(1, "Class is required"),
+  sem: z.string().min(1, "Semester is required"),
+  batch: z.string().min(1, "Batch is required"),
+  tell: z.string().min(1, "Tell is required"),
+  status: z.string().min(1, "Status is required"),
 });
 
 type EnrollmentFormValues = z.infer<typeof enrollmentSchema>;
@@ -90,10 +94,13 @@ interface Student {
   id: string;
   studentId: string;
   studentName: string;
-  faculty: string;
+  password: string;
   department: string;
+  sem: string;
+  batch: string;
+  tell: string;
   session: string;
-  class: string;
+  status: string;
 }
 
 const StudentEnrollment = () => {
@@ -112,10 +119,13 @@ const StudentEnrollment = () => {
     defaultValues: {
       studentId: "",
       studentName: "",
-      faculty: "",
+      password: "",
       department: "",
       session: "",
-      class: "",
+      sem: "",
+      batch: "",
+      tell: "",
+      status: "",
     },
   });
 
@@ -127,28 +137,37 @@ const StudentEnrollment = () => {
         id: "1",
         studentId: "STU001",
         studentName: "John Doe",
-        faculty: "Engineering",
+        password: "xckhvsdjkgsh",
         department: "Computer Engineering",
-        session: "2023-2024",
-        class: "Year 1",
+        session: "Weekend",
+        sem: "3",
+        batch: "BS",
+        tell: "1234567890",
+        status: "Active",
       },
       {
         id: "2",
         studentId: "STU002",
         studentName: "Jane Smith",
-        faculty: "Science",
+        password: "dgjkshdjfas",
         department: "Physics",
-        session: "2023-2024",
-        class: "Year 2",
+        session: "Regular",
+        sem: "2",
+        batch: "BS",
+        tell: "9876543210",
+        status: "Active",
       },
       {
         id: "3",
         studentId: "STU003",
         studentName: "Alice Johnson",
-        faculty: "Business",
+        password: "djhgasjkga",
         department: "Finance",
-        session: "2023-2024",
-        class: "Year 3",
+        session: "Distance",
+        sem: "3",
+        batch: "BS",
+        tell: "5555555555",
+        status: "Inactive",
       },
     ];
     setStudents(sampleStudents);
@@ -233,7 +252,7 @@ const StudentEnrollment = () => {
     <div className="space-y-6">
       <PageHeader
         title="Student Enrollment"
-        description="Manage student enrollments"
+        // description="Manage student enrollments"
         action={{
           label: "Enroll Student",
           icon: Plus,
@@ -250,7 +269,7 @@ const StudentEnrollment = () => {
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search students..."
+              placeholder="Search students ID, name..."
               className="pl-8 w-[250px]"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -264,10 +283,14 @@ const StudentEnrollment = () => {
               <TableRow>
                 <TableHead>Student ID</TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>Faculty</TableHead>
+                <TableHead>Password</TableHead>
                 <TableHead>Department</TableHead>
+                <TableHead>Batch</TableHead>
+                <TableHead>Sem</TableHead>
                 <TableHead>Session</TableHead>
-                <TableHead>Class</TableHead>
+                <TableHead>Tell</TableHead>
+                <TableHead>Status</TableHead>
+
                 <TableHead className="w-[100px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -286,10 +309,19 @@ const StudentEnrollment = () => {
                   <TableRow key={student.id}>
                     <TableCell>{student.studentId}</TableCell>
                     <TableCell>{student.studentName}</TableCell>
-                    <TableCell>{student.faculty}</TableCell>
+                    <TableCell>{student.password}</TableCell>
                     <TableCell>{student.department}</TableCell>
+                    <TableCell>{student.batch}</TableCell>
+                    <TableCell>{student.sem}</TableCell>
                     <TableCell>{student.session}</TableCell>
-                    <TableCell>{student.class}</TableCell>
+                    <TableCell>{student.tell}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`px-2 py-1 rounded text-white ${student.status === "Active" ? "bg-green-500" : "bg-red-500"}`}
+                      >
+                        {student.status}
+                      </span>
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center space-x-2">
                         <Button

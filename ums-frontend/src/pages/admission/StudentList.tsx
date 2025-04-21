@@ -123,50 +123,6 @@ const StudentManager = () => {
     return matchesSearch && matchesId && matchesSemester && matchesStatus;
   });
 
-  // Function to render the status badge
-  const renderStatusBadge = (status: Student["status"]) => {
-    switch (status) {
-      case "active":
-        return (
-          <Badge
-            variant="default"
-            className="bg-green-100 text-green-800 hover:bg-green-200"
-          >
-            Active
-          </Badge>
-        );
-      case "inactive":
-        return (
-          <Badge
-            variant="secondary"
-            className="bg-gray-100 text-gray-800 hover:bg-gray-200"
-          >
-            Inactive
-          </Badge>
-        );
-      case "graduated":
-        return (
-          <Badge
-            variant="default"
-            className="bg-blue-100 text-blue-800 hover:bg-blue-200"
-          >
-            Graduated
-          </Badge>
-        );
-      case "suspended":
-        return (
-          <Badge
-            variant="secondary"
-            className="bg-red-100 text-red-800 hover:bg-red-200"
-          >
-            Suspended
-          </Badge>
-        );
-      default:
-        return null;
-    }
-  };
-
   // Function to clear all filters
   const clearFilters = () => {
     setSearchTerm("");
@@ -192,6 +148,7 @@ const StudentManager = () => {
                 size="sm"
                 onClick={() => {
                   fetchStudents();
+                  clearFilters();
                   toast.success("Student data refreshed");
                 }}
               >
@@ -237,20 +194,7 @@ const StudentManager = () => {
                   />
                 </div>
               </div>
-              <div className="w-full md:w-48">
-                <Label htmlFor="id-filter" className="mb-2 block">
-                  Student ID
-                </Label>
-                <Input
-                  id="id-filter"
-                  placeholder="Filter by ID"
-                  value={idFilter}
-                  onChange={(e) => setIdFilter(e.target.value)}
-                />
-              </div>
-            </div>
 
-            <div className="flex flex-col md:flex-row gap-4">
               <div className="w-full md:w-48">
                 <Label htmlFor="semester-filter" className="mb-2 block">
                   Semester
@@ -293,14 +237,16 @@ const StudentManager = () => {
                 </Select>
               </div>
 
-              <div className="self-end">
-                <Button
-                  variant="outline"
-                  onClick={clearFilters}
-                  className="h-10"
-                >
-                  <X className="h-4 w-4 mr-2" /> Clear Filters
-                </Button>
+              <div className="w-full md:w-48">
+                <Label htmlFor="id-filter" className="mb-2 block">
+                  Student ID
+                </Label>
+                <Input
+                  id="id-filter"
+                  placeholder="Filter by ID"
+                  value={idFilter}
+                  onChange={(e) => setIdFilter(e.target.value)}
+                />
               </div>
             </div>
           </div>
@@ -359,7 +305,22 @@ const StudentManager = () => {
                       <TableCell className="hidden md:table-cell">
                         {student.session}
                       </TableCell>
-                      <TableCell>{renderStatusBadge(student.status)}</TableCell>
+                      <TableCell>
+                        <span
+                          className={`px-2 py-1 rounded text-white ${
+                            student.status === "active"
+                              ? "bg-green-500"
+                              : student.status === "graduated"
+                                ? "bg-blue-500"
+                                : student.status === "suspended"
+                                  ? "bg-gray-500"
+                                  : "bg-red-500"
+                          }`}
+                        >
+                          {student.status}
+                        </span>
+                      </TableCell>
+
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
