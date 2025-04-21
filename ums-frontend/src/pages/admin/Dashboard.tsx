@@ -5,36 +5,48 @@ import PageHeader from "@/components/PageHeader";
 import StatsCard from "@/components/StatsCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
-import { Users, GraduationCap, School, BookOpen, Plus } from "lucide-react";
+import {
+  Users,
+  GraduationCap,
+  School,
+  BookOpen,
+  Plus,
+  HomeIcon,
+} from "lucide-react";
 
 // Sample data for the dashboard
 const overviewStats = [
   {
-    title: "Total Students",
-    value: "12,543",
+    title: "Total Active Students",
+    value: "543",
     icon: GraduationCap,
     iconColor: "text-blue-600",
+    bgColor: "bg-blue-600",
     trend: { value: 12, isPositive: true },
-  },
-  {
-    title: "Total admission",
-    value: "842",
-    icon: Users,
-    iconColor: "text-indigo-600",
-    trend: { value: 5, isPositive: true },
   },
   {
     title: "Faculties",
     value: "8",
     icon: School,
     iconColor: "text-purple-600",
+    bgColor: "bg-purple-600",
     trend: { value: 0, isPositive: true },
   },
   {
+    title: "Total Departments",
+    value: "12",
+    icon: HomeIcon,
+    iconColor: "text-indigo-600",
+    bgColor: "bg-indigo-600",
+    trend: { value: 5, isPositive: true },
+  },
+
+  {
     title: "Courses",
-    value: "384",
+    value: "38",
     icon: BookOpen,
     iconColor: "text-emerald-600",
+    bgColor: "bg-emerald-600",
     trend: { value: 3, isPositive: true },
   },
 ];
@@ -66,8 +78,8 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={`Welcome, ${user?.name}`}
-        description="Academic administration dashboard overview"
+        title={`Welcome, Back!`}
+        // description="Academic administration dashboard overview"
       />
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -79,6 +91,7 @@ const Dashboard = () => {
             icon={stat.icon}
             trend={stat.trend}
             iconColor={stat.iconColor}
+            bgColor={stat.bgColor}
           />
         ))}
       </div>
@@ -106,7 +119,7 @@ const Dashboard = () => {
         </Card>
 
         <div className="grid gap-6">
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle>Recent Announcements</CardTitle>
             </CardHeader>
@@ -133,7 +146,7 @@ const Dashboard = () => {
                 </li>
               </ul>
             </CardContent>
-          </Card>
+          </Card> */}
 
           <Card>
             <CardHeader>

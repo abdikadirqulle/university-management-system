@@ -10,6 +10,7 @@ interface StatsCardProps {
     isPositive: boolean;
   };
   iconColor?: string;
+  bgColor?: string;
   className?: string;
 }
 
@@ -19,36 +20,18 @@ const StatsCard = ({
   icon: Icon,
   trend,
   iconColor = "text-primary",
+  bgColor,
   className,
 }: StatsCardProps) => {
   return (
-    <div className={cn("card-stats", className)}>
+    <div className={cn("card-stats", bgColor, className)}>
       <div className="flex items-center justify-between">
-        <h3 className="card-stats-title">{title}</h3>
-        <div
-          className={cn(
-            "rounded-full p-2",
-            iconColor.replace("text-", "bg-") + "/10",
-          )}
-        >
-          <Icon className={cn("h-5 w-5", iconColor)} />
+        <h3 className="card-stats-title text-white text-xl">{title}</h3>
+        <div className={cn("rounded-full p-2 text-black")}>
+          <Icon className={cn("h-6 w-6 ")} />
         </div>
       </div>
-      <p className="card-stats-value">{value}</p>
-
-      {trend && (
-        <div
-          className={cn(
-            "mt-2 flex items-center text-xs",
-            trend.isPositive ? "text-green-600" : "text-red-600",
-          )}
-        >
-          <span className="mr-1">{trend.isPositive ? "↑" : "↓"}</span>
-          <span>
-            {trend.value}%{trend.isPositive ? " increase" : " decrease"}
-          </span>
-        </div>
-      )}
+      <p className="card-stats-value text-white text-3xl">{value}</p>
     </div>
   );
 };
