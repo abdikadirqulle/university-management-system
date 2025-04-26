@@ -98,14 +98,10 @@ const AppSidebar = () => {
         icon: CreditCard,
         path: "/financial/payments",
       },
-      {
-        title: "Budget",
-        icon: DollarSign,
-        path: "/financial/budget",
-      },
+
       {
         title: "Expenses",
-        icon: Wallet2Icon,
+        icon: DollarSign,
         path: "/financial/expenses",
       },
 

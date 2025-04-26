@@ -69,7 +69,7 @@ The University Management System (UMS) is a web-based application designed to ma
  ┃ ┣ 📂 config        # Database & server configuration
  ┃ ┣ 📂 controllers   # API controllers (business logic)
  ┃ ┣ 📂 middleware    # Middleware (auth, validation)
- ┃ ┣ 📂 models        # Prisma schema & database models
+ ┃ ┣ 📂 prisma        # Prisma schema & database models
  ┃ ┣ 📂 routes        # API route handlers
  ┃ ┣ 📂 services      # Business logic & integrations
  ┃ ┣ 📂 utils         # Helper functions
