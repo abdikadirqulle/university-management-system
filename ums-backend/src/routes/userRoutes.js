@@ -3,6 +3,10 @@ import {
   registerUser,
   loginUser,
   getCurrentUser,
+  updateUser,
+  deleteUser,
+  getAllUsers,
+  getUserById,
 } from "../controllers/userController.js"
 import { authenticateUser, authorize } from "../middleware/authMiddleware.js"
 
@@ -14,18 +18,35 @@ router.post("/login", loginUser)
 
 // Protected routes
 router.get("/me", authenticateUser, getCurrentUser)
+router.put("/me", authenticateUser, updateUser)
 
-// Role-based routes example
+// Admin routes
+router.get("/admin/users", authenticateUser, authorize("admin"), getAllUsers)
+
 router.get(
-  "/admin-dashboard",
+  "/admin/users/:id",
   authenticateUser,
-  authorize("ADMIN", "SUPER_ADMIN"),
+  authorize("admin"),
+  getUserById
+)
+
+router.delete(
+  "/admin/users/:id",
+  authenticateUser,
+  authorize("admin"),
+  deleteUser
+)
+
+// Role-based dashboard routes
+router.get(
+  "/admin/dashboard",
+  authenticateUser,
+  authorize("admin"),
   (req, res) => {
     res.status(200).json({
       success: true,
       message: "Admin dashboard data",
       data: {
-        // Admin dashboard data would go here
         stats: {
           totalStudents: 1250,
           totalFaculty: 85,
@@ -38,15 +59,46 @@ router.get(
 )
 
 router.get(
-  "/student-dashboard",
+  "/financial/dashboard",
   authenticateUser,
-  authorize("STUDENT"),
+  authorize("financial"),
+  (req, res) => {
+    res.status(200).json({
+      success: true,
+      message: "Financial dashboard data",
+      data: {
+        payments: [],
+        financialStats: {},
+      },
+    })
+  }
+)
+
+router.get(
+  "/admission/dashboard",
+  authenticateUser,
+  authorize("admission"),
+  (req, res) => {
+    res.status(200).json({
+      success: true,
+      message: "Admission dashboard data",
+      data: {
+        applications: [],
+        admissionStats: {},
+      },
+    })
+  }
+)
+
+router.get(
+  "/student/dashboard",
+  authenticateUser,
+  authorize("student"),
   (req, res) => {
     res.status(200).json({
       success: true,
       message: "Student dashboard data",
       data: {
-        // Student dashboard data would go here
         enrollments: [],
         exams: [],
         payments: [],

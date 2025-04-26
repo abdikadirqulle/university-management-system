@@ -25,25 +25,34 @@ const authenticateUser = async (req, res, next) => {
         name: true,
         email: true,
         role: true,
-        student: {
+        students: {
           select: {
             id: true,
             studentId: true,
-            department: true,
-            yearOfStudy: true,
-          },
-        },
-        admin: {
-          select: {
-            id: true,
-            role: true,
-          },
-        },
-        faculty: {
-          select: {
-            id: true,
-            department: true,
-            position: true,
+            fullName: true,
+            gender: true,
+            dateOfBirth: true,
+            placeOfBirth: true,
+            email: true,
+            phoneNumber: true,
+            highSchoolName: true,
+            highSchoolCity: true,
+            graduationYear: true,
+            averagePass: true,
+            session: true,
+            academicYear: true,
+            registerYear: true,
+            semester: true,
+            faculty: {
+              select: {
+                name: true,
+              },
+            },
+            department: {
+              select: {
+                name: true,
+              },
+            },
           },
         },
       },
