@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
+
 import {
   Table,
   TableBody,
@@ -13,34 +13,25 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { Search, Plus, Edit, Trash2 } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { RegistrationForm } from "./RegistrationForm";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 // Sample data
 const FACULTIES = [
@@ -78,6 +69,7 @@ const enrollmentSchema = z.object({
   studentId: z.string().min(1, "Student ID is required"),
   studentName: z.string().min(1, "Student name is required"),
   faculty: z.string().min(1, "Faculty is required"),
+  password: z.string().min(1, "password is required"),
   department: z.string().min(1, "Department is required"),
   session: z.string().min(1, "Session is required"),
   class: z.string().min(1, "Class is required"),
@@ -94,6 +86,7 @@ interface Student {
   id: string;
   studentId: string;
   studentName: string;
+  faculty: string;
   password: string;
   department: string;
   sem: string;
@@ -137,6 +130,7 @@ const StudentEnrollment = () => {
         id: "1",
         studentId: "STU001",
         studentName: "John Doe",
+        faculty: "Engineering",
         password: "xckhvsdjkgsh",
         department: "Computer Engineering",
         session: "Weekend",
@@ -149,6 +143,7 @@ const StudentEnrollment = () => {
         id: "2",
         studentId: "STU002",
         studentName: "Jane Smith",
+        faculty: "Science",
         password: "dgjkshdjfas",
         department: "Physics",
         session: "Regular",
@@ -161,6 +156,7 @@ const StudentEnrollment = () => {
         id: "3",
         studentId: "STU003",
         studentName: "Alice Johnson",
+        faculty: "Business",
         password: "djhgasjkga",
         department: "Finance",
         session: "Distance",
@@ -173,29 +169,6 @@ const StudentEnrollment = () => {
     setStudents(sampleStudents);
   }, []);
 
-  // Handle form submission
-  const onSubmit = (data: EnrollmentFormValues) => {
-    if (isEditing && currentStudent) {
-      // Update existing student
-      setStudents((prev) =>
-        prev.map((student) =>
-          student.id === currentStudent.id ? { ...student, ...data } : student,
-        ),
-      );
-      toast.success("Student updated successfully");
-    } else {
-      // Add new student
-      const newStudent: Student = {
-        id: Date.now().toString(),
-        ...data,
-      };
-      setStudents((prev) => [...prev, newStudent]);
-      toast.success("Student enrolled successfully");
-    }
-    setIsDialogOpen(false);
-    resetForm();
-  };
-
   // Reset form and editing state
   const resetForm = () => {
     form.reset();
@@ -203,11 +176,6 @@ const StudentEnrollment = () => {
     setCurrentStudent(null);
     setSelectedFaculty("");
   };
-
-  // Filter departments based on selected faculty
-  const filteredDepartments = selectedFaculty
-    ? DEPARTMENTS[selectedFaculty as keyof typeof DEPARTMENTS] || []
-    : [];
 
   // Handle editing a student
   const handleEdit = (student: Student) => {
@@ -229,7 +197,7 @@ const StudentEnrollment = () => {
           .flatMap(([_, depts]) => depts)
           .find((d) => d.name === student.department)?.id || "",
       session: student.session,
-      class: student.class,
+      class: student.batch,
     });
 
     setIsDialogOpen(true);
@@ -263,6 +231,7 @@ const StudentEnrollment = () => {
         }}
       />
 
+      {/* table */}
       <div className="rounded-lg border bg-card">
         <div className="p-4 flex items-center justify-between border-b">
           <h3 className="text-lg font-medium">Students</h3>
@@ -332,14 +301,31 @@ const StudentEnrollment = () => {
                           <Edit className="h-4 w-4" />
                           <span className="sr-only">Edit</span>
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(student.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                          <span className="sr-only">Delete</span>
-                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                              <span className="sr-only">Delete</span>
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will
+                                permanently delete the student record.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDelete(student.id)}
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -350,172 +336,11 @@ const StudentEnrollment = () => {
         </div>
       </div>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>
-              {isEditing ? "Edit Student" : "Enroll New Student"}
-            </DialogTitle>
-            <DialogDescription>
-              {isEditing
-                ? "Update student enrollment details"
-                : "Fill in the details to enroll a new student"}
-            </DialogDescription>
-          </DialogHeader>
-
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="studentId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Student ID</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter student ID" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="studentName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Student Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter full name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="faculty"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Faculty</FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          field.onChange(value);
-                          setSelectedFaculty(value);
-                          form.setValue("department", ""); // Reset department when faculty changes
-                        }}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select faculty" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {FACULTIES.map((faculty) => (
-                            <SelectItem key={faculty.id} value={faculty.id}>
-                              {faculty.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="department"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Department</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                        disabled={!selectedFaculty}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select department" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {filteredDepartments.map((dept) => (
-                            <SelectItem key={dept.id} value={dept.id}>
-                              {dept.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="session"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Session</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., 2023-2024" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="class"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Class</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select class" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Year 1">Year 1</SelectItem>
-                          <SelectItem value="Year 2">Year 2</SelectItem>
-                          <SelectItem value="Year 3">Year 3</SelectItem>
-                          <SelectItem value="Year 4">Year 4</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setIsDialogOpen(false);
-                    resetForm();
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit">
-                  {isEditing ? "Update Student" : "Enroll Student"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+      {/* form */}
+      <RegistrationForm
+        setIsDialogOpen={setIsDialogOpen}
+        isDialogOpen={isDialogOpen}
+      />
     </div>
   );
 };

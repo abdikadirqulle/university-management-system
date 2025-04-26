@@ -42,15 +42,6 @@ const AppSidebar = () => {
     return location.pathname === path;
   };
 
-  // Common menu items for all roles
-  const commonMenuItems = [
-    {
-      title: "Settings",
-      icon: Settings,
-      path: `/${user?.role === "academic" ? "admin" : user?.role}/settings`,
-    },
-  ];
-
   // Role-specific menu items
   const roleMenuItems = {
     academic: [
@@ -89,6 +80,11 @@ const AppSidebar = () => {
         title: "Reports",
         icon: BarChart,
         path: "/admin/reports",
+      },
+      {
+        title: "Settings",
+        icon: Settings,
+        path: `/admin/settings`,
       },
     ],
     financial: [
@@ -172,9 +168,7 @@ const AppSidebar = () => {
   };
 
   // Get menu items based on user role
-  const menuItems = user?.role
-    ? [...roleMenuItems[user.role], ...commonMenuItems]
-    : [];
+  const menuItems = [...roleMenuItems[user.role]];
 
   const roleLabel = user?.role
     ? {

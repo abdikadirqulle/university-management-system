@@ -28,7 +28,6 @@ import AdmissionDashboard from "./pages/admission/Dashboard";
 import StudentEnrollment from "./pages/admission/StudentEnrollment";
 import StudentAdmission from "./pages/admission/StudentAdmission";
 import StudentManager from "./pages/admission/StudentList";
-import AdmissionSettings from "./pages/admission/Settings";
 
 // Student Pages
 import StudentDashboard from "./pages/student/Dashboard";
@@ -66,6 +65,9 @@ const App = () => (
             {/* Auth routes */}
             <Route element={<AuthLayout />}>
               <Route path="/login" element={<LoginPage />} />
+              {/* Root redirect to login */}
+
+              <Route path="/" element={<LoginPage />} />
             </Route>
 
             {/* Admin routes */}
@@ -92,7 +94,6 @@ const App = () => (
               />
               <Route path="student-admission" element={<StudentAdmission />} />
               <Route path="students" element={<StudentManager />} />
-              <Route path="settings" element={<AdmissionSettings />} />
 
               {/* 404 Page */}
               <Route path="*" element={<NotFound />} />
@@ -118,9 +119,6 @@ const App = () => (
               {/* 404 Page */}
               <Route path="*" element={<NotFound />} />
             </Route>
-
-            {/* Root redirect to login */}
-            <Route path="/" element={<Index />} />
 
             {/* 404 Page */}
             <Route path="*" element={<NotFound />} />
