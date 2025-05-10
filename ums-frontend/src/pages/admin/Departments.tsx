@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, Loader2 } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import {
   Dialog,
@@ -33,65 +33,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-// Define the Department interface
-interface Department {
-  id: string;
-  name: string;
-  description: string;
-  facultyId: string;
-  facultyName: string;
-  head: string;
-  email: string;
-  phone: string;
-}
-
-// Define the Faculty interface for dropdown selection
-interface Faculty {
-  id: string;
-  name: string;
-}
-
-// Sample data
-const initialDepartments: Department[] = [
-  {
-    id: "1",
-    name: "Computer Science",
-    description: "Studies in computer science and information technology",
-    facultyId: "1",
-    facultyName: "Faculty of Science",
-    head: "Dr. ALi aadan",
-    email: "cs.dept@university.edu",
-    phone: "123-456-7890",
-  },
-  {
-    id: "2",
-    name: "Business Administration",
-    description: "Studies in business and management",
-    facultyId: "2",
-    facultyName: "Faculty of Business",
-    head: "Prof. Mohamed Xassan",
-    email: "business.dept@university.edu",
-    phone: "123-456-7891",
-  },
-  {
-    id: "3",
-    name: "Electrical Engineering",
-    description: "Studies in electrical systems and electronics",
-    facultyId: "3",
-    facultyName: "Faculty of Engineering",
-    head: "Dr. Farah Macalin",
-    email: "ee.dept@university.edu",
-    phone: "123-456-7892",
-  },
-];
-
-// Sample faculties for dropdown
-const faculties: Faculty[] = [
-  { id: "1", name: "Faculty of Science" },
-  { id: "2", name: "Faculty of Business" },
-  { id: "3", name: "Faculty of Engineering" },
-];
+import { Department, useDepartmentStore } from "@/store/useDepartmentStore";
+import { Faculty, useFacultyStore } from "@/store/useFacultyStore";
 
 // Form schema
 const departmentFormSchema = z.object({
@@ -108,8 +51,15 @@ const departmentFormSchema = z.object({
 type DepartmentFormValues = z.infer<typeof departmentFormSchema>;
 
 const DepartmentsPage = () => {
-  const [departments, setDepartments] =
-    useState<Department[]>(initialDepartments);
+  const {
+    departments,
+    fetchDepartments,
+    addDepartment,
+    updateDepartment,
+    deleteDepartment,
+    isLoading,
+  } = useDepartmentStore();
+  const { faculties, fetchFaculties, isLoading: facultiesLoading } = useFacultyStore();
   const [isOpen, setIsOpen] = useState(false);
   const [editingDepartment, setEditingDepartment] = useState<Department | null>(
     null,
@@ -128,6 +78,12 @@ const DepartmentsPage = () => {
     },
   });
 
+  // Fetch departments and faculties on component mount
+  useEffect(() => {
+    fetchDepartments();
+    fetchFaculties();
+  }, [fetchDepartments, fetchFaculties]);
+
   // Reset form when dialog closes
   const handleDialogOpenChange = (open: boolean) => {
     if (!open) {
@@ -138,36 +94,35 @@ const DepartmentsPage = () => {
   };
 
   // Handle form submission
-  const onSubmit = (data: DepartmentFormValues) => {
-    const selectedFaculty = faculties.find(
-      (faculty) => faculty.id === data.facultyId,
-    );
-    const facultyName = selectedFaculty ? selectedFaculty.name : "";
-
-    if (editingDepartment) {
-      // Update existing department
-      const updatedDepartments = departments.map((department) =>
-        department.id === editingDepartment.id
-          ? {
-              ...department,
-              ...data,
-              facultyName,
-            }
-          : department,
+  const onSubmit = async (data: DepartmentFormValues) => {
+    try {
+      const selectedFaculty = faculties.find(
+        (faculty) => faculty.id === data.facultyId,
       );
-      setDepartments(updatedDepartments);
-      toast.success("Department updated successfully");
-    } else {
-      // Add new department
-      const newDepartment: Department = {
-        id: String(Date.now()),
-        ...data,
-        facultyName,
-      };
-      setDepartments([...departments, newDepartment]);
-      toast.success("Department added successfully");
+      const facultyName = selectedFaculty ? selectedFaculty.name : "Unknown Faculty";
+
+      if (editingDepartment) {
+        // Update existing department
+        await updateDepartment(editingDepartment.id, {
+          ...data,
+          departmentHead: data.head,
+          facultyName,
+        });
+        toast.success("Department updated successfully");
+      } else {
+        // Add new department
+        await addDepartment({
+          ...data,
+          departmentHead: data.head,
+          facultyName,
+        });
+        toast.success("Department added successfully");
+      }
+      handleDialogOpenChange(false);
+    } catch (error) {
+      toast.error("Failed to save department");
+      console.error(error);
     }
-    handleDialogOpenChange(false);
   };
 
   // Handle edit department
@@ -175,22 +130,26 @@ const DepartmentsPage = () => {
     setEditingDepartment(department);
     form.reset({
       name: department.name,
-      description: department.description,
+      description: department.description || "",
       facultyId: department.facultyId,
-      head: department.head,
-      email: department.email,
-      phone: department.phone,
+      head: department.departmentHead,
+      email: department.email || "",
+      phone: department.phone || "",
     });
     setIsOpen(true);
   };
 
   // Handle delete department
-  const handleDelete = (id: string) => {
-    const updatedDepartments = departments.filter(
-      (department) => department.id !== id,
-    );
-    setDepartments(updatedDepartments);
-    toast.success("Department deleted successfully");
+  const handleDelete = async (id: string) => {
+    if (confirm("Are you sure you want to delete this department? This action cannot be undone.")) {
+      try {
+        await deleteDepartment(id);
+        toast.success("Department deleted successfully");
+      } catch (error) {
+        toast.error("Failed to delete department");
+        console.error(error);
+      }
+    }
   };
 
   // Define columns
@@ -204,7 +163,7 @@ const DepartmentsPage = () => {
       header: "Faculty",
     },
     {
-      accessorKey: "head",
+      accessorKey: "departmentHead",
       header: "Department Head",
     },
     {
@@ -225,6 +184,7 @@ const DepartmentsPage = () => {
               variant="ghost"
               size="icon"
               onClick={() => handleEdit(department)}
+              disabled={isLoading}
             >
               <Edit className="h-4 w-4" />
               <span className="sr-only">Edit</span>
@@ -233,6 +193,7 @@ const DepartmentsPage = () => {
               variant="ghost"
               size="icon"
               onClick={() => handleDelete(department.id)}
+              disabled={isLoading}
             >
               <Trash2 className="h-4 w-4 text-destructive" />
               <span className="sr-only">Delete</span>
@@ -255,7 +216,16 @@ const DepartmentsPage = () => {
         }}
       />
 
-      <DataTable columns={columns} data={departments} />
+      <div className="mt-6">
+        {isLoading ? (
+          <div className="flex justify-center items-center py-10">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <span className="ml-2">Loading departments...</span>
+          </div>
+        ) : (
+          <DataTable columns={columns} data={departments} />
+        )}
+      </div>
 
       <Dialog open={isOpen} onOpenChange={handleDialogOpenChange}>
         <DialogContent className="sm:max-w-[550px]">
@@ -320,11 +290,22 @@ const DepartmentsPage = () => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {faculties.map((faculty) => (
-                          <SelectItem key={faculty.id} value={faculty.id}>
-                            {faculty.name}
-                          </SelectItem>
-                        ))}
+                        {facultiesLoading ? (
+                          <div className="flex items-center justify-center p-2">
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            Loading...
+                          </div>
+                        ) : faculties.length === 0 ? (
+                          <div className="p-2 text-center text-muted-foreground">
+                            No faculties found
+                          </div>
+                        ) : (
+                          faculties.map((faculty) => (
+                            <SelectItem key={faculty.id} value={faculty.id}>
+                              {faculty.name}
+                            </SelectItem>
+                          ))
+                        )}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -380,8 +361,26 @@ const DepartmentsPage = () => {
               />
 
               <DialogFooter>
-                <Button type="submit">
-                  {editingDepartment ? "Update Department" : "Add Department"}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleDialogOpenChange(false)}
+                  disabled={form.formState.isSubmitting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={form.formState.isSubmitting || isLoading}
+                >
+                  {form.formState.isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {editingDepartment ? "Updating..." : "Adding..."}
+                    </>
+                  ) : (
+                    editingDepartment ? "Update Department" : "Add Department"
+                  )}
                 </Button>
               </DialogFooter>
             </form>
