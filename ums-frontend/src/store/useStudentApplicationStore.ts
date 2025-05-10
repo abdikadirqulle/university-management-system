@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { StudentApplication } from "@/types/admission";
+import studentApplicationService from "@/services/studentApplicationService";
+import { toast } from "sonner";
 
 interface ApplicationState {
   applications: StudentApplication[];
@@ -33,55 +35,13 @@ export const useStudentApplicationStore = create<ApplicationState>(
     fetchApplications: async () => {
       set({ isLoading: true, error: null });
       try {
-        // This would be an API call in a real app
-        await new Promise((resolve) => setTimeout(resolve, 800));
-
-        // Sample data
-        const sampleApplications: StudentApplication[] = [
-          {
-            id: "1",
-            fullName: "John Smith",
-            email: "john.smith@example.com",
-            gender: "male",
-            dateOfBirth: "1999-05-15",
-            desiredDepartment: "Computer Science",
-            status: "pending",
-            applicationDate: "2023-06-10",
-          },
-          {
-            id: "2",
-            fullName: "Maria Garcia",
-            email: "maria.garcia@example.com",
-            gender: "female",
-            dateOfBirth: "2000-03-22",
-            desiredDepartment: "Business Administration",
-            status: "approved",
-            applicationDate: "2023-05-28",
-            reviewedBy: "Admin User",
-            reviewedAt: "2023-06-05",
-          },
-          {
-            id: "3",
-            fullName: "Ahmed Khan",
-            email: "ahmed.khan@example.com",
-            gender: "male",
-            dateOfBirth: "1998-11-08",
-            desiredDepartment: "Electrical Engineering",
-            status: "rejected",
-            applicationDate: "2023-06-01",
-            reviewedBy: "Admin User",
-            reviewedAt: "2023-06-07",
-            notes: "Missing prerequisite qualifications",
-          },
-        ];
-
-        set({ applications: sampleApplications, isLoading: false });
+        const applications = await studentApplicationService.getAllApplications();
+        set({ applications, isLoading: false });
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Failed to fetch applications";
+        toast.error(errorMessage);
         set({
-          error:
-            error instanceof Error
-              ? error.message
-              : "Failed to fetch applications",
+          error: errorMessage,
           isLoading: false,
         });
       }
@@ -90,26 +50,17 @@ export const useStudentApplicationStore = create<ApplicationState>(
     addApplication: async (application) => {
       set({ isLoading: true, error: null });
       try {
-        // This would be an API call in a real app
-        await new Promise((resolve) => setTimeout(resolve, 800));
-
-        const newApplication: StudentApplication = {
-          ...application,
-          id: String(Date.now()),
-          applicationDate: new Date().toISOString().split("T")[0],
-          status: "pending",
-        };
-
+        const newApplication = await studentApplicationService.createApplication(application);
         set((state) => ({
           applications: [...state.applications, newApplication],
           isLoading: false,
         }));
+        toast.success("Application submitted successfully");
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Failed to add application";
+        toast.error(errorMessage);
         set({
-          error:
-            error instanceof Error
-              ? error.message
-              : "Failed to add application",
+          error: errorMessage,
           isLoading: false,
         });
       }
@@ -118,21 +69,19 @@ export const useStudentApplicationStore = create<ApplicationState>(
     updateApplication: async (id, data) => {
       set({ isLoading: true, error: null });
       try {
-        // This would be an API call in a real app
-        await new Promise((resolve) => setTimeout(resolve, 800));
-
+        const updatedApplication = await studentApplicationService.updateApplication(id, data);
         set((state) => ({
           applications: state.applications.map((app) =>
-            app.id === id ? { ...app, ...data } : app,
+            app.id === id ? updatedApplication : app
           ),
           isLoading: false,
         }));
+        toast.success("Application updated successfully");
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Failed to update application";
+        toast.error(errorMessage);
         set({
-          error:
-            error instanceof Error
-              ? error.message
-              : "Failed to update application",
+          error: errorMessage,
           isLoading: false,
         });
       }
@@ -141,19 +90,17 @@ export const useStudentApplicationStore = create<ApplicationState>(
     deleteApplication: async (id) => {
       set({ isLoading: true, error: null });
       try {
-        // This would be an API call in a real app
-        await new Promise((resolve) => setTimeout(resolve, 800));
-
+        await studentApplicationService.deleteApplication(id);
         set((state) => ({
           applications: state.applications.filter((app) => app.id !== id),
           isLoading: false,
         }));
+        toast.success("Application deleted successfully");
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Failed to delete application";
+        toast.error(errorMessage);
         set({
-          error:
-            error instanceof Error
-              ? error.message
-              : "Failed to delete application",
+          error: errorMessage,
           isLoading: false,
         });
       }
@@ -162,12 +109,8 @@ export const useStudentApplicationStore = create<ApplicationState>(
     approveApplication: async (id, reviewedBy) => {
       set({ isLoading: true, error: null });
       try {
-        // This would be an API call in a real app
-        await new Promise((resolve) => setTimeout(resolve, 800));
-
-        // Generate student ID - in a real app this would be done on the server
-        const studentId = `STU${Math.floor(10000 + Math.random() * 90000)}`;
-
+        const studentId = await studentApplicationService.approveApplication(id, reviewedBy);
+        
         set((state) => ({
           applications: state.applications.map((app) =>
             app.id === id
@@ -177,19 +120,18 @@ export const useStudentApplicationStore = create<ApplicationState>(
                   reviewedBy,
                   reviewedAt: new Date().toISOString(),
                 }
-              : app,
+              : app
           ),
           isLoading: false,
         }));
-
-        // Return the generated student ID
+        
+        toast.success("Application approved successfully");
         return studentId;
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Failed to approve application";
+        toast.error(errorMessage);
         set({
-          error:
-            error instanceof Error
-              ? error.message
-              : "Failed to approve application",
+          error: errorMessage,
           isLoading: false,
         });
         throw error;
@@ -199,9 +141,8 @@ export const useStudentApplicationStore = create<ApplicationState>(
     rejectApplication: async (id, reviewedBy, notes) => {
       set({ isLoading: true, error: null });
       try {
-        // This would be an API call in a real app
-        await new Promise((resolve) => setTimeout(resolve, 800));
-
+        await studentApplicationService.rejectApplication(id, reviewedBy, notes);
+        
         set((state) => ({
           applications: state.applications.map((app) =>
             app.id === id
@@ -210,20 +151,22 @@ export const useStudentApplicationStore = create<ApplicationState>(
                   status: "rejected",
                   reviewedBy,
                   reviewedAt: new Date().toISOString(),
-                  notes: notes || app.notes,
+                  notes,
                 }
-              : app,
+              : app
           ),
           isLoading: false,
         }));
+        
+        toast.success("Application rejected successfully");
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Failed to reject application";
+        toast.error(errorMessage);
         set({
-          error:
-            error instanceof Error
-              ? error.message
-              : "Failed to reject application",
+          error: errorMessage,
           isLoading: false,
         });
+        throw error;
       }
     },
   }),

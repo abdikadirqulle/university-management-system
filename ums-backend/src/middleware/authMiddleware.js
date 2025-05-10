@@ -20,42 +20,7 @@ const authenticateUser = async (req, res, next) => {
     // Find user by id
     const user = await prisma.user.findUnique({
       where: { id: decoded.id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        students: {
-          select: {
-            id: true,
-            studentId: true,
-            fullName: true,
-            gender: true,
-            dateOfBirth: true,
-            placeOfBirth: true,
-            email: true,
-            phoneNumber: true,
-            highSchoolName: true,
-            highSchoolCity: true,
-            graduationYear: true,
-            averagePass: true,
-            session: true,
-            academicYear: true,
-            registerYear: true,
-            semester: true,
-            faculty: {
-              select: {
-                name: true,
-              },
-            },
-            department: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-      },
+   
     })
 
     if (!user) {

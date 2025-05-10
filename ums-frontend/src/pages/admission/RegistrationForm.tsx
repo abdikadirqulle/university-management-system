@@ -3,16 +3,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -20,6 +13,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
@@ -30,233 +24,284 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
-
+import { Loader2 } from "lucide-react";
+import { useDepartmentStore } from "@/store/useDepartmentStore";
+import { useFacultyStore } from "@/store/useFacultyStore";
+import { useStudentStore } from "@/store/useStudentStore";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
+import PageHeader from "@/components/PageHeader";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
-// Sample data
-const FACULTIES = [
-  { id: "1", name: "Engineering" },
-  { id: "2", name: "Science" },
-  { id: "3", name: "Arts" },
-  { id: "4", name: "Business" },
+// Academic years and semesters
+const ACADEMIC_YEARS = [
+  { id: "2023", name: "2023-2024" },
+  { id: "2024", name: "2024-2025" },
+  { id: "2025", name: "2025-2026" },
 ];
 
-const DEPARTMENTS = {
-  "1": [
-    { id: "101", name: "Computer Engineering" },
-    { id: "102", name: "Electrical Engineering" },
-    { id: "103", name: "Mechanical Engineering" },
-  ],
-  "2": [
-    { id: "201", name: "Physics" },
-    { id: "202", name: "Chemistry" },
-    { id: "203", name: "Mathematics" },
-  ],
-  "3": [
-    { id: "301", name: "Literature" },
-    { id: "302", name: "History" },
-    { id: "303", name: "Philosophy" },
-  ],
-  "4": [
-    { id: "401", name: "Marketing" },
-    { id: "402", name: "Finance" },
-    { id: "403", name: "Management" },
-  ],
-};
+const SEMESTERS = [
+  { id: "1", name: "First Semester" },
+  { id: "2", name: "Second Semester" },
+  { id: "3", name: "Summer Semester" },
+];
+
+const SESSIONS = [
+  { id: "morning", name: "Morning" },
+  { id: "afternoon", name: "Afternoon" },
+  { id: "evening", name: "Evening" },
+  { id: "weekend", name: "Weekend" },
+];
 
 // Define the form schema with Zod
-const enrollmentSchema = z.object({
+const studentSchema = z.object({
   // Personal Information
-  studentName: z.string().min(1, "Student name is required"),
-  gender: z.string().min(1, "Gender is required"),
+  fullName: z.string().min(3, "Full name is required and must be at least 3 characters"),
+  gender: z.enum(["male", "female"], { required_error: "Gender is required" }),
   dateOfBirth: z.string().min(1, "Date of birth is required"),
   placeOfBirth: z.string().min(1, "Place of birth is required"),
   email: z.string().email("Invalid email address"),
-  tell: z.string().min(1, "Phone number is required"),
-
-  // School Information
+  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  address: z.string().min(1, "Address is required"),
+  nationalId: z.string().optional(),
+  
+  
+  // Academic Background
   highSchoolName: z.string().min(1, "High school name is required"),
-  highSchoolCity: z.string().min(1, "High school city is required"),
-  graduationYear: z.string().min(1, "HS graduation year is required"),
-  averagePass: z.string().min(1, "HS average pass is required"),
+  highSchoolGraduationYear: z.string().min(1, "Graduation year is required"),
+  highSchoolGPA: z.string().min(1, "GPA is required"),
+  previousInstitution: z.string().optional(),
+  transferCredits: z.string().optional(),
 
   // Program Information
-  faculty: z.string().min(1, "Faculty name is required"),
-  department: z.string().min(1, "Department is required"),
+  facultyId: z.string().min(1, "Faculty is required"),
+  departmentId: z.string().min(1, "Department is required"),
   session: z.string().min(1, "Session is required"),
   academicYear: z.string().min(1, "Academic year is required"),
   registerYear: z.string().min(1, "Register year is required"),
   semester: z.string().min(1, "Semester is required"),
+  
+ 
 });
 
-type EnrollmentFormValues = z.infer<typeof enrollmentSchema>;
+type StudentFormValues = z.infer<typeof studentSchema>;
 
-// Student type
+// Student interface to match our database schema
 interface Student {
-  // Personal Information
-  id: string;
-  studentName: string;
-  gender: string;
+  id?: string;
+  studentId?: string;
+  fullName: string;
+  gender: "male" | "female";
   dateOfBirth: string;
   placeOfBirth: string;
   email: string;
-  tell: string;
+  phone: string;
 
-  // School Information
+ 
+
+  // Academic Background
   highSchoolName: string;
-  highSchoolCity: string;
-  graduationYear: string;
-  averagePass: string;
+  highSchoolGraduationYear: string;
+  highSchoolGPA: string;
+  previousInstitution?: string;
+  transferCredits?: string;
 
   // Program Information
-  faculty: string;
-  department: string;
+  facultyId: string;
+  departmentId: string;
   session: string;
   academicYear: string;
   registerYear: string;
   semester: string;
+  
+ 
+  
+  // Relations
+  faculty?: { id: string; name: string };
+  department?: { id: string; name: string };
+  
+  // System fields
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export const RegistrationForm = ({
-  isDialogOpen,
-  setIsDialogOpen,
-}: {
-  setIsDialogOpen: (open: boolean) => void;
-  isDialogOpen: boolean;
-}) => {
+const RegistrationForm = () => {
   useAuthGuard(["admission"]);
+  const navigate = useNavigate();
 
-  const [students, setStudents] = useState<Student[]>([]);
+  // Get data from stores
+  const { faculties, fetchFaculties } = useFacultyStore();
+  const { departments, fetchDepartments } = useDepartmentStore();
+  const { addStudent, isLoading } = useStudentStore();
+
   const [selectedFaculty, setSelectedFaculty] = useState<string>("");
-  const [isEditing, setIsEditing] = useState(false);
-  const [currentStudent, setCurrentStudent] = useState<Student | null>(null);
+  const [filteredDepartments, setFilteredDepartments] = useState<any[]>([]);
+
+  // Fetch faculties and departments on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await Promise.all([fetchFaculties(), fetchDepartments()]);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        toast.error("Failed to load faculties and departments");
+      }
+    };
+
+    fetchData();
+  }, [fetchFaculties, fetchDepartments]);
 
   // Setup form
-  const form = useForm<EnrollmentFormValues>({
-    resolver: zodResolver(enrollmentSchema),
+  const form = useForm<StudentFormValues>({
+    resolver: zodResolver(studentSchema),
     defaultValues: {
       // Personal Information
-      studentName: "",
-      gender: "",
+      fullName: "",
+      gender: "male",
       dateOfBirth: "",
       placeOfBirth: "",
       email: "",
-      tell: "",
+      phone: "",
+    
 
-      // School Information
+      // Academic Background
       highSchoolName: "",
-      highSchoolCity: "",
-      graduationYear: "",
-      averagePass: "",
+      highSchoolGraduationYear: "",
+      highSchoolGPA: "",
+      previousInstitution: "",
+      transferCredits: "",
 
       // Program Information
-      faculty: "",
-      department: "",
+      facultyId: "",
+      departmentId: "",
       session: "",
       academicYear: "",
-      registerYear: "",
+      registerYear: new Date().getFullYear().toString(),
       semester: "",
+ 
     },
   });
 
-  // Handle form submission
-  const onSubmit = (data: EnrollmentFormValues) => {
-    console.log("student form data:", data);
-    if (isEditing && currentStudent) {
-      // Update existing student
-      setStudents((prev) =>
-        prev.map((student) =>
-          student.id === currentStudent.id ? { ...student, ...data } : student,
-        ),
-      );
-      toast.success("Student updated successfully");
+  // Update filtered departments when faculty changes
+  useEffect(() => {
+    if (selectedFaculty && departments.length > 0) {
+      const depts = departments.filter(dept => dept.facultyId === selectedFaculty);
+      setFilteredDepartments(depts);
     } else {
-      // Add new student
-      const newStudent: Student = {
-        id: Date.now().toString(),
-        ...data,
-      };
-      setStudents((prev) => [...prev, newStudent]);
-      toast.success("Student enrolled successfully");
+      setFilteredDepartments([]);
     }
-    setIsDialogOpen(false);
-    resetForm();
-  };
+  }, [selectedFaculty, departments]);
 
-  // Reset form and editing state
-  const resetForm = () => {
-    form.reset();
-    setIsEditing(false);
-    setCurrentStudent(null);
-    setSelectedFaculty("");
-  };
+  // Watch faculty selection to filter departments
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === 'facultyId' && value.facultyId) {
+        setSelectedFaculty(value.facultyId);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
 
-  // Filter departments based on selected faculty
-  const filteredDepartments = selectedFaculty
-    ? DEPARTMENTS[selectedFaculty as keyof typeof DEPARTMENTS] || []
-    : [];
+  // Handle form submission
+  const onSubmit = async (data: StudentFormValues) => {
+    
+    console.log(data)
+    try {
+    console.log(data)
+      // Generate a student ID (this would normally be done by the backend)
+      const year = new Date().getFullYear().toString().slice(-2);
+      const facultyCode = faculties.find(f => f.id === data.facultyId)?.code || 'XX';
+      const deptCode = departments.find(d => d.id === data.departmentId)?.code || 'XX';
+      const randomNum = Math.floor(1000 + Math.random() * 9000); // 4-digit random number
+      
+      const studentId = `${year}${facultyCode}${deptCode}${randomNum}`;
+      
+      // Prepare student data
+      const studentData: Student = {
+        ...data,
+        studentId,
+      };
+      
+      // Add student to database
+      await addStudent(studentData);
+      
+      toast.success("Student registered successfully");
+      navigate("/admission/students");
+    } catch (error) {
+      console.error("Error registering student:", error);
+      toast.error("Failed to register student");
+    }
+  };
 
   return (
-    <div>
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {isEditing ? "Edit Student" : "Student Registration"}
-            </DialogTitle>
-            <DialogDescription>
-              {isEditing
-                ? "Update student registration details"
-                : "Fill in the student registration form"}
-            </DialogDescription>
-          </DialogHeader>
+    <div className="space-y-6">
+      <PageHeader
+        title="Student Registration"
+        description="Register a new student in the system"
+      />
 
+      <Card>
+        <CardHeader>
+          <CardTitle>Student Registration Form</CardTitle>
+        </CardHeader>
+        <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               {/* Personal Information Section */}
-              <div className="space-y-4">
+              <div>
                 <h3 className="text-lg font-medium">Personal Information</h3>
-                <Separator />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Separator className="my-4" />
+                <div className="grid gap-4 sm:grid-cols-2">
                   <FormField
                     control={form.control}
-                    name="studentName"
+                    name="fullName"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Full Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter full name" {...field} />
+                          <Input placeholder="John Doe" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
+                  
                   <FormField
                     control={form.control}
                     name="gender"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="space-y-3">
                         <FormLabel>Gender</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select gender" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="male">Male</SelectItem>
-                            <SelectItem value="female">Female</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex flex-row space-x-4"
+                          >
+                            <FormItem className="flex items-center space-x-2 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem value="male" />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                Male
+                              </FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-2 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem value="female" />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                Female
+                              </FormLabel>
+                            </FormItem>
+                          </RadioGroup>
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
+                  
                   <FormField
                     control={form.control}
                     name="dateOfBirth"
@@ -270,7 +315,7 @@ export const RegistrationForm = ({
                       </FormItem>
                     )}
                   />
-
+                  
                   <FormField
                     control={form.control}
                     name="placeOfBirth"
@@ -278,16 +323,13 @@ export const RegistrationForm = ({
                       <FormItem>
                         <FormLabel>Place of Birth</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="Enter place of birth"
-                            {...field}
-                          />
+                          <Input placeholder="City, Country" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
+                  
                   <FormField
                     control={form.control}
                     name="email"
@@ -295,38 +337,41 @@ export const RegistrationForm = ({
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input
-                            type="email"
-                            placeholder="Enter email"
-                            {...field}
-                          />
+                          <Input type="email" placeholder="john.doe@example.com" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
+                  
                   <FormField
                     control={form.control}
-                    name="tell"
+                    name="phone"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Phone Number</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter phone number" {...field} />
+                          <Input placeholder="+1234567890" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                  
+               
+                  
+                
                 </div>
               </div>
-
-              {/* School Information Section */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">School Information</h3>
-                <Separator />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              {/* Emergency Contact Section */}
+           
+              
+              {/* Academic Background Section */}
+              <div>
+                <h3 className="text-lg font-medium">Academic Background</h3>
+                <Separator className="my-4" />
+                <div className="grid gap-4 sm:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="highSchoolName"
@@ -334,98 +379,69 @@ export const RegistrationForm = ({
                       <FormItem>
                         <FormLabel>High School Name</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="Enter high school name"
-                            {...field}
-                          />
+                          <Input placeholder="Central High School" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
+                  
                   <FormField
                     control={form.control}
-                    name="highSchoolCity"
+                    name="highSchoolGraduationYear"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>High School City</FormLabel>
+                        <FormLabel>Graduation Year</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="Enter high school city"
-                            {...field}
-                          />
+                          <Input placeholder="2023" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
+                  
                   <FormField
                     control={form.control}
-                    name="graduationYear"
+                    name="highSchoolGPA"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>HS Graduation Year</FormLabel>
+                        <FormLabel>GPA / Grade</FormLabel>
                         <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="Enter graduation year"
-                            {...field}
-                          />
+                          <Input placeholder="3.5" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
-                  <FormField
-                    control={form.control}
-                    name="averagePass"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>HS Average Pass</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            placeholder="Enter average pass"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  
+              
+                  
+              
                 </div>
               </div>
-
+              
               {/* Program Information Section */}
-              <div className="space-y-4">
+              <div>
                 <h3 className="text-lg font-medium">Program Information</h3>
-                <Separator />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Separator className="my-4" />
+                <div className="grid gap-4 sm:grid-cols-2">
                   <FormField
                     control={form.control}
-                    name="faculty"
+                    name="facultyId"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Faculty</FormLabel>
-                        <Select
-                          onValueChange={(value) => {
-                            field.onChange(value);
-                            setSelectedFaculty(value);
-                            form.setValue("department", "");
-                          }}
-                          value={field.value}
+                        <Select 
+                          onValueChange={field.onChange} 
+                          defaultValue={field.value}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select faculty" />
+                              <SelectValue placeholder="Select a faculty" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {FACULTIES.map((faculty) => (
+                            {faculties.map((faculty) => (
                               <SelectItem key={faculty.id} value={faculty.id}>
                                 {faculty.name}
                               </SelectItem>
@@ -436,21 +452,21 @@ export const RegistrationForm = ({
                       </FormItem>
                     )}
                   />
-
+                  
                   <FormField
                     control={form.control}
-                    name="department"
+                    name="departmentId"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Department</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
+                        <Select 
+                          onValueChange={field.onChange} 
+                          defaultValue={field.value}
                           disabled={!selectedFaculty}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select department" />
+                              <SelectValue placeholder="Select a department" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -461,75 +477,79 @@ export const RegistrationForm = ({
                             ))}
                           </SelectContent>
                         </Select>
+                        <FormDescription>
+                          {!selectedFaculty && "Select a faculty first"}
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
+                  
                   <FormField
                     control={form.control}
                     name="session"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Session</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
+                        <Select 
+                          onValueChange={field.onChange} 
+                          defaultValue={field.value}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select Session" />
+                              <SelectValue placeholder="Select a session" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="regular">Regular</SelectItem>
-                            <SelectItem value="weekend">Weekend</SelectItem>
-                            <SelectItem value="distance">Distance</SelectItem>
+                            {SESSIONS.map((session) => (
+                              <SelectItem key={session.id} value={session.id}>
+                                {session.name}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
-
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
+                  
                   <FormField
                     control={form.control}
                     name="academicYear"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Academic Year</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter academic year" {...field} />
-                        </FormControl>
+                        <Select 
+                          onValueChange={field.onChange} 
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select academic year" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {ACADEMIC_YEARS.map((year) => (
+                              <SelectItem key={year.id} value={year.id}>
+                                {year.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
-                  <FormField
-                    control={form.control}
-                    name="registerYear"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Register Year</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter register year" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
+                  
                   <FormField
                     control={form.control}
                     name="semester"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Semester</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
+                        <Select 
+                          onValueChange={field.onChange} 
+                          defaultValue={field.value}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -537,46 +557,56 @@ export const RegistrationForm = ({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="1">1</SelectItem>
-                            <SelectItem value="2">2</SelectItem>
-                            <SelectItem value="3">3</SelectItem>
-                            <SelectItem value="4">4</SelectItem>
-                            <SelectItem value="5">5</SelectItem>
-                            <SelectItem value="6">6</SelectItem>
-                            <SelectItem value="7">7</SelectItem>
-                            <SelectItem value="8">8</SelectItem>
-                            <SelectItem value="9">9</SelectItem>
-                            <SelectItem value="10">10</SelectItem>
-                            <SelectItem value="11">11</SelectItem>
-                            <SelectItem value="12">12</SelectItem>
+                            {SEMESTERS.map((semester) => (
+                              <SelectItem key={semester.id} value={semester.id}>
+                                {semester.name}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                  
+                  <FormField
+                    control={form.control}
+                    name="registerYear"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Registration Year</FormLabel>
+                        <FormControl>
+                          <Input type="number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </div>
-
-              <DialogFooter>
+              
+              {/* Additional Information Section */}
+          
+              
+              <div className="flex justify-end space-x-4">
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => {
-                    setIsDialogOpen(false);
-                    resetForm();
-                  }}
+                  onClick={() => navigate("/admission/dashboard")}
                 >
                   Cancel
                 </Button>
-                <Button type="submit">
-                  {isEditing ? "Update Student" : "Register Student"}
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Register Student
                 </Button>
-              </DialogFooter>
+              </div>
             </form>
           </Form>
-        </DialogContent>
-      </Dialog>
+        </CardContent>
+      </Card>
     </div>
   );
 };
+
+export default RegistrationForm;

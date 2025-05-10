@@ -126,9 +126,7 @@ const loginUser = async (req, res) => {
     // Find user by email
     const user = await prisma.user.findUnique({
       where: { email },
-      include: {
-        students: true,
-      },
+     
     })
 
     if (!user) {

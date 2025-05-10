@@ -10,7 +10,7 @@ import { authenticateUser, authorize } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 // Admin dashboard stats
-router.get("/admin", authenticateUser, authorize("admin"), getAdminStats);
+router.get("/admin", authenticateUser, authorize("admin", "admission"), getAdminStats);
 
 // Financial dashboard stats
 router.get("/financial", authenticateUser, authorize("admin", "financial"), getFinancialStats);

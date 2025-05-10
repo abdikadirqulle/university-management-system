@@ -10,13 +10,7 @@ const getAllStudents = async (req, res) => {
   try {
     const students = await prisma.student.findMany({
       include: {
-        user: {
-          select: {
-            name: true,
-            email: true,
-            role: true,
-          },
-        },
+      
         faculty: {
           select: {
             name: true,
@@ -126,18 +120,6 @@ const createStudent = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Student ID already exists',
-      });
-    }
-
-    // Check if email already exists
-    const existingEmail = await prisma.student.findUnique({
-      where: { email },
-    });
-
-    if (existingEmail) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email already exists',
       });
     }
 

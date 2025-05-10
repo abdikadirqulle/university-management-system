@@ -5,6 +5,15 @@ import * as z from "zod";
 import { toast } from "sonner";
 
 import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+
+import {
   Table,
   TableBody,
   TableCell,
@@ -16,10 +25,9 @@ import { Button } from "@/components/ui/button";
 
 import { Input } from "@/components/ui/input";
 
-import { Search, Plus, Edit, Trash2 } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Slash } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
-import { RegistrationForm } from "./RegistrationForm";
 
 import {
   AlertDialog,
@@ -32,6 +40,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import RegistrationForm from "./RegistrationForm";
 
 // Sample data
 const FACULTIES = [
@@ -218,7 +227,7 @@ const StudentEnrollment = () => {
 
   return (
     <div className="space-y-6">
-      <PageHeader
+      {/* <PageHeader
         title="Student Enrollment"
         // description="Manage student enrollments"
         action={{
@@ -229,10 +238,10 @@ const StudentEnrollment = () => {
             setIsDialogOpen(true);
           },
         }}
-      />
+      /> */}
 
       {/* table */}
-      <div className="rounded-lg border bg-card">
+      {/* <div className="rounded-lg border bg-card">
         <div className="p-4 flex items-center justify-between border-b">
           <h3 className="text-lg font-medium">Students</h3>
           <div className="relative">
@@ -334,13 +343,10 @@ const StudentEnrollment = () => {
             </TableBody>
           </Table>
         </div>
-      </div>
+      </div> */}
 
       {/* form */}
-      <RegistrationForm
-        setIsDialogOpen={setIsDialogOpen}
-        isDialogOpen={isDialogOpen}
-      />
+    <RegistrationForm/>
     </div>
   );
 };
