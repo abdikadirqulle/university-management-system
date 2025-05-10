@@ -36,6 +36,7 @@ import StudentDashboard from "./pages/student/Dashboard";
 import FinancialDashboard from "./pages/financial/Dashboard";
 import PaymentsPage from "./pages/financial/Payments";
 import FinancialReportsPage from "./pages/financial/Reports";
+import FinancialStudentsPage from "./pages/financial/Students";
 
 // Not Found
 import NotFound from "./pages/NotFound";
@@ -113,6 +114,7 @@ const App = () => (
             {/* Financial Admin routes */}
             <Route path="/financial" element={<AppLayout />}>
               <Route path="dashboard" element={<FinancialDashboard />} />
+              <Route path="students" element={<FinancialStudentsPage />} />
               <Route path="payments" element={<PaymentsPage />} />
               <Route path="reports" element={<FinancialReportsPage />} />
 

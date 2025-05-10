@@ -100,17 +100,20 @@ const AppSidebar = () => {
         path: "/financial/dashboard",
       },
       {
+        title: "Students",
+        icon: UsersRound,
+        path: "/financial/students",
+      },
+      {
         title: "Student Payments",
         icon: CreditCard,
         path: "/financial/payments",
       },
-
       {
         title: "Expenses",
         icon: DollarSign,
         path: "/financial/expenses",
       },
-
       {
         title: "Reports",
         icon: BarChart,
