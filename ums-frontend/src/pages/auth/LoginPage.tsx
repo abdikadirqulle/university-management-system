@@ -9,19 +9,27 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, LoaderCircle, School } from "lucide-react";
+import { Loader2, LoaderCircle, School, UserCircle, GraduationCap } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, isLoading, error, clearError } = useAuth();
+  const [studentId, setStudentId] = useState("");
+  const [studentPassword, setStudentPassword] = useState("");
+  const { login, loginStudent, isLoading, error, clearError } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleStaffSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await login({ email, password });
+  };
+
+  const handleStudentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await loginStudent({ studentId, password: studentPassword });
   };
 
   // Login info for demo
@@ -45,52 +53,113 @@ const LoginPage = () => {
             Enter your credentials to access your account
           </CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            {error && (
-              <Alert variant="destructive" className="text-sm">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
+        
+        <Tabs defaultValue="staff" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsTrigger value="staff" className="flex items-center gap-2">
+              <UserCircle className="h-4 w-4" /> Staff Login
+            </TabsTrigger>
+            <TabsTrigger value="student" className="flex items-center gap-2">
+              <GraduationCap className="h-4 w-4" /> Student Login
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="staff">
+            <form onSubmit={handleStaffSubmit}>
+              <CardContent className="space-y-4">
+                {error && (
+                  <Alert variant="destructive" className="text-sm">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="your.email@university.edu"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (error) clearError();
-                }}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                {/* <a href="#" className="text-xs text-primary underline">
-                  Forgot password?
-                </a> */}
-              </div>
-              <Input
-                id="password"
-                type="password"
-                placeholder="enter password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  if (error) clearError();
-                }}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Login"}
-            </Button>
-          </CardContent>
-        </form>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your.email@university.edu"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (error) clearError();
+                    }}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Password</Label>
+                  </div>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (error) clearError();
+                    }}
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Login as Staff"}
+                </Button>
+              </CardContent>
+            </form>
+          </TabsContent>
+          
+          <TabsContent value="student">
+            <form onSubmit={handleStudentSubmit}>
+              <CardContent className="space-y-4">
+                {error && (
+                  <Alert variant="destructive" className="text-sm">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+
+                <div className="space-y-2">
+                  <Label htmlFor="studentId">Student ID</Label>
+                  <Input
+                    id="studentId"
+                    type="text"
+                    placeholder="Enter your student ID"
+                    value={studentId}
+                    onChange={(e) => {
+                      setStudentId(e.target.value);
+                      if (error) clearError();
+                    }}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="studentPassword">Password</Label>
+                  </div>
+                  <Input
+                    id="studentPassword"
+                    type="password"
+                    placeholder="Enter password"
+                    value={studentPassword}
+                    onChange={(e) => {
+                      setStudentPassword(e.target.value);
+                      if (error) clearError();
+                    }}
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Login as Student"}
+                </Button>
+              </CardContent>
+            </form>
+          </TabsContent>
+        </Tabs>
+        
+        <CardFooter className="text-xs text-center text-muted-foreground pt-0">
+          <p className="w-full">For students: Your default password is your Student ID</p>
+        </CardFooter>
       </Card>
     </div>
   );

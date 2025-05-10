@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { LoginCredentials, User } from "../types/auth";
+import { LoginCredentials, StudentLoginCredentials, User } from "../types/auth";
 
 interface LoginResponse {
   success: boolean;
@@ -20,6 +20,19 @@ export const authService = {
     const response = await api.post<LoginResponse>("/users/login", credentials);
     if (!response.data.success) {
       throw new Error(response.data.message || "Login failed");
+    }
+    return {
+      user: response.data.user,
+      token: response.data.token,
+    };
+  },
+  
+  loginStudent: async (
+    credentials: StudentLoginCredentials,
+  ): Promise<{ user: User; token: string }> => {
+    const response = await api.post<LoginResponse>("/student-auth/login", credentials);
+    if (!response.data.success) {
+      throw new Error(response.data.message || "Student login failed");
     }
     return {
       user: response.data.user,

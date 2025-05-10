@@ -15,6 +15,11 @@ export interface LoginCredentials {
   password: string;
 }
 
+export interface StudentLoginCredentials {
+  studentId: string;
+  password: string;
+}
+
 export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
