@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { User } from "@/types/auth";
+import { userService } from "@/services/userService";
 
 interface UserState {
   users: User[];
@@ -21,35 +22,9 @@ export const useUserStore = create<UserState>((set) => ({
   fetchUsers: async () => {
     set({ isLoading: true, error: null });
     try {
-      // This would be an API call in a real app
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Sample data
-      const sampleUsers: User[] = [
-        {
-          id: "1",
-          email: "admin@university.edu",
-          name: "Admin User",
-          password: "password",
-          role: "academic",
-        },
-        {
-          id: "2",
-          email: "admission@university.edu",
-          name: "Admission Officer",
-          password: "password",
-          role: "admission",
-        },
-        {
-          id: "3",
-          email: "financial@university.edu",
-          name: "Finance Officer",
-          password: "password",
-          role: "financial",
-        },
-      ];
-
-      set({ users: sampleUsers, isLoading: false });
+      // Call the API to get all users
+      const users = await userService.getAllUsers();
+      set({ users, isLoading: false });
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : "Failed to fetch users",
@@ -61,11 +36,19 @@ export const useUserStore = create<UserState>((set) => ({
   addUser: async (user: User) => {
     set({ isLoading: true, error: null });
     try {
-      // This would be an API call in a real app
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
+      // Remove password from user object if it exists to avoid sending it in plaintext
+      const { password, ...userData } = user;
+      
+      // If password exists, include it in a secure way
+      const userToCreate = password 
+        ? { ...userData, password } 
+        : userData;
+        
+      // Call the API to create a new user
+      const newUser = await userService.createUser(userToCreate as Omit<User, "id">);
+      
       set((state) => ({
-        users: [...state.users, { ...user, id: String(Date.now()) }],
+        users: [...state.users, newUser],
         isLoading: false,
       }));
     } catch (error) {
@@ -79,12 +62,12 @@ export const useUserStore = create<UserState>((set) => ({
   updateUser: async (id: string, userData: Partial<User>) => {
     set({ isLoading: true, error: null });
     try {
-      // This would be an API call in a real app
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
+      // Call the API to update the user
+      const updatedUser = await userService.updateUser(id, userData);
+      
       set((state) => ({
         users: state.users.map((user) =>
-          user.id === id ? { ...user, ...userData } : user,
+          user.id === id ? { ...user, ...updatedUser } : user
         ),
         isLoading: false,
       }));
@@ -99,9 +82,9 @@ export const useUserStore = create<UserState>((set) => ({
   deleteUser: async (id: string) => {
     set({ isLoading: true, error: null });
     try {
-      // This would be an API call in a real app
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
+      // Call the API to delete the user
+      await userService.deleteUser(id);
+      
       set((state) => ({
         users: state.users.filter((user) => user.id !== id),
         isLoading: false,

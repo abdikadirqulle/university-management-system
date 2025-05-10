@@ -35,7 +35,7 @@ export const authService = {
   },
 
   getCurrentUser: async (): Promise<User> => {
-    const response = await api.get<UserResponse>("/user/me");
+    const response = await api.get<UserResponse>("/users/me");
     if (!response.data.success) {
       throw new Error("Failed to get current user");
     }
@@ -43,7 +43,7 @@ export const authService = {
   },
 
   register: async (userData: any): Promise<{ user: User; token: string }> => {
-    const response = await api.post<LoginResponse>("/user/register", userData);
+    const response = await api.post<LoginResponse>("/users/register", userData);
     if (!response.data.success) {
       throw new Error(response.data.message || "Registration failed");
     }

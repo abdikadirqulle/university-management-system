@@ -44,7 +44,7 @@ const UserTable: React.FC<UserTableProps> = ({
           student: "bg-amber-100 text-amber-800",
         };
         const roleDisplayMap: Record<UserRole, string> = {
-          admin: "Academic",
+          admin: "Admin",
           admission: "Admission",
           financial: "Financial",
           student: "Student",

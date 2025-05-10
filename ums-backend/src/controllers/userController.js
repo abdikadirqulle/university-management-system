@@ -235,17 +235,34 @@ const getCurrentUser = async (req, res) => {
 
 // Update user
 const updateUser = async (req, res) => {
-  const { name, email, password } = req.body
-
   try {
+    // Get user data from request body
+    const { name, email, password } = req.body
+
+    // Find user by ID
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+    })
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      })
+    }
+
+    // Update user data
     const updateData = {}
     if (name) updateData.name = name
     if (email) updateData.email = email
+
+    // Hash password if provided
     if (password) {
       const salt = await bcrypt.genSalt(10)
       updateData.password = await bcrypt.hash(password, salt)
     }
 
+    // Update user in database
     const updatedUser = await prisma.user.update({
       where: { id: req.user.id },
       data: updateData,
@@ -266,6 +283,65 @@ const updateUser = async (req, res) => {
     })
   } catch (error) {
     console.error("Update user error:", error)
+    res.status(500).json({
+      success: false,
+      message: "Server error updating user",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    })
+  }
+}
+
+// Update user by ID (admin only)
+const updateUserById = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { name, email, password, role } = req.body
+
+    // Find user by ID
+    const user = await prisma.user.findUnique({
+      where: { id },
+    })
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      })
+    }
+
+    // Update user data
+    const updateData = {}
+    if (name) updateData.name = name
+    if (email) updateData.email = email
+    if (role) updateData.role = role
+
+    // Hash password if provided
+    if (password) {
+      const salt = await bcrypt.genSalt(10)
+      updateData.password = await bcrypt.hash(password, salt)
+    }
+
+    // Update user in database
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: updateData,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    })
+
+    res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      user: updatedUser,
+    })
+  } catch (error) {
+    console.error("Update user by ID error:", error)
     res.status(500).json({
       success: false,
       message: "Server error updating user",
@@ -381,6 +457,7 @@ export {
   loginUser,
   getCurrentUser,
   updateUser,
+  updateUserById,
   getAllUsers,
   getUserById,
   deleteUser,

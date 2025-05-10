@@ -20,22 +20,12 @@ router.post("/login", loginUser)
 router.get("/me", authenticateUser, getCurrentUser)
 router.put("/me", authenticateUser, updateUser)
 
-// Admin routes
-router.get("/admin/users", authenticateUser, authorize("admin"), getAllUsers)
-
-router.get(
-  "/admin/users/:id",
-  authenticateUser,
-  authorize("admin"),
-  getUserById
-)
-
-router.delete(
-  "/admin/users/:id",
-  authenticateUser,
-  authorize("admin"),
-  deleteUser
-)
+// User management routes (admin only)
+router.get("/", authenticateUser, authorize("admin"), getAllUsers)
+router.get("/:id", authenticateUser, authorize("admin"), getUserById)
+router.post("/", authenticateUser, authorize("admin"), registerUser)
+router.put("/:id", authenticateUser, authorize("admin"), updateUser)
+router.delete("/:id", authenticateUser, authorize("admin"), deleteUser)
 
 // Role-based dashboard routes
 router.get(
