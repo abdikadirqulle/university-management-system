@@ -50,8 +50,20 @@ import {
   X,
   UploadCloud,
   Download,
+  Trash2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 // Define available semesters for filtering
 const semesters = [
@@ -68,7 +80,7 @@ const sessions = ["2021-2022", "2022-2023", "2023-2024", "2024-2025"];
 const StudentManager = () => {
   useAuthGuard(["admission"]);
 
-  const { students, isLoading, fetchStudents, updateStudent } =
+  const { students, isLoading, fetchStudents, updateStudent, deleteStudent } =
     useStudentStore();
 
   // State for search and filters
@@ -102,7 +114,19 @@ const StudentManager = () => {
   // Handle saving edited student
   const handleSaveStudent = (updatedStudent: Student) => {
     updateStudent(updatedStudent.id, updatedStudent);
+    setIsEditDialogOpen(false);
     toast.success("Student information updated successfully");
+  };
+
+  // Handle deleting a student
+  const handleDeleteStudent = async (id: string) => {
+    try {
+      await deleteStudent(id);
+      toast.success("Student deleted successfully");
+    } catch (error) {
+      toast.error("Failed to delete student");
+      console.error("Error deleting student:", error);
+    }
   };
 
   // Filter students based on search term and filters
@@ -336,6 +360,35 @@ const StudentManager = () => {
                             >
                               <Pencil className="h-4 w-4 mr-2" /> Edit
                             </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <DropdownMenuItem
+                                  onSelect={(e) => e.preventDefault()}
+                                  className="text-destructive focus:text-destructive"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" /> Delete
+                                </DropdownMenuItem>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete the student
+                                    record for {student.fullName} and remove their data from the system.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDeleteStudent(student.id)}
+                                    className="bg-destructive hover:bg-destructive/90"
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>

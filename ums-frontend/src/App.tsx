@@ -41,6 +41,7 @@ import FinancialReportsPage from "./pages/financial/Reports";
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
 import Students from "./pages/admin/Students";
+import RegistrationForm from "./pages/admission/RegistrationForm";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -93,6 +94,7 @@ const App = () => (
                 element={<StudentEnrollment />}
               />
               <Route path="student-admission" element={<StudentAdmission />} />
+              <Route path="registration" element={<RegistrationForm />} />
               <Route path="students" element={<StudentManager />} />
 
               {/* 404 Page */}

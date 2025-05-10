@@ -5,7 +5,14 @@ import * as z from "zod";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Student } from "@/types/student";
-
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -25,7 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
-import { Loader2 } from "lucide-react";
+import { Loader2, Slash } from "lucide-react";
 import { useDepartmentStore } from "@/store/useDepartmentStore";
 import { useFacultyStore } from "@/store/useFacultyStore";
 import { useStudentStore } from "@/store/useStudentStore";
@@ -205,7 +212,7 @@ const RegistrationForm = () => {
       await addStudent(studentData);
       
       toast.success("Student registered successfully");
-      navigate("/admission/students");
+      navigate("/admission/student-enrollment");
     } catch (error) {
       console.error("Error registering student:", error);
       toast.error("Failed to register student");
@@ -219,6 +226,19 @@ const RegistrationForm = () => {
         description="Register a new student in the system"
       />
 
+<Breadcrumb>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/admission/student-enrollment">Student Enrollment</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator>
+          <Slash />
+        </BreadcrumbSeparator>       
+        <BreadcrumbItem>
+          <BreadcrumbPage>Registration</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
       <Card>
         <CardHeader>
           <CardTitle>Student Registration Form</CardTitle>
