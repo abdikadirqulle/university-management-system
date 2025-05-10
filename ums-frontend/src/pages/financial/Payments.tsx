@@ -1,433 +1,254 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
-import { useQuery } from "@tanstack/react-query";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { DataTable } from "@/components/DataTable";
-import { ColumnDef } from "@tanstack/react-table";
-import { CreditCard, Download, FileText, Plus, Search } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle 
+} from "@/components/ui/alert-dialog";
+import { CreditCard, FileText, Plus, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
-// Define the Payment interface
-interface Payment {
-  id: string;
-  studentId: string;
-  studentName: string;
-  amount: number;
-  paymentDate: string;
-  dueDate: string;
-  status: "paid" | "pending" | "overdue" | "partial";
-  type: "tuition" | "accommodation" | "library" | "other";
-  semester: string;
-  academicYear: string;
-  referenceNumber: string;
-}
+import PaymentForm from "@/components/financial/PaymentForm";
+import PaymentTable from "@/components/financial/PaymentTable";
+import { usePaymentStore } from "@/store/usePaymentStore";
+import { useStudentStore } from "@/store/useStudentStore";
+import { Payment, PaymentFormData, PaymentStatus, PaymentType } from "@/types/payment";
 
-// Mock data
-const mockPayments: Payment[] = Array.from({ length: 30 }).map((_, i) => {
-  const statuses = ["paid", "pending", "overdue", "partial"] as const;
-  const types = ["tuition", "accommodation", "library", "other"] as const;
 
-  // Create random dates
-  const today = new Date();
-  const randomPastDays = Math.floor(Math.random() * 60);
-  const randomFutureDays = Math.floor(Math.random() * 60);
-
-  const paymentDate = new Date(today);
-  paymentDate.setDate(today.getDate() - randomPastDays);
-
-  const dueDate = new Date(today);
-  const isOverdue = i % 5 === 0;
-  if (isOverdue) {
-    dueDate.setDate(today.getDate() - Math.floor(Math.random() * 15));
-  } else {
-    dueDate.setDate(today.getDate() + randomFutureDays);
-  }
-
-  // Generate a status based on dates
-  let status: Payment["status"];
-  if (isOverdue) {
-    status = "overdue";
-  } else if (i % 4 === 0) {
-    status = "paid";
-  } else if (i % 6 === 0) {
-    status = "partial";
-  } else {
-    status = "pending";
-  }
-
-  return {
-    id: `PMT-${1000 + i}`,
-    studentId: `ST-${2000 + i}`,
-    studentName: [
-      "John Smith",
-      "Emma Johnson",
-      "Michael Williams",
-      "Olivia Brown",
-      "James Jones",
-      "Sophia Miller",
-      "Robert Davis",
-      "Ava Wilson",
-      "William Moore",
-      "Isabella Taylor",
-      "David Anderson",
-      "Mia Thomas",
-      "Joseph Jackson",
-      "Charlotte White",
-      "Charles Harris",
-    ][i % 15],
-    amount: Math.floor(Math.random() * 5000) + 1000,
-    paymentDate: paymentDate.toISOString().split("T")[0],
-    dueDate: dueDate.toISOString().split("T")[0],
-    status,
-    type: types[i % types.length],
-    semester: i % 2 === 0 ? "Fall 2023" : "Spring 2024",
-    academicYear: "2023-2024",
-    referenceNumber: `REF-${Math.floor(Math.random() * 100000)}`,
-  };
-});
 
 const PaymentsPage = () => {
-  useAuthGuard(["financial"]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
-  const [selectedType, setSelectedType] = useState<string | null>(null);
-  const [openAddPaymentDialog, setOpenAddPaymentDialog] = useState(false);
-
-  // Simulate data loading with react-query
-  const { data: payments = [], isLoading } = useQuery({
-    queryKey: ["payments"],
-    queryFn: () =>
-      new Promise<Payment[]>((resolve) =>
-        setTimeout(() => resolve(mockPayments), 1000),
-      ),
-  });
-
-  // Filter payments based on search and filters
-  const filteredPayments = payments.filter((payment) => {
-    const matchesSearch =
-      !searchTerm ||
-      payment.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.referenceNumber.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus = !selectedStatus || payment.status === selectedStatus;
-    const matchesType = !selectedType || payment.type === selectedType;
-
-    return matchesSearch && matchesStatus && matchesType;
-  });
-
-  // Define table columns
-  const columns: ColumnDef<Payment>[] = [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      accessorKey: "id",
-      header: "Payment ID",
-      cell: ({ row }) => (
-        <span className="font-medium">{row.getValue("id")}</span>
-      ),
-    },
-    {
-      accessorKey: "studentName",
-      header: "Student",
-      cell: ({ row }) => (
-        <div>
-          <div className="font-medium">{row.getValue("studentName")}</div>
-          <div className="text-xs text-muted-foreground">
-            {row.original.studentId}
-          </div>
-        </div>
-      ),
-    },
-    {
-      accessorKey: "amount",
-      header: "Amount",
-      cell: ({ row }) => (
-        <span>${row.getValue<number>("amount").toLocaleString()}</span>
-      ),
-    },
-    {
-      accessorKey: "status",
-      header: "Status",
-      cell: ({ row }) => {
-        const status = row.getValue<string>("status");
-        const statusMap: Record<
-          string,
-          {
-            label: string;
-            variant:
-              | "default"
-              | "destructive"
-              | "outline"
-              | "secondary"
-              | "success"
-              | null
-              | undefined;
-          }
-        > = {
-          paid: { label: "Paid", variant: "success" },
-          pending: { label: "Pending", variant: "secondary" },
-          overdue: { label: "Overdue", variant: "destructive" },
-          partial: { label: "Partial", variant: "outline" },
-        };
-        const badgeVariant = statusMap[status]?.variant || "default";
-        const badgeLabel = statusMap[status]?.label || status;
-
-        return (
-          <Badge
-            variant={badgeVariant === "success" ? "default" : badgeVariant}
-          >
-            {badgeLabel}
-          </Badge>
-        );
-      },
-    },
-    {
-      accessorKey: "type",
-      header: "Type",
-      cell: ({ row }) => {
-        const type = row.getValue<string>("type");
-        const formattedType = type.charAt(0).toUpperCase() + type.slice(1);
-        return formattedType;
-      },
-    },
-    {
-      accessorKey: "dueDate",
-      header: "Due Date",
-      cell: ({ row }) => row.getValue<string>("dueDate"),
-    },
-    {
-      accessorKey: "paymentDate",
-      header: "Payment Date",
-      cell: ({ row }) => row.getValue<string>("paymentDate") || "Not paid",
-    },
-    {
-      id: "actions",
-      cell: ({ row }) => {
-        return (
-          <div className="flex space-x-2">
-            <Button variant="ghost" size="icon">
-              <FileText className="h-4 w-4" />
-              <span className="sr-only">View details</span>
-            </Button>
-          </div>
-        );
-      },
-    },
-  ];
-
-  const handleAddPayment = (formData: FormData) => {
-    // In a real app, this would send the data to your API
-    console.log("New payment added:", Object.fromEntries(formData.entries()));
-    setOpenAddPaymentDialog(false);
+  useAuthGuard(["financial", "admin"]);
+  
+  // State for dialogs
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  
+  // Get data from stores
+  const { 
+    payments, 
+    isLoading, 
+    selectedPayment,
+    fetchPayments, 
+    createPayment, 
+    updatePayment, 
+    deletePayment, 
+    setSelectedPayment,
+    statistics,
+    fetchPaymentStatistics
+  } = usePaymentStore();
+  
+  const { students, fetchStudents } = useStudentStore();
+  
+  // Fetch data on component mount
+  useEffect(() => {
+    fetchPayments();
+    fetchStudents();
+    fetchPaymentStatistics();
+  }, [fetchPayments, fetchStudents, fetchPaymentStatistics]);
+  
+  // Handle form submission
+  const handleSubmitPayment = async (data: PaymentFormData) => {
+    try {
+      if (selectedPayment) {
+        await updatePayment(selectedPayment.id, data);
+        toast.success("Payment updated successfully");
+      } else {
+        await createPayment(data);
+        toast.success("Payment created successfully");
+      }
+      setIsFormOpen(false);
+      setSelectedPayment(null);
+    } catch (error) {
+      console.error("Payment submission error:", error);
+      toast.error("Failed to save payment");
+    }
+  };
+  
+  // Handle payment edit
+  const handleEditPayment = (payment: Payment) => {
+    setSelectedPayment(payment);
+    setIsFormOpen(true);
+  };
+  
+  // Handle payment delete
+  const handleDeletePayment = (payment: Payment) => {
+    setSelectedPayment(payment);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  // Confirm delete payment
+  const confirmDeletePayment = async () => {
+    if (selectedPayment) {
+      try {
+        await deletePayment(selectedPayment.id);
+        toast.success("Payment deleted successfully");
+      } catch (error) {
+        console.error("Delete payment error:", error);
+        toast.error("Failed to delete payment");
+      }
+      setIsDeleteDialogOpen(false);
+      setSelectedPayment(null);
+    }
+  };
+  
+  // Format currency
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(amount);
   };
 
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto py-6 space-y-6">
       <PageHeader
         title="Payments Management"
-        description="Manage student payments, fees, and financial transactions"
+        description="Manage student payments, invoices, and financial records"
         action={{
           label: "Add Payment",
           icon: Plus,
-          onClick: () => setOpenAddPaymentDialog(true),
+          onClick: () => {
+            setSelectedPayment(null);
+            setIsFormOpen(true);
+          },
         }}
       />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Payments</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col space-y-4 mb-4 md:flex-row md:space-y-0 md:space-x-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search payments by ID, student name, or reference..."
-                className="pl-8"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+      {/* Stats Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Payments</CardTitle>
+            <CreditCard className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {statistics ? formatCurrency(statistics.totalPaid + statistics.totalPending + statistics.totalOverdue) : "$0.00"}
             </div>
+            <p className="text-xs text-muted-foreground">
+              {statistics ? statistics.totalPayments : 0} payments processed
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Pending Payments</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {statistics ? formatCurrency(statistics.totalPending) : "$0.00"}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {payments.filter(p => p.status === PaymentStatus.PENDING).length} pending payments
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Overdue Payments</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground text-red-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-500">
+              {statistics ? formatCurrency(statistics.totalOverdue) : "$0.00"}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {payments.filter(p => p.status === PaymentStatus.OVERDUE).length} overdue payments
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Paid Payments</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-500">
+              {statistics ? formatCurrency(statistics.totalPaid) : "$0.00"}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {payments.filter(p => p.status === PaymentStatus.PAID).length} completed payments
+            </p>
+          </CardContent>
+        </Card>
+      </div>
 
-            <Select
-              value={selectedStatus || ""}
-              onValueChange={(value) => setSelectedStatus(value || null)}
-            >
-              <SelectTrigger className="w-full md:w-[180px]">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="paid">Paid</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="overdue">Overdue</SelectItem>
-                <SelectItem value="partial">Partial</SelectItem>
-              </SelectContent>
-            </Select>
+      {/* Payments Table */}
+      <PaymentTable 
+        payments={payments}
+        isLoading={isLoading}
+        onEdit={handleEditPayment}
+        onDelete={handleDeletePayment}
+      />
 
-            <Select
-              value={selectedType || ""}
-              onValueChange={(value) => setSelectedType(value || null)}
-            >
-              <SelectTrigger className="w-full md:w-[180px]">
-                <SelectValue placeholder="Filter by type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="tuition">Tuition</SelectItem>
-                <SelectItem value="accommodation">Accommodation</SelectItem>
-                <SelectItem value="library">Library</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Button variant="outline" className="md:w-[130px]">
-              <Download className="mr-2 h-4 w-4" />
-              Export
-            </Button>
-          </div>
-
-          <DataTable
-            columns={columns}
-            data={filteredPayments}
-            loading={isLoading}
-          />
-        </CardContent>
-      </Card>
-
-      <Dialog
-        open={openAddPaymentDialog}
-        onOpenChange={setOpenAddPaymentDialog}
-      >
-        <DialogContent className="sm:max-w-[425px]">
+      {/* Payment Form Dialog */}
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="sm:max-w-[700px]">
           <DialogHeader>
-            <DialogTitle>Add New Payment</DialogTitle>
+            <DialogTitle>{selectedPayment ? "Edit Payment" : "Add New Payment"}</DialogTitle>
             <DialogDescription>
-              Record a new payment from a student. Fill in all required fields.
+              {selectedPayment 
+                ? "Update the payment details below." 
+                : "Enter the payment details below to create a new payment record."}
             </DialogDescription>
           </DialogHeader>
-          <form action={handleAddPayment}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="studentId" className="text-right">
-                  Student ID
-                </Label>
-                <Input
-                  id="studentId"
-                  name="studentId"
-                  placeholder="ST-1234"
-                  className="col-span-3"
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="amount" className="text-right">
-                  Amount
-                </Label>
-                <Input
-                  id="amount"
-                  name="amount"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="0.00"
-                  className="col-span-3"
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="type" className="text-right">
-                  Type
-                </Label>
-                <Select name="type" required>
-                  <SelectTrigger className="col-span-3" id="type">
-                    <SelectValue placeholder="Select payment type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="tuition">Tuition</SelectItem>
-                    <SelectItem value="accommodation">Accommodation</SelectItem>
-                    <SelectItem value="library">Library</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="paymentDate" className="text-right">
-                  Payment Date
-                </Label>
-                <Input
-                  id="paymentDate"
-                  name="paymentDate"
-                  type="date"
-                  className="col-span-3"
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="reference" className="text-right">
-                  Reference #
-                </Label>
-                <Input
-                  id="reference"
-                  name="reference"
-                  placeholder="REF-12345"
-                  className="col-span-3"
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                type="button"
-                onClick={() => setOpenAddPaymentDialog(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit">Save Payment</Button>
-            </DialogFooter>
-          </form>
+
+          <PaymentForm
+            payment={selectedPayment || undefined}
+            students={students}
+            onSubmit={handleSubmitPayment}
+            isLoading={isLoading}
+            onCancel={() => {
+              setIsFormOpen(false);
+              setSelectedPayment(null);
+            }}
+          />
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the payment
+              record for {selectedPayment?.student?.fullName || "this student"}.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setIsDeleteDialogOpen(false);
+              setSelectedPayment(null);
+            }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDeletePayment}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
