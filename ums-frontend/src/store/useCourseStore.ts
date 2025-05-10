@@ -1,14 +1,19 @@
 import { create } from "zustand";
+import { courseService } from "../services/courseService";
+import { departmentService } from "../services/departmentService";
+import { Course as ApiCourse, CreateCourseDto, UpdateCourseDto } from "../types/course";
 
+// Frontend Course model (slightly different from API model for UI purposes)
 export interface Course {
   id: string;
   code: string;
   title: string;
-  department: string;
+  departmentId: string;
+  department: string; // Department name for display
+  faculty?: string; // Faculty name for display
   credits: number;
-  description: string;
   semester: string;
-  instructor?: string;
+  instructor: string;
 }
 
 interface CourseState {
@@ -31,71 +36,52 @@ export const useCourseStore = create<CourseState>((set) => ({
   fetchCourses: async () => {
     set({ isLoading: true, error: null });
     try {
-      // This would be an API call in a real app
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Fetch courses from the API
+      const apiCourses = await courseService.getAllCourses();
+      
+      // Transform API courses to our frontend model
+      const transformedCourses: Course[] = await Promise.all(
+        apiCourses.map(async (course) => {
+          let departmentName = "Unknown Department";
+          let facultyName = "Unknown Faculty";
+          
+          // If department info is included in the response
+          if (course.department) {
+            departmentName = course.department.name;
+            if (course.department.faculty) {
+              facultyName = course.department.faculty.name;
+            }
+          } else if (course.departmentId) {
+            // If not, fetch department details
+            try {
+              const department = await departmentService.getDepartmentById(course.departmentId);
+              departmentName = department.name;
+              if (department.faculty) {
+                facultyName = department.faculty.name;
+              }
+            } catch (error) {
+              console.error("Error fetching department:", error);
+            }
+          }
+          
+          return {
+            id: course.id,
+            code: course.code,
+            title: course.title,
+            departmentId: course.departmentId,
+            department: departmentName,
+            faculty: facultyName,
+            credits: course.credits,
+            semester: course.semester,
+            instructor: course.instructor || "Not assigned",
+          };
+        })
+      );
 
-      // Sample data
-      const sampleCourses: Course[] = [
-        {
-          id: "1",
-          code: "CS101",
-          title: "Introduction to Computer Science",
-          department: "Computer Science",
-          credits: 3,
-          description:
-            "An introductory course covering the basics of computer science.",
-          semester: "Fall 2023",
-          instructor: "Professor Mohamed isse",
-        },
-        {
-          id: "2",
-          code: "BUS200",
-          title: "Business Economics",
-          department: "Business",
-          credits: 4,
-          description: "Study of economic principles in business contexts.",
-          semester: "Spring 2024",
-          instructor: "Dean Jamac Salad",
-        },
-        {
-          id: "3",
-          code: "ENG150",
-          title: "Engineering Mechanics",
-          department: "Engineering",
-          credits: 4,
-          description:
-            "Basic principles of mechanics for engineering applications.",
-          semester: "Fall 2023",
-          instructor: "Dr. Mohamed Hassan",
-        },
-        {
-          id: "4",
-          code: "MTH201",
-          title: "Calculus II",
-          department: "Mathematics",
-          credits: 3,
-          description:
-            "Advanced calculus topics including integration techniques.",
-          semester: "Spring 2024",
-          instructor: "Dr. LIban Jamac",
-        },
-        {
-          id: "5",
-          code: "PHY105",
-          title: "Physics for Scientists",
-          department: "Physics",
-          credits: 4,
-          description: "Comprehensive introduction to classical physics.",
-          semester: "Fall 2023",
-          instructor: "Professor Abdilahi Amin",
-        },
-      ];
-
-      set({ courses: sampleCourses, isLoading: false });
+      set({ courses: transformedCourses, isLoading: false });
     } catch (error) {
       set({
-        error:
-          error instanceof Error ? error.message : "Failed to fetch courses",
+        error: error instanceof Error ? error.message : "Failed to fetch courses",
         isLoading: false,
       });
     }
@@ -104,16 +90,32 @@ export const useCourseStore = create<CourseState>((set) => ({
   addCourse: async (course: Omit<Course, "id">) => {
     set({ isLoading: true, error: null });
     try {
-      // This would be an API call in a real app
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const newCourse: Course = {
-        ...course,
-        id: String(Date.now()),
+      // Create API DTO from frontend model
+      const courseDto: CreateCourseDto = {
+        code: course.code,
+        title: course.title,
+        departmentId: course.departmentId,
+        credits: course.credits,
+        semester: course.semester,
+        instructor: course.instructor || "",
       };
 
+      // Call API to create course
+      const newCourse = await courseService.createCourse(courseDto);
+      
+      // Add the new course to the state
       set((state) => ({
-        courses: [...state.courses, newCourse],
+        courses: [...state.courses, {
+          id: newCourse.id,
+          code: newCourse.code,
+          title: newCourse.title,
+          departmentId: newCourse.departmentId,
+          department: course.department, // Use the name we already have
+          faculty: course.faculty,
+          credits: newCourse.credits,
+          semester: newCourse.semester,
+          instructor: newCourse.instructor || "Not assigned",
+        }],
         isLoading: false,
       }));
     } catch (error) {
@@ -127,19 +129,39 @@ export const useCourseStore = create<CourseState>((set) => ({
   updateCourse: async (id: string, courseData: Partial<Course>) => {
     set({ isLoading: true, error: null });
     try {
-      // This would be an API call in a real app
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Create API DTO from frontend model
+      const updateDto: UpdateCourseDto = {};
+      
+      if (courseData.code) updateDto.code = courseData.code;
+      if (courseData.title) updateDto.title = courseData.title;
+      if (courseData.departmentId) updateDto.departmentId = courseData.departmentId;
+      if (courseData.credits) updateDto.credits = courseData.credits;
+      if (courseData.semester) updateDto.semester = courseData.semester;
+      if (courseData.instructor) updateDto.instructor = courseData.instructor;
 
+      // Call API to update course
+      const updatedCourse = await courseService.updateCourse(id, updateDto);
+      
+      // Update the course in state
       set((state) => ({
         courses: state.courses.map((course) =>
-          course.id === id ? { ...course, ...courseData } : course,
+          course.id === id ? { 
+            ...course, 
+            ...courseData,
+            // Ensure we have the latest data from the API
+            code: updatedCourse.code,
+            title: updatedCourse.title,
+            departmentId: updatedCourse.departmentId,
+            credits: updatedCourse.credits,
+            semester: updatedCourse.semester,
+            instructor: updatedCourse.instructor || "Not assigned",
+          } : course
         ),
         isLoading: false,
       }));
     } catch (error) {
       set({
-        error:
-          error instanceof Error ? error.message : "Failed to update course",
+        error: error instanceof Error ? error.message : "Failed to update course",
         isLoading: false,
       });
     }
@@ -148,17 +170,17 @@ export const useCourseStore = create<CourseState>((set) => ({
   deleteCourse: async (id: string) => {
     set({ isLoading: true, error: null });
     try {
-      // This would be an API call in a real app
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Call API to delete course
+      await courseService.deleteCourse(id);
 
+      // Remove the course from state
       set((state) => ({
         courses: state.courses.filter((course) => course.id !== id),
         isLoading: false,
       }));
     } catch (error) {
       set({
-        error:
-          error instanceof Error ? error.message : "Failed to delete course",
+        error: error instanceof Error ? error.message : "Failed to delete course",
         isLoading: false,
       });
     }

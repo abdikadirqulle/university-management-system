@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, Loader2 } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import { Course, useCourseStore } from "@/store/useCourseStore";
 import {
@@ -35,47 +35,25 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast } from "sonner";
+import { departmentService } from "@/services/departmentService";
 
 // Form schema
 const courseFormSchema = z.object({
   code: z.string().min(2, { message: "Course code is required" }),
   title: z.string().min(3, { message: "Course title is required" }),
-  department: z.string().min(2, { message: "Department is required" }),
+  departmentId: z.string().min(2, { message: "Department is required" }),
   credits: z.coerce
     .number()
     .min(1, { message: "Credits must be at least 1" })
     .max(6),
-  description: z
-    .string()
-    .min(10, { message: "Description must be at least 10 characters" }),
   semester: z.string().min(1, { message: "Semester is required" }),
   instructor: z.string().optional(),
 });
 
 type CourseFormValues = z.infer<typeof courseFormSchema>;
 
-// Sample departments
-const departments = [
-  "Computer Science",
-  "Business",
-  "Engineering",
-  "Mathematics",
-  "Physics",
-  "Biology",
-  "Chemistry",
-  "Economics",
-  "History",
-  "Psychology",
-];
-
-// Sample semesters
-const semesters = [
-  "Fall 2023",
-  "Spring 2024",
-  "Summer 2024",
-  "Fall 2024",
-  "Spring 2025",
-];
+// Semesters
+const semesters = Array.from({ length: 12 }, (_, i) => `${i + 1}`);
 
 const CoursesPage = () => {
   const {
@@ -88,6 +66,8 @@ const CoursesPage = () => {
   } = useCourseStore();
   const [isOpen, setIsOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+  const [departments, setDepartments] = useState<{id: string, name: string}[]>([]);
+  const [loadingDepartments, setLoadingDepartments] = useState(false);
 
   // Setup form
   const form = useForm<CourseFormValues>({
@@ -95,9 +75,8 @@ const CoursesPage = () => {
     defaultValues: {
       code: "",
       title: "",
-      department: "",
+      departmentId: "",
       credits: 3,
-      description: "",
       semester: "",
       instructor: "",
     },
@@ -107,6 +86,24 @@ const CoursesPage = () => {
   useEffect(() => {
     fetchCourses();
   }, [fetchCourses]);
+
+  // Fetch departments for dropdown
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      setLoadingDepartments(true);
+      try {
+        const data = await departmentService.getAllDepartments();
+        setDepartments(data.map(dept => ({ id: dept.id, name: dept.name })));
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+        toast.error("Failed to load departments");
+      } finally {
+        setLoadingDepartments(false);
+      }
+    };
+
+    fetchDepartments();
+  }, []);
 
   // Reset form when dialog closes
   const handleDialogOpenChange = (open: boolean) => {
@@ -118,15 +115,26 @@ const CoursesPage = () => {
   };
 
   // Handle form submission
-  const onSubmit = async (data: Course) => {
+  const onSubmit = async (data: CourseFormValues) => {
     try {
+      // Find department name for display purposes
+      const selectedDept = departments.find(d => d.id === data.departmentId);
+      const departmentName = selectedDept ? selectedDept.name : "Unknown Department";
+
       if (editingCourse) {
         // Update existing course
-        await updateCourse(editingCourse.id, data);
+        await updateCourse(editingCourse.id, {
+          ...data,
+          department: departmentName,
+        });
         toast.success("Course updated successfully");
       } else {
         // Add new course
-        await addCourse(data);
+        await addCourse({
+          ...data,
+          department: departmentName,
+          instructor: data.instructor || "Not assigned",
+        });
         toast.success("Course added successfully");
       }
       handleDialogOpenChange(false);
@@ -142,9 +150,8 @@ const CoursesPage = () => {
     form.reset({
       code: course.code,
       title: course.title,
-      department: course.department,
+      departmentId: course.departmentId,
       credits: course.credits,
-      description: course.description,
       semester: course.semester,
       instructor: course.instructor || "",
     });
@@ -153,12 +160,14 @@ const CoursesPage = () => {
 
   // Handle delete course
   const handleDelete = async (id: string) => {
-    try {
-      await deleteCourse(id);
-      toast.success("Course deleted successfully");
-    } catch (error) {
-      toast.error("Failed to delete course");
-      console.error(error);
+    if (confirm("Are you sure you want to delete this course? This action cannot be undone.")) {
+      try {
+        await deleteCourse(id);
+        toast.success("Course deleted successfully");
+      } catch (error) {
+        toast.error("Failed to delete course");
+        console.error(error);
+      }
     }
   };
 
@@ -175,6 +184,11 @@ const CoursesPage = () => {
     {
       accessorKey: "department",
       header: "Department",
+    },
+    {
+      accessorKey: "faculty",
+      header: "Faculty",
+      cell: ({ row }) => row.original.faculty || "Not specified",
     },
     {
       accessorKey: "credits",
@@ -199,6 +213,7 @@ const CoursesPage = () => {
               variant="ghost"
               size="icon"
               onClick={() => handleEdit(course)}
+              disabled={isLoading}
             >
               <Edit className="h-4 w-4" />
               <span className="sr-only">Edit</span>
@@ -207,6 +222,7 @@ const CoursesPage = () => {
               variant="ghost"
               size="icon"
               onClick={() => handleDelete(course.id)}
+              disabled={isLoading}
             >
               <Trash2 className="h-4 w-4 text-destructive" />
               <span className="sr-only">Delete</span>
@@ -218,29 +234,40 @@ const CoursesPage = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto py-10">
       <PageHeader
-        title="Courses"
-        description="Manage university courses"
+        title="Courses Management"
+        description="Create, view, and manage university courses"
         action={{
           label: "Add Course",
           icon: Plus,
           onClick: () => setIsOpen(true),
         }}
       />
+        
+     
 
-      <DataTable columns={columns} data={courses} loading={isLoading} />
+      <div className="mt-6">
+        {isLoading ? (
+          <div className="flex justify-center items-center py-10">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <span className="ml-2">Loading courses...</span>
+          </div>
+        ) : (
+          <DataTable columns={columns} data={courses} />
+        )}
+      </div>
 
       <Dialog open={isOpen} onOpenChange={handleDialogOpenChange}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>
-              {editingCourse ? "Edit Course" : "Add New Course"}
+              {editingCourse ? 'Edit Course' : 'Add New Course'}
             </DialogTitle>
             <DialogDescription>
               {editingCourse
-                ? "Update course information in the form below."
-                : "Fill in the details to create a new course."}
+                ? 'Update the course details below'
+                : 'Fill in the course details below to add a new course'}
             </DialogDescription>
           </DialogHeader>
 
@@ -254,8 +281,66 @@ const CoursesPage = () => {
                     <FormItem>
                       <FormLabel>Course Code</FormLabel>
                       <FormControl>
-                        <Input placeholder="E.g., CS101" {...field} />
+                        <Input placeholder="e.g. CS101" {...field} />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Course Title</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g. Introduction to Programming"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="departmentId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Department</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select department" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {loadingDepartments ? (
+                            <div className="flex items-center justify-center p-2">
+                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                              Loading...
+                            </div>
+                          ) : departments.length === 0 ? (
+                            <div className="p-2 text-center text-muted-foreground">
+                              No departments found
+                            </div>
+                          ) : (
+                            departments.map((dept) => (
+                              <SelectItem key={dept.id} value={dept.id}>
+                                {dept.name}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -270,64 +355,18 @@ const CoursesPage = () => {
                       <FormControl>
                         <Input
                           type="number"
-                          placeholder="3"
                           min={1}
                           max={6}
                           {...field}
                         />
                       </FormControl>
                       <FormMessage />
-                      <FormDescription>
-                        Number of credit hours (1-6)
-                      </FormDescription>
                     </FormItem>
                   )}
                 />
               </div>
 
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Course Title</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter course title" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="department"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Department</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select department" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {departments.map((dept) => (
-                            <SelectItem key={dept} value={dept}>
-                              {dept}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 <FormField
                   control={form.control}
                   name="semester"
@@ -355,46 +394,49 @@ const CoursesPage = () => {
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="instructor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Instructor</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g. Dr. John Doe"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Optional. Leave blank if not yet assigned.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Enter course description"
-                        className="min-h-[100px]"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="instructor"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Instructor (Optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter instructor name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                    <FormDescription>
-                      Leave blank if no instructor assigned yet
-                    </FormDescription>
-                  </FormItem>
-                )}
-              />
-
               <DialogFooter>
-                <Button type="submit">
-                  {editingCourse ? "Update Course" : "Add Course"}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleDialogOpenChange(false)}
+                  disabled={form.formState.isSubmitting}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={form.formState.isSubmitting || isLoading}
+                >
+                  {form.formState.isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {editingCourse ? "Updating..." : "Adding..."}
+                    </>
+                  ) : (
+                    editingCourse ? "Update Course" : "Add Course"
+                  )}
                 </Button>
               </DialogFooter>
             </form>
