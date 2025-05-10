@@ -11,6 +11,7 @@ import {
   BarChart3,
   BookOpen,
   Building,
+  FileText,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -25,6 +26,8 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { usePaymentStore } from "@/store/usePaymentStore";
+import { PaymentStatus } from "@/types/payment";
 
 // Mock financial data for demonstration
 const mockFinancialStats = {
@@ -60,9 +63,32 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const FinancialDashboard = () => {
   // Use auth guard to protect this page
-  useAuthGuard(["financial"]);
+  useAuthGuard(["financial", "admin"]);
 
-  // Simulate data loading with react-query
+  // Get payment data from store
+  const { 
+    payments, 
+    isLoading: isPaymentsLoading, 
+    statistics,
+    fetchPayments,
+    fetchPaymentStatistics 
+  } = usePaymentStore();
+  
+  // Fetch payment data on component mount
+  useEffect(() => {
+    fetchPayments();
+    fetchPaymentStatistics();
+  }, [fetchPayments, fetchPaymentStatistics]);
+  
+  // Format currency
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(amount);
+  };
+  
+  // Use existing mock data for charts
   const { data: stats, isLoading: isStatsLoading } = useQuery({
     queryKey: ["financial-stats"],
     queryFn: () =>
@@ -78,8 +104,9 @@ const FinancialDashboard = () => {
         // description="Overview of university financial metrics and operations"
       />
 
+      {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {isStatsLoading ? (
+        {isPaymentsLoading ? (
           Array(4)
             .fill(0)
             .map((_, i) => (
@@ -92,38 +119,62 @@ const FinancialDashboard = () => {
             ))
         ) : (
           <>
-            <StatsCard
-              title="Total Revenue"
-              value={stats.totalRevenue}
-              icon={BadgeDollarSign}
-              iconColor="text-emerald-500"
-              bgColor="bg-emerald-500"
-              trend={{ value: 12, isPositive: true }}
-            />
-            <StatsCard
-              title="Pending Payments"
-              value={stats.pendingPayments}
-              icon={CreditCard}
-              iconColor="text-orange-500"
-              bgColor="bg-orange-500"
-              trend={{ value: 5, isPositive: false }}
-            />
-            <StatsCard
-              title="Transactions"
-              value={stats.completedTransactions}
-              icon={BarChart3}
-              iconColor="text-purple-500"
-              bgColor="bg-purple-500"
-              trend={{ value: 8, isPositive: true }}
-            />
-            <StatsCard
-              title="Outstanding Fees"
-              value={stats.outstandingFees}
-              icon={Users}
-              iconColor="text-red-500"
-              bgColor="bg-red-500"
-              trend={{ value: 3, isPositive: false }}
-            />
+            <Card style={{ borderTop: `4px solid ${COLORS[0]}` }}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Payments</CardTitle>
+                <CreditCard className="h-4 w-4" style={{ color: COLORS[0] }} />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold" style={{ color: COLORS[0] }}>
+                  {statistics ? formatCurrency(statistics.totalPaid + statistics.totalPending + statistics.totalOverdue) : "$0.00"}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {statistics ? statistics.totalPayments : 0} payments processed
+                </p>
+              </CardContent>
+            </Card>
+            <Card style={{ borderTop: `4px solid ${COLORS[2]}` }}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Pending Payments</CardTitle>
+                <FileText className="h-4 w-4" style={{ color: COLORS[2] }} />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold" style={{ color: COLORS[2] }}>
+                  {statistics ? formatCurrency(statistics.totalPending) : "$0.00"}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {payments.filter(p => p.status === PaymentStatus.PENDING).length} pending payments
+                </p>
+              </CardContent>
+            </Card>
+            <Card style={{ borderTop: `4px solid ${COLORS[3]}` }}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Overdue Payments</CardTitle>
+                <FileText className="h-4 w-4" style={{ color: COLORS[3] }} />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold" style={{ color: COLORS[3] }}>
+                  {statistics ? formatCurrency(statistics.totalOverdue) : "$0.00"}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {payments.filter(p => p.status === PaymentStatus.OVERDUE).length} overdue payments
+                </p>
+              </CardContent>
+            </Card>
+            <Card style={{ borderTop: `4px solid ${COLORS[1]}` }}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Paid Payments</CardTitle>
+                <FileText className="h-4 w-4" style={{ color: COLORS[1] }} />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold" style={{ color: COLORS[1] }}>
+                  {statistics ? formatCurrency(statistics.totalPaid) : "$0.00"}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {payments.filter(p => p.status === PaymentStatus.PAID).length} completed payments
+                </p>
+              </CardContent>
+            </Card>
           </>
         )}
       </div>
