@@ -40,6 +40,7 @@ import FinancialReportsPage from "./pages/financial/Reports";
 // Not Found
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
+import Students from "./pages/admin/Students";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -72,6 +73,7 @@ const App = () => (
             <Route path="/admin" element={<AppLayout />}>
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<UsersPage />} />
+              <Route path="students" element={<Students />} />
               <Route path="faculties" element={<FacultiesPage />} />
               <Route path="courses" element={<CoursesPage />} />
               <Route path="departments" element={<DepartmentsPage />} />

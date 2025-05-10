@@ -6,6 +6,7 @@ import userRoutes from "./routes/userRoutes.js"
 import courseRoutes from "./routes/courseRoutes.js"
 import departmentRoutes from "./routes/departmentRoutes.js"
 import facultyRoutes from "./routes/facultyRoutes.js"
+import studentRoutes from "./routes/studentRoutes.js"
 import { connectDB } from "./config/db.js"
 
 // Load environment variables
@@ -27,6 +28,7 @@ app.use("/api/users", userRoutes)
 app.use("/api/courses", courseRoutes)
 app.use("/api/departments", departmentRoutes)
 app.use("/api/faculties", facultyRoutes)
+app.use("/api/students", studentRoutes)
 
 // Default route
 app.get("/", (req, res) => {

@@ -1,6 +1,6 @@
-const express = require('express');
-const router = express.Router();
-const {
+import express from "express"
+
+import {
   getAllStudents,
   getStudentById,
   createStudent,
@@ -8,11 +8,14 @@ const {
   deleteStudent,
   getStudentsByDepartment,
   getStudentsByFaculty,
-} = require('../controllers/studentController');
-const { authenticateUser, authorize } = require('../middleware/authMiddleware');
+}  from '../controllers/studentController.js';
+
+import { authenticateUser, authorize } from '../middleware/authMiddleware.js';
+
+const router = express.Router();
 
 // Get all students - Admin and Admission access
-router.get('/', authenticateUser, authorize(['admin', 'admission']), getAllStudents);
+router.get('/', authenticateUser, authorize(['admin', 'admission', 'financial', 'student']), getAllStudents);
 
 // Get student by ID - Admin, Admission, and Student (own record) access
 router.get('/:id', authenticateUser, authorize(['admin', 'admission', 'student']), getStudentById);
@@ -32,4 +35,4 @@ router.get('/department/:departmentId', authenticateUser, authorize(['admin', 'a
 // Get students by faculty - Admin and Admission access
 router.get('/faculty/:facultyId', authenticateUser, authorize(['admin', 'admission']), getStudentsByFaculty);
 
-module.exports = router;
+export default router

@@ -55,6 +55,11 @@ const AppSidebar = () => {
         icon: Users,
         path: "/admin/users",
       },
+      {
+        title: "All Students",
+        icon: UsersRound,
+        path: "/admin/students",
+      },
 
       {
         title: "Faculties",

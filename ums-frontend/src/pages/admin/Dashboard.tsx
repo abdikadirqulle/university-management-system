@@ -12,6 +12,7 @@ import {
   BookOpen,
   Plus,
   HomeIcon,
+  UserPlus,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -19,7 +20,7 @@ import { useNavigate } from "react-router-dom";
 const overviewStats = [
   {
     title: "Total Students",
-    value: "543", // chage this qiimaha saxda ah from database
+    value: "543", // This will be updated with real data from database
     icon: GraduationCap,
     iconColor: "text-blue-600",
     bgColor: "bg-blue-600",
@@ -154,6 +155,15 @@ const Dashboard = () => {
                   >
                     <School size={20} />
                     <span className="mt-1 text-sm">Add Faculty</span>
+                  </div>
+                </Card>
+                <Card className="cursor-pointer border border-dashed p-3 hover:border-primary hover:text-primary">
+                  <div
+                    className="flex flex-col items-center justify-center"
+                    onClick={() => navigate("/admin/students")}
+                  >
+                    <Users size={20} />
+                    <span className="mt-1 text-sm">Manage Students</span>
                   </div>
                 </Card>
               </div>

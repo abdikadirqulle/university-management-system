@@ -28,7 +28,7 @@ const registerUser = async (req, res) => {
       data: {
         name,
         email,
-        password: hashedPassword,
+        password,
         role,
       },
     })
