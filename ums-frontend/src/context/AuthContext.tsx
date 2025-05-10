@@ -68,23 +68,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       
       if (token && storedUser) {
         try {
+          // Set initial state from localStorage to prevent flashing unauthenticated state
+          const parsedUser = JSON.parse(storedUser);
+          setAuthState({
+            user: parsedUser,
+            token,
+            isAuthenticated: true,
+            isLoading: true, // Set to true while we verify
+            error: null,
+          });
+          
           // Verify token by getting current user
           const user = await authService.getCurrentUser();
           
           // Update auth state with fresh user data
           setAuthState({
-            user,
+            user, // Use the fresh user data from API
             token,
             isAuthenticated: true,
             isLoading: false,
             error: null,
           });
         } catch (error) {
-          // Token might be invalid or expired
           console.error("Auth verification failed:", error);
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-          setAuthState(initialAuthState);
+          
+          // Instead of immediately removing token, check if it's a network error
+          // Only remove token if it's an authentication error (401/403)
+          if (error instanceof Error && error.message.includes("401") || error.message.includes("403")) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            setAuthState(initialAuthState);
+          } else {
+            // For other errors (like network issues), keep the user logged in
+            // Just use the stored user data
+            const parsedUser = JSON.parse(storedUser);
+            setAuthState({
+              user: parsedUser,
+              token,
+              isAuthenticated: true,
+              isLoading: false,
+              error: null,
+            });
+          }
         }
       }
     };

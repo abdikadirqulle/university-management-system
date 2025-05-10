@@ -13,7 +13,7 @@ import UserFormDialog, {
 } from "@/components/admin/UserFormDialog";
 
 const UsersPage = () => {
-  useAuthGuard(["academic"]);
+  useAuthGuard(["admin"]);
 
   const { users, isLoading, fetchUsers, addUser, updateUser, deleteUser } =
     useUserStore();
