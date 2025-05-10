@@ -31,7 +31,7 @@ router.post('/', authenticateUser,
 router.put('/:id', authenticateUser, authorize(['admin', 'admission']), updateStudent);
 
 // Delete student - Admin only access
-router.delete('/:id', authenticateUser, authorize(['admin']), deleteStudent);
+router.delete('/:id', authenticateUser, authorize(['admin', 'admission']), deleteStudent);
 
 // Get students by department - Admin and Admission access
 router.get('/department/:departmentId', authenticateUser, authorize(['admin', 'admission']), getStudentsByDepartment);
