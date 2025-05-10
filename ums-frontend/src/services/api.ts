@@ -1,9 +1,9 @@
 import axios from "axios";
 import { toast } from "sonner";
 
-// Base URL would typically point to your backend server
+// Base URL points to our local backend server
 export const api = axios.create({
-  baseURL: "https://api.universitymanagement.com/api/v1", // Replace with your actual API URL
+  baseURL: "http://localhost:5000/api", // Local backend API URL
   headers: {
     "Content-Type": "application/json",
   },
