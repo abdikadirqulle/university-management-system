@@ -109,8 +109,9 @@ const StudentManager = () => {
   const filteredStudents = students.filter((student) => {
     const matchesSearch =
       student.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.department.toLowerCase().includes(searchTerm.toLowerCase());
+      student.email.toLowerCase().includes(searchTerm.toLowerCase())
+      //  ||
+      // student.department.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesId = idFilter ? student.studentId.includes(idFilter) : true;
 
@@ -118,9 +119,10 @@ const StudentManager = () => {
       ? student.semester === semesterFilter
       : true;
 
-    const matchesStatus = statusFilter ? student.status === statusFilter : true;
+    // const matchesStatus = statusFilter ? student.status === statusFilter : true;
 
-    return matchesSearch && matchesId && matchesSemester && matchesStatus;
+    return matchesSearch && matchesId && matchesSemester;
+    // && matchesStatus;
   });
 
   // Function to clear all filters
@@ -296,16 +298,16 @@ const StudentManager = () => {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      {/* <TableCell className="hidden md:table-cell">
                         {student.department}
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell className="hidden md:table-cell">
                         {student.semester}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         {student.session}
                       </TableCell>
-                      <TableCell>
+                      {/* <TableCell>
                         <span
                           className={`px-2 py-1 rounded text-white ${
                             student.status === "active"
@@ -319,7 +321,7 @@ const StudentManager = () => {
                         >
                           {student.status}
                         </span>
-                      </TableCell>
+                      </TableCell> */}
 
                       <TableCell className="text-right">
                         <DropdownMenu>
