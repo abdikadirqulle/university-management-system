@@ -6,30 +6,26 @@ The **University Management System (UMS)** is a web-based platform that streamli
 
 ## 📌 Features
 
-- **User Management** (Admins, Students, Faculty, Staff)
+- **User Management** (Admins)
 - **Student Enrollment & Management**
-- **Course & Class Management**
-- **Faculty & Staff Management**
-- **Exams & Results Management**
+- **Course  Management**
+- **Faculty Management**
 - **Fee & Finance Management**
 - **Authentication & Role-Based Access**
 - **Real-time Data Handling with React Query**
 
 ## 👥 User Roles & Permissions
 
-### 1️⃣ **Super Admin (Academic)**
+### 1️⃣ **Admin**
 
 - Manages academic calendar
-- Creates staff accounts
+- Creates users
 - Manages courses and classes
 
-### 2️⃣ **Normal Admins**
+### 2️⃣ **Admins**
 
-- **Exam Admin** → Manages exams & results
-- **Finance Admin** → Handles student payments & invoices
-- **Student Enrollment Admin** → Registers students
-- **Staff (Deans)** → Creates lectures & assigns courses
-- **Staff (Lecturers)** → Adds exam results, views assigned courses
+- **Finance Admin** → Handles student payments
+- **Admission Officer** → Registers students
 
 ### 3️⃣ **Students**
 
@@ -112,7 +108,7 @@ npm install
 
 ### **3️⃣ Set Up Environment Variables**
 
-Create a `.env` file in the `backend/` directory:
+Create a `.env` file in the `ums-backend/` directory:
 
 ```env
 PORT=5000
@@ -124,11 +120,11 @@ JWT_SECRET=your-secret-key
 
 ```sh
 # Run frontend
-cd frontend
+cd ums-frontend
 npm run dev
 
 # Run backend
-cd ../backend
+cd ums-backend
 npm run dev
 ```
 
@@ -145,9 +141,9 @@ vercel
 
 1. Go to [Render](https://render.com/).
 2. Create a new Web Service and connect your GitHub repository.
-3. Set the **Root Directory** as `backend/`.
+3. Set the **Root Directory** as `ums-backend/`.
 4. Use the following commands:
-   - **Build Command:** `cd backend && npm install`
+   - **Build Command:** `cd ums-backend && npm install`
    - **Start Command:** `npm start`
 
 ## 📌 Next Steps
