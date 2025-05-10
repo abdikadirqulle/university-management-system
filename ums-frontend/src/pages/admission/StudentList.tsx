@@ -109,20 +109,21 @@ const StudentManager = () => {
   const filteredStudents = students.filter((student) => {
     const matchesSearch =
       student.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchTerm.toLowerCase())
-      //  ||
-      // student.department.toLowerCase().includes(searchTerm.toLowerCase());
+      student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (student.department?.name?.toLowerCase() || '').includes(searchTerm.toLowerCase());
 
     const matchesId = idFilter ? student.studentId.includes(idFilter) : true;
 
-    const matchesSemester = semesterFilter
+    const matchesSemester = semesterFilter && semesterFilter !== 'all'
       ? student.semester === semesterFilter
       : true;
 
-    // const matchesStatus = statusFilter ? student.status === statusFilter : true;
+    // We'll implement status filtering when the status field is added to the API
+    const matchesStatus = statusFilter && statusFilter !== 'all'
+      ? true // Replace with actual status check when implemented
+      : true;
 
-    return matchesSearch && matchesId && matchesSemester;
-    // && matchesStatus;
+    return matchesSearch && matchesId && matchesSemester && matchesStatus;
   });
 
   // Function to clear all filters
@@ -298,30 +299,22 @@ const StudentManager = () => {
                           </div>
                         </div>
                       </TableCell>
-                      {/* <TableCell className="hidden md:table-cell">
-                        {student.department}
-                      </TableCell> */}
+                      <TableCell className="hidden md:table-cell">
+                        {student.department?.name || 'N/A'}
+                      </TableCell>
                       <TableCell className="hidden md:table-cell">
                         {student.semester}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         {student.session}
                       </TableCell>
-                      {/* <TableCell>
-                        <span
-                          className={`px-2 py-1 rounded text-white ${
-                            student.status === "active"
-                              ? "bg-green-500"
-                              : student.status === "graduated"
-                                ? "bg-blue-500"
-                                : student.status === "suspended"
-                                  ? "bg-gray-500"
-                                  : "bg-red-500"
-                          }`}
+                      <TableCell>
+                        <Badge
+                          className={`px-2 py-1 ${student.academicYear ? "bg-green-500" : "bg-gray-500"}`}
                         >
-                          {student.status}
-                        </span>
-                      </TableCell> */}
+                          {student.academicYear ? "Active" : "Pending"}
+                        </Badge>
+                      </TableCell>
 
                       <TableCell className="text-right">
                         <DropdownMenu>
