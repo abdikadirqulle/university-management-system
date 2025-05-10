@@ -154,12 +154,13 @@ const LoginPage = () => {
                 </Button>
               </CardContent>
             </form>
+            <CardFooter className="text-xs text-center text-muted-foreground pt-0">
+          <p className="w-full">For students: Your default password is your Student ID</p>
+        </CardFooter>
           </TabsContent>
         </Tabs>
         
-        <CardFooter className="text-xs text-center text-muted-foreground pt-0">
-          <p className="w-full">For students: Your default password is your Student ID</p>
-        </CardFooter>
+     
       </Card>
     </div>
   );
