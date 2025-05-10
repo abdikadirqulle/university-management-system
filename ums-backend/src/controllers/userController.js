@@ -34,65 +34,7 @@ const registerUser = async (req, res) => {
     })
 
     // Create profile based on role
-    if (role === "student") {
-      const {
-        studentId,
-        fullName,
-        gender,
-        dateOfBirth,
-        placeOfBirth,
-        email,
-        phoneNumber,
-        highSchoolName,
-        highSchoolCity,
-        graduationYear,
-        averagePass,
-        facultyId,
-        departmentId,
-        session,
-        academicYear,
-        registerYear,
-        semester,
-      } = req.body
-
-      if (!studentId || !fullName || !facultyId || !departmentId) {
-        return res.status(400).json({
-          success: false,
-          message: "Required student details are missing",
-        })
-      }
-
-      await prisma.student.create({
-        data: {
-          userId: newUser.id,
-          studentId,
-          fullName,
-          gender,
-          dateOfBirth: new Date(dateOfBirth),
-          placeOfBirth,
-          email,
-          phoneNumber,
-          highSchoolName,
-          highSchoolCity,
-          graduationYear: parseInt(graduationYear),
-          averagePass: parseFloat(averagePass),
-          facultyId,
-          departmentId,
-          session,
-          academicYear,
-          registerYear: parseInt(registerYear),
-          semester,
-        },
-      })
-    } else if (
-      role === "admin" ||
-      role === "financial" ||
-      role === "admission"
-    ) {
-      // For admin, financial and admission roles, no additional profile needed
-      // The role is already stored in the User model
-      return
-    }
+ 
 
     // Generate JWT token
     const token = generateToken(newUser.id)

@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LoaderCircle, School } from "lucide-react";
+import { Loader2, LoaderCircle, School } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -87,7 +87,7 @@ const LoginPage = () => {
               />
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? <LoaderCircle /> : "Login"}
+              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Login"}
             </Button>
           </CardContent>
         </form>
