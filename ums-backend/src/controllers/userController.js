@@ -445,14 +445,51 @@ const deleteUser = async (req, res) => {
   }
 }
 
+// Logout user
+const logoutUser = async (req, res) => {
+  try {
+    // Get user ID from request object (set by auth middleware)
+    const userId = req.user?.id
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authenticated",
+      })
+    }
+
+    // In a stateless JWT authentication system, we don't need to invalidate tokens on the server
+    // since tokens are validated by signature and expiration time
+    // However, we can implement a token blacklist or revocation mechanism if needed
+    
+    // For now, we'll just send a success response
+    // The client will remove the token from local storage
+    
+    res.status(200).json({
+      success: true,
+      message: "Logged out successfully",
+    })
+  } catch (error) {
+    console.error("Logout error:", error)
+    res.status(500).json({
+      success: false,
+      message: "Server error during logout",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    })
+  }
+}
+
 // Generate JWT token
 const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" })
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  })
 }
 
 export {
   registerUser,
   loginUser,
+  logoutUser,
   getCurrentUser,
   updateUser,
   updateUserById,

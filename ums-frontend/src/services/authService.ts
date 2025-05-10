@@ -28,10 +28,14 @@ export const authService = {
   },
 
   logout: async (): Promise<void> => {
-    // The backend doesn't have a logout endpoint, so we just clear the token locally
-    // This is handled in the AuthContext
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    try {
+      // Call the backend logout endpoint
+      await api.post<{ success: boolean; message: string }>("/users/logout");
+    } finally {
+      // Always clear local storage, even if the API call fails
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    }
   },
 
   getCurrentUser: async (): Promise<User> => {

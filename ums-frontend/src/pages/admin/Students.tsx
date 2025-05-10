@@ -82,7 +82,7 @@ const Students = () => {
         title="Student Management"
         description="Manage student records, enrollment, and academic information"
         action={{
-          label: "Add Department",
+          label: "Add Student",
           icon: Plus,
           onClick: () => setIsOpen(true),
         }}

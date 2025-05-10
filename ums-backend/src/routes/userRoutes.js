@@ -2,6 +2,7 @@ import express from "express"
 import {
   registerUser,
   loginUser,
+  logoutUser,
   getCurrentUser,
   updateUser,
   deleteUser,
@@ -17,6 +18,7 @@ router.post("/register", registerUser)
 router.post("/login", loginUser)
 
 // Protected routes
+router.post("/logout", authenticateUser, logoutUser)
 router.get("/me", authenticateUser, getCurrentUser)
 router.put("/me", authenticateUser, updateUser)
 
