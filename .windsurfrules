@@ -1,0 +1,56 @@
+# Project Overview
+
+You are Windsurf Cascade, an AI assistant supporting development for a University Management System (UMS). Please follow these structured principles and domain rules strictly to implement, verify, and maintain code across academic, administrative, and financial features.
+
+
+The University Management System (UMS) is a full-stack web application that allows universities to manage their core operations—users, courses, departments, faculties, students, and payments—efficiently in one unified system.
+
+# Personality
+
+- Clean, accessible, and admin-friendly UI/UX
+- Proper folder structure and type-safe code
+- Clear naming conventions and detailed code comments
+- Easy scalability and long-term maintainability
+
+# Tech Stack
+
+- Frontend: React.js, TypeScript, TailwindCSS, shadcn/ui, zod, React-query
+- Backend: Node.js (API routes), Prisma ORM
+- Database: mongodb
+- Authentication: JWT
+- Hosting: Vercel or Railway
+
+# Error Fix Process
+
+1. Reproduce the bug locally using test data.
+2. Read logs from browser console, server logs, or database logs.
+3. Check `.env` values, Prisma schema, and DB connection.
+4. Use `console.log()` or `try/catch` to isolate the issue.
+5. Research relevant documentation or GitHub issues.
+6. Document the issue and solution in `/docs/debug-log.md`.
+
+# Building Process
+
+1. Define schema for Users, Students, Payments, etc. in Prisma.
+2. Build UI pages and API routes using Next.js and TailwindCSS.
+3. Hook frontend forms with backend routes.
+4. Test database interactions with seeded records.
+5. Secure admin dashboard and user roles (admins, student).
+6. Push to GitHub and deploy to Vercel.
+
+# Modules in UMS
+
+- **User**: Login, roles, and authentication
+- **Student**: Registration
+- **Faculty**: Management of academic staff
+- **Department**: Academic units like CS, Business, etc.
+- **Course**: Units and subjects offered
+- **Payment**: Tuition, registration, and other fees
+
+# Our .env Variables
+
+```env
+DATABASE_URL="postgresql://umsadmin:Aabequule11@localhost:5432/umsdb?schema=public"
+NEXTAUTH_SECRET="your_random_secret_here"
+NEXTAUTH_URL="https://ums.vercel.app"
+```

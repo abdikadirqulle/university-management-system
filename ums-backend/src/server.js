@@ -3,6 +3,9 @@ import cors from "cors"
 import dotenv from "dotenv"
 
 import userRoutes from "./routes/userRoutes.js"
+import courseRoutes from "./routes/courseRoutes.js"
+import departmentRoutes from "./routes/departmentRoutes.js"
+import facultyRoutes from "./routes/facultyRoutes.js"
 import { connectDB } from "./config/db.js"
 
 // Load environment variables
@@ -21,9 +24,9 @@ app.use(cors())
 
 // Routes
 app.use("/api/users", userRoutes)
-// Add more routes as needed
-// app.use('/api/courses', courseRoutes);
-// app.use('/api/exams', examRoutes);
+app.use("/api/courses", courseRoutes)
+app.use("/api/departments", departmentRoutes)
+app.use("/api/faculties", facultyRoutes)
 
 // Default route
 app.get("/", (req, res) => {

@@ -123,15 +123,15 @@ const authorizeAdmin = (...adminRoles) => {
       })
     }
 
-    if (req.user.role !== "ADMIN" && req.user.role !== "SUPER_ADMIN") {
+    if (req.user.role !== "admin") {
       return res.status(403).json({
         success: false,
         message: "Access denied. Admin only",
       })
     }
 
-    // If no specific admin roles are required or user is SUPER_ADMIN
-    if (adminRoles.length === 0 || req.user.role === "SUPER_ADMIN") {
+    // If no specific admin roles are required
+    if (adminRoles.length === 0) {
       return next()
     }
 
