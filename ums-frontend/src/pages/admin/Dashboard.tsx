@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import PageHeader from "@/components/PageHeader";
@@ -15,20 +15,22 @@ import {
   UserPlus,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import dashboardService, { DashboardStats, EnrollmentTrend } from "@/services/dashboardService";
+import { toast } from "sonner";
 
-// Sample data for the dashboard
-const overviewStats = [
+// Define the stats structure
+const createStats = (stats: DashboardStats) => [
   {
     title: "Total Students",
-    value: "543", // This will be updated with real data from database
+    value: stats.totalStudents.toString(),
     icon: GraduationCap,
     iconColor: "text-blue-600",
     bgColor: "bg-blue-600",
-    trend: { value: 12, isPositive: true },
+    trend: { value: 0, isPositive: true },
   },
   {
     title: "Faculties",
-    value: "8",
+    value: stats.totalFaculties.toString(),
     icon: School,
     iconColor: "text-purple-600",
     bgColor: "bg-purple-600",
@@ -36,48 +38,78 @@ const overviewStats = [
   },
   {
     title: "Total Departments",
-    value: "12",
+    value: stats.totalDepartments.toString(),
     icon: HomeIcon,
     iconColor: "text-indigo-600",
     bgColor: "bg-indigo-600",
-    trend: { value: 5, isPositive: true },
+    trend: { value: 0, isPositive: true },
   },
-
   {
     title: "Courses",
-    value: "38",
+    value: stats.totalCourses.toString(),
     icon: BookOpen,
     iconColor: "text-emerald-600",
     bgColor: "bg-emerald-600",
-    trend: { value: 3, isPositive: true },
+    trend: { value: 0, isPositive: true },
   },
 ];
 
-const enrollmentData = [
-  { name: "Jan", students: 2500 },
-  { name: "Feb", students: 3200 },
-  { name: "Mar", students: 3000 },
-  { name: "Apr", students: 4000 },
-  { name: "May", students: 3800 },
-  { name: "Jun", students: 3500 },
-  { name: "Jul", students: 3300 },
-  { name: "Aug", students: 4200 },
-  { name: "Sep", students: 5000 },
-  { name: "Oct", students: 4800 },
-  { name: "Nov", students: 4600 },
-  { name: "Dec", students: 4400 },
+// Default enrollment data (will be replaced with real data)
+const defaultEnrollmentData = [
+  { name: "2020", students: 0 },
+  { name: "2021", students: 0 },
+  { name: "2022", students: 0 },
+  { name: "2023", students: 0 },
+  { name: "2024", students: 0 },
 ];
 
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+  const [stats, setStats] = useState<DashboardStats>({
+    totalStudents: 0,
+    totalFaculties: 0,
+    totalDepartments: 0,
+    totalCourses: 0,
+  });
+  const [enrollmentData, setEnrollmentData] = useState<{ name: string; students: number }[]>(defaultEnrollmentData);
 
   useAuthGuard(["admin"]);
 
   useEffect(() => {
-    // This could fetch dashboard data from an API
-    console.log("Admin dashboard loaded");
+    const fetchDashboardData = async () => {
+      try {
+        setIsLoading(true);
+        // Fetch both stats and enrollment trends in parallel
+        const [dashboardStats, trends] = await Promise.all([
+          dashboardService.getAdminStats(),
+          dashboardService.getEnrollmentTrends()
+        ]);
+        
+        setStats(dashboardStats);
+        
+        // Transform enrollment trends data for the chart
+        if (trends.length > 0) {
+          const chartData = trends.map(trend => ({
+            name: trend.year.toString(),
+            students: trend.students
+          }));
+          setEnrollmentData(chartData);
+        }
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+        toast.error("Failed to load dashboard data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDashboardData();
   }, []);
+  
+  // Create stats cards with real data
+  const overviewStats = createStats(stats);
 
   return (
     <div className="space-y-6">
@@ -87,37 +119,58 @@ const Dashboard = () => {
       />
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {overviewStats.map((stat, idx) => (
-          <StatsCard
-            key={idx}
-            title={stat.title}
-            value={stat.value}
-            icon={stat.icon}
-            trend={stat.trend}
-            iconColor={stat.iconColor}
-            bgColor={stat.bgColor}
-          />
-        ))}
+        {isLoading ? (
+          // Show loading skeleton when data is being fetched
+          Array(4).fill(0).map((_, idx) => (
+            <Card key={idx} className="animate-pulse">
+              <CardContent className="p-6">
+                <div className="h-10 w-10 rounded-full bg-gray-200 mb-4"></div>
+                <div className="h-4 w-24 bg-gray-200 mb-2"></div>
+                <div className="h-6 w-16 bg-gray-300"></div>
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          // Show actual stats when data is loaded
+          overviewStats.map((stat, idx) => (
+            <StatsCard
+              key={idx}
+              title={stat.title}
+              value={stat.value}
+              icon={stat.icon}
+              trend={stat.trend}
+              iconColor={stat.iconColor}
+              bgColor={stat.bgColor}
+            />
+          ))
+        )}
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Student Enrollment Trends</CardTitle>
+            <CardTitle>Student Enrollment Trends by Year</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={enrollmentData}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Bar
-                    dataKey="students"
-                    fill="#6366f1"
-                    radius={[4, 4, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+              {isLoading ? (
+                <div className="h-full w-full flex items-center justify-center bg-gray-50 rounded-md">
+                  <div className="animate-pulse h-4/5 w-4/5 bg-gray-200 rounded-md"></div>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={enrollmentData}>
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Bar
+                      dataKey="students"
+                      fill="#6366f1"
+                      radius={[4, 4, 0, 0]}
+                      name="Students"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </CardContent>
         </Card>
