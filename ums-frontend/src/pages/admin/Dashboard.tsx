@@ -71,7 +71,7 @@ const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  useAuthGuard(["academic"]);
+  useAuthGuard(["admin"]);
 
   useEffect(() => {
     // This could fetch dashboard data from an API

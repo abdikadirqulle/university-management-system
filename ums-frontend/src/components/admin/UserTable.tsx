@@ -38,13 +38,13 @@ const UserTable: React.FC<UserTableProps> = ({
       cell: ({ row }) => {
         const role = row.getValue("role") as UserRole;
         const roleColorMap: Record<UserRole, string> = {
-          academic: "bg-indigo-100 text-indigo-800",
+          admin: "bg-indigo-100 text-indigo-800",
           admission: "bg-blue-100 text-blue-800",
           financial: "bg-green-100 text-green-800",
           student: "bg-amber-100 text-amber-800",
         };
         const roleDisplayMap: Record<UserRole, string> = {
-          academic: "Academic",
+          admin: "Academic",
           admission: "Admission",
           financial: "Financial",
           student: "Student",

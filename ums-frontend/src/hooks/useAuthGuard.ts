@@ -27,7 +27,7 @@ export const useAuthGuard = (
       if (!hasPermission) {
         // Redirect based on user role
         switch (user.role) {
-          case "academic":
+          case "admin":
             navigate("/admin/dashboard");
             break;
           case "admission":

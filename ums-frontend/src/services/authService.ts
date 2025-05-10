@@ -1,20 +1,55 @@
 import { api } from "./api";
 import { LoginCredentials, User } from "../types/auth";
 
+interface LoginResponse {
+  success: boolean;
+  message: string;
+  token: string;
+  user: User;
+}
+
+interface UserResponse {
+  success: boolean;
+  user: User;
+}
+
 export const authService = {
   login: async (
     credentials: LoginCredentials,
   ): Promise<{ user: User; token: string }> => {
-    const response = await api.post("/auth/login", credentials);
-    return response.data;
+    const response = await api.post<LoginResponse>("/users/login", credentials);
+    if (!response.data.success) {
+      throw new Error(response.data.message || "Login failed");
+    }
+    return {
+      user: response.data.user,
+      token: response.data.token,
+    };
   },
 
   logout: async (): Promise<void> => {
-    await api.post("/auth/logout");
+    // The backend doesn't have a logout endpoint, so we just clear the token locally
+    // This is handled in the AuthContext
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
   },
 
   getCurrentUser: async (): Promise<User> => {
-    const response = await api.get("/auth/me");
-    return response.data;
+    const response = await api.get<UserResponse>("/user/me");
+    if (!response.data.success) {
+      throw new Error("Failed to get current user");
+    }
+    return response.data.user;
+  },
+
+  register: async (userData: any): Promise<{ user: User; token: string }> => {
+    const response = await api.post<LoginResponse>("/user/register", userData);
+    if (!response.data.success) {
+      throw new Error(response.data.message || "Registration failed");
+    }
+    return {
+      user: response.data.user,
+      token: response.data.token,
+    };
   },
 };

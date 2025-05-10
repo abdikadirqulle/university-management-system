@@ -44,7 +44,7 @@ const AppSidebar = () => {
 
   // Role-specific menu items
   const roleMenuItems = {
-    academic: [
+    admin: [ // Add admin role with same menu items as academic
       {
         title: "Dashboard",
         icon: Home,
@@ -87,6 +87,7 @@ const AppSidebar = () => {
         path: `/admin/settings`,
       },
     ],
+ 
     financial: [
       {
         title: "Dashboard",
@@ -163,21 +164,26 @@ const AppSidebar = () => {
     ],
   };
 
-  // Get menu items based on user role
-  const menuItems = [...roleMenuItems[user.role]];
+  // Get menu items based on user role with fallback to prevent errors
+  const menuItems = user?.role && roleMenuItems[user.role] 
+    ? [...roleMenuItems[user.role]] 
+    : [];
 
-  const roleLabel = user?.role
-    ? {
-        academic: "Academic Affairs",
-        admission: "admission Officer",
-        student: "Student",
-        financial: "Financial Officer",
-      }[user.role]
-    : "";
+  // Map user role to display label with fallback
+  const roleLabelMap = {
+    admin: "Academic Affairs", // Handle admin role same as academic
+    admission: "Admission Officer",
+    student: "Student",
+    financial: "Financial Officer",
+  };
+  
+  const roleLabel = user?.role && roleLabelMap[user.role] 
+    ? roleLabelMap[user.role] 
+    : "User";
 
   const roleBadgeClass = user?.role
     ? {
-        academic: "badge-role-admin",
+        admin: "badge-role-admin",
         admission: "badge-role-admission",
         student: "badge-role-student",
         financial: "badge-role-financial",
