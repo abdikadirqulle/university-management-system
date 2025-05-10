@@ -1,13 +1,17 @@
 import axios from "axios";
 import { toast } from "sonner";
+import config from "@/config/enviroment-config";
 
-// Base URL points to our local backend server
+// Create axios instance with environment-specific base URL
 export const api = axios.create({
-  baseURL: "http://localhost:5000/api", // Local backend API URL
+  baseURL: config.apiUrl,
   headers: {
     "Content-Type": "application/json",
   },
 });
+
+// Log which environment we're using (for debugging)
+console.log(`API is using ${config.isProduction ? 'production' : 'development'} environment: ${config.apiUrl}`);
 
 // Request interceptor
 api.interceptors.request.use(
