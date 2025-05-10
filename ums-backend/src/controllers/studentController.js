@@ -148,21 +148,21 @@ const createStudent = async (req, res) => {
     }
 
     // Check if user exists
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-    });
+    // const user = await prisma.user.findUnique({
+    //   where: { id: userId },
+    // });
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found',
-      });
-    }
+    // if (!user) {
+    //   return res.status(404).json({
+    //     success: false,
+    //     message: 'User not found',
+    //   });
+    // }
 
     const student = await prisma.student.create({
       data: {
         studentId,
-        userId,
+        // userId,
         fullName,
         gender,
         dateOfBirth: new Date(dateOfBirth),

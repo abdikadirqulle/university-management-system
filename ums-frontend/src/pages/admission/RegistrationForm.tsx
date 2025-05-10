@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { Student } from "@/types/student";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,7 +30,6 @@ import { useDepartmentStore } from "@/store/useDepartmentStore";
 import { useFacultyStore } from "@/store/useFacultyStore";
 import { useStudentStore } from "@/store/useStudentStore";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Textarea } from "@/components/ui/textarea";
 import PageHeader from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -62,69 +62,31 @@ const studentSchema = z.object({
   dateOfBirth: z.string().min(1, "Date of birth is required"),
   placeOfBirth: z.string().min(1, "Place of birth is required"),
   email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  address: z.string().min(1, "Address is required"),
-  nationalId: z.string().optional(),
-  
+  phoneNumber: z.string().min(10, "Phone number must be at least 10 digits"),
   
   // Academic Background
   highSchoolName: z.string().min(1, "High school name is required"),
-  highSchoolGraduationYear: z.string().min(1, "Graduation year is required"),
-  highSchoolGPA: z.string().min(1, "GPA is required"),
-  previousInstitution: z.string().optional(),
-  transferCredits: z.string().optional(),
+  highSchoolCity: z.string().min(1, "High school city is required"),
+  graduationYear: z.string().min(1, "Graduation year is required").transform(val => parseInt(val)),
+  averagePass: z.string().min(1, "GPA is required").transform(val => parseFloat(val)),
 
   // Program Information
   facultyId: z.string().min(1, "Faculty is required"),
   departmentId: z.string().min(1, "Department is required"),
   session: z.string().min(1, "Session is required"),
   academicYear: z.string().min(1, "Academic year is required"),
-  registerYear: z.string().min(1, "Register year is required"),
+  registerYear: z.string().min(1, "Register year is required").transform(val => parseInt(val)),
   semester: z.string().min(1, "Semester is required"),
   
- 
+  // Hidden fields that will be set programmatically
+  userId: z.string().optional(),
+  studentId: z.string().optional()
 });
 
 type StudentFormValues = z.infer<typeof studentSchema>;
 
-// Student interface to match our database schema
-interface Student {
-  id?: string;
-  studentId?: string;
-  fullName: string;
-  gender: "male" | "female";
-  dateOfBirth: string;
-  placeOfBirth: string;
-  email: string;
-  phone: string;
-
- 
-
-  // Academic Background
-  highSchoolName: string;
-  highSchoolGraduationYear: string;
-  highSchoolGPA: string;
-  previousInstitution?: string;
-  transferCredits?: string;
-
-  // Program Information
-  facultyId: string;
-  departmentId: string;
-  session: string;
-  academicYear: string;
-  registerYear: string;
-  semester: string;
-  
- 
-  
-  // Relations
-  faculty?: { id: string; name: string };
-  department?: { id: string; name: string };
-  
-  // System fields
-  createdAt?: string;
-  updatedAt?: string;
-}
+// Use the Student type from our types directory
+// This ensures we're aligned with the API expectations
 
 const RegistrationForm = () => {
   useAuthGuard(["admission"]);
@@ -162,15 +124,13 @@ const RegistrationForm = () => {
       dateOfBirth: "",
       placeOfBirth: "",
       email: "",
-      phone: "",
-    
+      phoneNumber: "",
 
       // Academic Background
       highSchoolName: "",
-      highSchoolGraduationYear: "",
-      highSchoolGPA: "",
-      previousInstitution: "",
-      transferCredits: "",
+      highSchoolCity: "",
+      graduationYear: "",
+      averagePass: "",
 
       // Program Information
       facultyId: "",
@@ -179,7 +139,6 @@ const RegistrationForm = () => {
       academicYear: "",
       registerYear: new Date().getFullYear().toString(),
       semester: "",
- 
     },
   });
 
@@ -205,10 +164,7 @@ const RegistrationForm = () => {
 
   // Handle form submission
   const onSubmit = async (data: StudentFormValues) => {
-    
-    console.log(data)
     try {
-    console.log(data)
       // Generate a student ID (this would normally be done by the backend)
       const year = new Date().getFullYear().toString().slice(-2);
       const facultyCode = faculties.find(f => f.id === data.facultyId)?.code || 'XX';
@@ -217,11 +173,33 @@ const RegistrationForm = () => {
       
       const studentId = `${year}${facultyCode}${deptCode}${randomNum}`;
       
-      // Prepare student data
-      const studentData: Student = {
-        ...data,
+      // Get current user ID from localStorage
+      const userJson = localStorage.getItem('user');
+      const userId = userJson ? JSON.parse(userJson).id : null;
+      
+      // Prepare student data - ensure it matches the API expected structure
+      const studentData = {
         studentId,
+        userId: userId,
+        fullName: data.fullName,
+        gender: data.gender,
+        dateOfBirth: data.dateOfBirth,
+        placeOfBirth: data.placeOfBirth,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        highSchoolName: data.highSchoolName,
+        highSchoolCity: data.highSchoolCity,
+        graduationYear: data.graduationYear,
+        averagePass: data.averagePass,
+        facultyId: data.facultyId,
+        departmentId: data.departmentId,
+        session: data.session,
+        academicYear: data.academicYear,
+        registerYear: data.registerYear,
+        semester: data.semester
       };
+      
+      console.log('Submitting student data:', studentData);
       
       // Add student to database
       await addStudent(studentData);
@@ -346,7 +324,7 @@ const RegistrationForm = () => {
                   
                   <FormField
                     control={form.control}
-                    name="phone"
+                    name="phoneNumber"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Phone Number</FormLabel>
@@ -357,15 +335,8 @@ const RegistrationForm = () => {
                       </FormItem>
                     )}
                   />
-                  
-               
-                  
-                
                 </div>
               </div>
-              
-              {/* Emergency Contact Section */}
-           
               
               {/* Academic Background Section */}
               <div>
@@ -388,7 +359,21 @@ const RegistrationForm = () => {
                   
                   <FormField
                     control={form.control}
-                    name="highSchoolGraduationYear"
+                    name="highSchoolCity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>High School City</FormLabel>
+                        <FormControl>
+                          <Input placeholder="City" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="graduationYear"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Graduation Year</FormLabel>
@@ -402,10 +387,10 @@ const RegistrationForm = () => {
                   
                   <FormField
                     control={form.control}
-                    name="highSchoolGPA"
+                    name="averagePass"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>GPA / Grade</FormLabel>
+                        <FormLabel>GPA / Average Pass</FormLabel>
                         <FormControl>
                           <Input placeholder="3.5" {...field} />
                         </FormControl>
@@ -413,10 +398,6 @@ const RegistrationForm = () => {
                       </FormItem>
                     )}
                   />
-                  
-              
-                  
-              
                 </div>
               </div>
               
@@ -470,11 +451,17 @@ const RegistrationForm = () => {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {filteredDepartments.map((dept) => (
-                              <SelectItem key={dept.id} value={dept.id}>
-                                {dept.name}
-                              </SelectItem>
-                            ))}
+                            {filteredDepartments.length > 0 ? (
+                              filteredDepartments.map((dept) => (
+                                <SelectItem key={dept.id} value={dept.id}>
+                                  {dept.name}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <div className="px-2 py-2 text-sm text-muted-foreground">
+                                No departments available
+                              </div>
+                            )}
                           </SelectContent>
                         </Select>
                         <FormDescription>
@@ -543,6 +530,20 @@ const RegistrationForm = () => {
                   
                   <FormField
                     control={form.control}
+                    name="registerYear"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Registration Year</FormLabel>
+                        <FormControl>
+                          <Input placeholder={new Date().getFullYear().toString()} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
                     name="semester"
                     render={({ field }) => (
                       <FormItem>
@@ -568,37 +569,26 @@ const RegistrationForm = () => {
                       </FormItem>
                     )}
                   />
-                  
-                  <FormField
-                    control={form.control}
-                    name="registerYear"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Registration Year</FormLabel>
-                        <FormControl>
-                          <Input type="number" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 </div>
               </div>
-              
-              {/* Additional Information Section */}
-          
               
               <div className="flex justify-end space-x-4">
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate("/admission/dashboard")}
+                  onClick={() => navigate("/admission/students")}
                 >
                   Cancel
                 </Button>
                 <Button type="submit" disabled={isLoading}>
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Register Student
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Registering...
+                    </>
+                  ) : (
+                    "Register Student"
+                  )}
                 </Button>
               </div>
             </form>
