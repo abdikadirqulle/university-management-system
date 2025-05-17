@@ -29,13 +29,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Loader2 } from "lucide-react";
 
 // Form schema for user form
 const userFormSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
   email: z.string().email("Please enter a valid email"),
   password: z.string().min(6, "Please enter a password"),
-  role: z.enum(["academic", "admission", "financial"] as const),
+  role: z.enum(["admin", "admission", "financial"] as const),
 });
 
 export type UserFormValues = z.infer<typeof userFormSchema>;
@@ -48,12 +49,7 @@ interface UserFormDialogProps {
   onSubmit: (data: UserFormValues) => Promise<void>;
 }
 
-const roleOptions = [
-  { value: "academic", label: "Academic" },
-  { value: "admission", label: "Admission" },
-  { value: "financial", label: "Financial" },
-  { value: "student", label: "Student" }, // Added student role
-];
+
 
 const UserFormDialog: React.FC<UserFormDialogProps> = ({
   isOpen,
@@ -170,10 +166,9 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="academic">Admin</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
                       <SelectItem value="admission">Admission</SelectItem>
                       <SelectItem value="financial">Financial</SelectItem>
-                      <SelectItem value="student">Student</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -189,8 +184,19 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
               >
                 Cancel
               </Button>
-              <Button type="submit">
-                {dialogMode === "add" ? "Add User" : "Save Changes"}
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {dialogMode === "add" ? (
+                  form.formState.isSubmitting ? (
+                    <div className="flex items-center space-x-2">
+                      <Loader2 className="h-4 w-4 animate-spin text-primary-foreground" />
+                      <span className="text-primary-foreground">Adding...</span>
+                    </div>
+                  ) : (
+                    "Add User"
+                  )
+                ) : (
+                  "Save Changes"
+                )}
               </Button>
             </DialogFooter>
           </form>
