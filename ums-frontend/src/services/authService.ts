@@ -17,14 +17,19 @@ export const authService = {
   login: async (
     credentials: LoginCredentials,
   ): Promise<{ user: User; token: string }> => {
-    const response = await api.post<LoginResponse>("/users/login", credentials);
-    if (!response.data.success) {
-      throw new Error(response.data.message || "Login failed");
+    try {
+      const response = await api.post<LoginResponse>("/users/login", credentials);
+      if (!response.data.success) {
+        throw new Error(response.data.message || "Invalid credentials");
+      }
+      return {
+        user: response.data.user,
+        token: response.data.token,
+      };
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || "Login failed";
+      throw new Error(errorMessage);
     }
-    return {
-      user: response.data.user,
-      token: response.data.token,
-    };
   },
   
   loginStudent: async (

@@ -10,36 +10,64 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, LoaderCircle, School, UserCircle, GraduationCap } from "lucide-react";
-import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const staffSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+const studentSchema = z.object({
+  studentId: z.string().min(1, "Student ID is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+type StaffFormData = z.infer<typeof staffSchema>;
+type StudentFormData = z.infer<typeof studentSchema>;
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [studentId, setStudentId] = useState("");
-  const [studentPassword, setStudentPassword] = useState("");
   const { login, loginStudent, isLoading, error, clearError } = useAuth();
 
-  const handleStaffSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await login({ email, password });
-  };
-
-  const handleStudentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await loginStudent({ studentId, password: studentPassword });
-  };
-
-  // Login info for demo
-  const demoAccounts = [
-    {
-      role: "Academic Admin",
-      email: "admin@university.edu",
-      password: "password",
+  const staffForm = useForm<StaffFormData>({
+    resolver: zodResolver(staffSchema),
+    defaultValues: {
+      email: "",
+      password: "",
     },
-  ];
+  });
+
+  const studentForm = useForm<StudentFormData>({
+    resolver: zodResolver(studentSchema),
+    defaultValues: {
+      studentId: "",
+      password: "",
+    },
+  });
+
+  const onStaffSubmit = async (data: StaffFormData) => {
+    try {
+      await login(data);
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
+  };
+
+  const onStudentSubmit = async (data: StudentFormData) => {
+    try {
+      await loginStudent({
+        studentId: data.studentId,
+        password: data.password
+      });
+    } catch (error) {
+      console.error('Student login failed:', error);
+    }
+  };
+
 
   return (
     <div className="w-full">
@@ -65,92 +93,76 @@ const LoginPage = () => {
           </TabsList>
           
           <TabsContent value="staff">
-            <form onSubmit={handleStaffSubmit}>
+            <form onSubmit={staffForm.handleSubmit(onStaffSubmit)} className="space-y-4">
               <CardContent className="space-y-4">
                 {error && (
                   <Alert variant="destructive" className="text-sm">
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
                 )}
-
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="your.email@university.edu"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      if (error) clearError();
-                    }}
-                    required
+                    placeholder="Enter your email"
+                    {...staffForm.register("email")}
                   />
+                  {staffForm.formState.errors.email && (
+                    <p className="text-sm text-red-500">{staffForm.formState.errors.email.message}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
-                  </div>
+                  <Label htmlFor="password">Password</Label>
                   <Input
                     id="password"
                     type="password"
-                    placeholder="Enter password"
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      if (error) clearError();
-                    }}
-                    required
+                    placeholder="Enter your password"
+                    {...staffForm.register("password")}
                   />
+                  {staffForm.formState.errors.password && (
+                    <p className="text-sm text-red-500">{staffForm.formState.errors.password.message}</p>
+                  )}
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Login as Staff"}
+                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Login"}
                 </Button>
               </CardContent>
             </form>
           </TabsContent>
           
           <TabsContent value="student">
-            <form onSubmit={handleStudentSubmit}>
+            <form onSubmit={studentForm.handleSubmit(onStudentSubmit)} className="space-y-4">
               <CardContent className="space-y-4">
                 {error && (
                   <Alert variant="destructive" className="text-sm">
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
                 )}
-
                 <div className="space-y-2">
                   <Label htmlFor="studentId">Student ID</Label>
                   <Input
                     id="studentId"
                     type="text"
                     placeholder="Enter your student ID"
-                    value={studentId}
-                    onChange={(e) => {
-                      setStudentId(e.target.value);
-                      if (error) clearError();
-                    }}
-                    required
+                    {...studentForm.register("studentId")}
                   />
+                  {studentForm.formState.errors.studentId && (
+                    <p className="text-sm text-red-500">{studentForm.formState.errors.studentId.message}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="studentPassword">Password</Label>
-                  </div>
+                  <Label htmlFor="password">Password</Label>
                   <Input
-                    id="studentPassword"
+                    id="password"
                     type="password"
-                    placeholder="Enter password"
-                    value={studentPassword}
-                    onChange={(e) => {
-                      setStudentPassword(e.target.value);
-                      if (error) clearError();
-                    }}
-                    required
+                    placeholder="Enter your password"
+                    {...studentForm.register("password")}
+                    onChange={() => error && clearError()}
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Login as Student"}
+                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Login"}
                 </Button>
               </CardContent>
             </form>
