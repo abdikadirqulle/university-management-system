@@ -39,7 +39,9 @@ import {
 } from "@/components/ui/card";
 import { useStudentStore } from "@/store/useStudentStore";
 import { Student } from "@/types/student";
+
 import StudentDetailDialog from "@/components/admission/StudentDetailDialog";
+import StudentRegistrationDialog from "@/components/admission/student-registration-dialog";
 
 
 
@@ -106,7 +108,7 @@ const StudentEnrollment = () => {
         action={{
           label: "Register New Student",
           icon: UserPlus,
-          onClick: () => navigate("/admission/registration"),
+          onClick: () => setIsEditDialogOpen(true),
         }}
       />
 
@@ -181,9 +183,7 @@ const StudentEnrollment = () => {
                       <TableCell>
                         <div>
                           <div className="font-medium">{student.fullName}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {student.email}
-                          </div>
+                        
                         </div>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
@@ -217,7 +217,7 @@ const StudentEnrollment = () => {
                             <Edit className="h-4 w-4" />
                             <span className="sr-only">Edit</span>
                           </Button>
-                          {/* <AlertDialog>
+                          <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button variant="ghost" size="sm">
                                 <Trash2 className="h-4 w-4 text-destructive" />
@@ -242,7 +242,7 @@ const StudentEnrollment = () => {
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
-                          </AlertDialog> */}
+                          </AlertDialog>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -270,11 +270,13 @@ const StudentEnrollment = () => {
       />
 
       {/* Edit Dialog */}
-      <StudentDetailDialog
-        student={selectedStudent}
-        isOpen={isEditDialogOpen}
-        onClose={() => setIsEditDialogOpen(false)}
-        onSave={handleSaveStudent}
+      <StudentRegistrationDialog
+        open={isEditDialogOpen}
+        onOpenChange={() => setIsEditDialogOpen(false)}
+        onSuccess={() => {
+          setIsEditDialogOpen(false);
+          fetchStudents();
+        }}
       />
     </div>
   );

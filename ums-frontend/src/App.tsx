@@ -42,7 +42,7 @@ import FinancialStudentsPage from "./pages/financial/Students";
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
 import Students from "./pages/admin/Students";
-import RegistrationForm from "./pages/admission/student-registration";
+import RegistrationForm from "./components/admission/student-registration-dialog";
 
 // Create a client
 const queryClient = new QueryClient({
