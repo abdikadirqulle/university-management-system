@@ -51,13 +51,7 @@ const getStudentById = async (req, res) => {
     const student = await prisma.student.findUnique({
       where: { id },
       include: {
-        user: {
-          select: {
-            name: true,
-            email: true,
-            role: true,
-          },
-        },
+       
         faculty: {
           select: {
             name: true,
@@ -329,6 +323,12 @@ const deleteStudent = async (req, res) => {
     }
 
     // Delete student
+    // First delete related payments
+    await prisma.payment.deleteMany({
+      where: { studentId: student.studentId },
+    });
+    
+    // Then delete the student
     await prisma.student.delete({
       where: { id },
     });
