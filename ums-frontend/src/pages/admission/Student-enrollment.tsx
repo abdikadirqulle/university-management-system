@@ -126,7 +126,6 @@ const StudentEnrollment = () => {
                 onClick={() => {
                   fetchStudents();
                   setSearchTerm("");
-                  toast.success("Student data refreshed");
                 }}
               >
                 <RefreshCw className="h-4 w-4 mr-1" /> Refresh

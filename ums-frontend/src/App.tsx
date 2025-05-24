@@ -24,10 +24,10 @@ import SettingsPage from "./pages/admin/Settings";
 import CalendarPage from "./pages/admin/Calendar";
 
 // admission Pages
-import AdmissionDashboard from "./pages/admission/Dashboard";
-import StudentEnrollment from "./pages/admission/StudentEnrollment";
-import StudentAdmission from "./pages/admission/StudentAdmission";
-import StudentList from "./pages/admission/StudentList";
+import AdmissionDashboard from "./pages/admission/admission-dashboard";
+import StudentEnrollment from "./pages/admission/Student-enrollment";
+import StudentAdmission from "./pages/admission/Student-admission";
+import StudentList from "./pages/admission/Students-list";
 
 // Student Pages
 import StudentDashboard from "./pages/student/Dashboard";
@@ -42,7 +42,7 @@ import FinancialStudentsPage from "./pages/financial/Students";
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
 import Students from "./pages/admin/Students";
-import RegistrationForm from "./pages/admission/RegistrationForm";
+import RegistrationForm from "./pages/admission/student-registration";
 
 // Create a client
 const queryClient = new QueryClient({
