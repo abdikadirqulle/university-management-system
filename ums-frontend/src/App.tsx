@@ -27,7 +27,7 @@ import CalendarPage from "./pages/admin/Calendar";
 import AdmissionDashboard from "./pages/admission/Dashboard";
 import StudentEnrollment from "./pages/admission/StudentEnrollment";
 import StudentAdmission from "./pages/admission/StudentAdmission";
-import StudentManager from "./pages/admission/StudentList";
+import StudentList from "./pages/admission/StudentList";
 
 // Student Pages
 import StudentDashboard from "./pages/student/Dashboard";
@@ -75,7 +75,9 @@ const App = () => (
             <Route path="/admin" element={<AppLayout />}>
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<UsersPage />} />
-              <Route path="students" element={<Students />} />
+              {/* <Route path="students" element={<Students />} /> */}
+              <Route path="students" element={<StudentList />} />
+
               <Route path="faculties" element={<FacultiesPage />} />
               <Route path="courses" element={<CoursesPage />} />
               <Route path="departments" element={<DepartmentsPage />} />
@@ -96,7 +98,7 @@ const App = () => (
               />
               <Route path="student-admission" element={<StudentAdmission />} />
               <Route path="registration" element={<RegistrationForm />} />
-              <Route path="students" element={<StudentManager />} />
+              <Route path="students" element={<StudentList />} />
 
               {/* 404 Page */}
               <Route path="*" element={<NotFound />} />

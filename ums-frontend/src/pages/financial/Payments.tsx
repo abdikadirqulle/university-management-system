@@ -129,65 +129,7 @@ const PaymentsPage = () => {
         }}
       />
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Payments</CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {statistics ? formatCurrency(statistics.totalPaid + statistics.totalPending + statistics.totalOverdue) : "$0.00"}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {statistics ? statistics.totalPayments : 0} payments processed
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Payments</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {statistics ? formatCurrency(statistics.totalPending) : "$0.00"}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {payments.filter(p => p.status === PaymentStatus.PENDING).length} pending payments
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Overdue Payments</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-500">
-              {statistics ? formatCurrency(statistics.totalOverdue) : "$0.00"}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {payments.filter(p => p.status === PaymentStatus.OVERDUE).length} overdue payments
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Paid Payments</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-500">
-              {statistics ? formatCurrency(statistics.totalPaid) : "$0.00"}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {payments.filter(p => p.status === PaymentStatus.PAID).length} completed payments
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+
 
       {/* Payments Table */}
       <PaymentTable 
