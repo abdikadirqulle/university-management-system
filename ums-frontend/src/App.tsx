@@ -24,10 +24,10 @@ import SettingsPage from "./pages/admin/Settings";
 import CalendarPage from "./pages/admin/Calendar";
 
 // admission Pages
-import AdmissionDashboard from "./pages/admission/Dashboard";
-import StudentEnrollment from "./pages/admission/StudentEnrollment";
-import StudentAdmission from "./pages/admission/StudentAdmission";
-import StudentManager from "./pages/admission/StudentList";
+import AdmissionDashboard from "./pages/admission/admission-dashboard";
+import StudentEnrollment from "./pages/admission/Student-enrollment";
+import StudentAdmission from "./pages/admission/Student-admission";
+import StudentList from "./pages/admission/Students-list";
 
 // Student Pages
 import StudentDashboard from "./pages/student/Dashboard";
@@ -42,7 +42,7 @@ import FinancialStudentsPage from "./pages/financial/Students";
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
 import Students from "./pages/admin/Students";
-import RegistrationForm from "./pages/admission/RegistrationForm";
+import RegistrationForm from "./components/admission/student-registration-dialog";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -75,7 +75,9 @@ const App = () => (
             <Route path="/admin" element={<AppLayout />}>
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<UsersPage />} />
-              <Route path="students" element={<Students />} />
+              {/* <Route path="students" element={<Students />} /> */}
+              <Route path="students" element={<StudentList />} />
+
               <Route path="faculties" element={<FacultiesPage />} />
               <Route path="courses" element={<CoursesPage />} />
               <Route path="departments" element={<DepartmentsPage />} />
@@ -96,7 +98,7 @@ const App = () => (
               />
               <Route path="student-admission" element={<StudentAdmission />} />
               <Route path="registration" element={<RegistrationForm />} />
-              <Route path="students" element={<StudentManager />} />
+              <Route path="students" element={<StudentList />} />
 
               {/* 404 Page */}
               <Route path="*" element={<NotFound />} />

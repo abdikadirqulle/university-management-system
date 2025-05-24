@@ -13,6 +13,15 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -32,27 +41,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
-import { Loader2, Slash } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useDepartmentStore } from "@/store/useDepartmentStore";
 import { useFacultyStore } from "@/store/useFacultyStore";
 import { useStudentStore } from "@/store/useStudentStore";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import PageHeader from "@/components/PageHeader";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
-// Academic years and semesters
-const ACADEMIC_YEARS = [
-  { id: "2023", name: "2023-2024" },
-  { id: "2024", name: "2024-2025" },
-  { id: "2025", name: "2025-2026" },
-];
 
-const SEMESTERS = [
-  { id: "1", name: "First Semester" },
-  { id: "2", name: "Second Semester" },
-  { id: "3", name: "Summer Semester" },
-];
+const SEMESTERS = Array.from({ length: 12 }, (_, i) => ({ 
+  id: `${i + 1}`, 
+  name: `${i + 1}` 
+}));
 
 const SESSIONS = [
   { id: "morning", name: "Morning" },
@@ -92,10 +92,14 @@ const studentSchema = z.object({
 
 type StudentFormValues = z.infer<typeof studentSchema>;
 
-// Use the Student type from our types directory
-// This ensures we're aligned with the API expectations
+interface StudentRegistrationDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
+}
 
-const RegistrationForm = () => {
+
+const StudentRegistrationDialog = ({ open, onOpenChange, onSuccess }: StudentRegistrationDialogProps) => {
   useAuthGuard(["admission"]);
   const navigate = useNavigate();
 
@@ -136,15 +140,15 @@ const RegistrationForm = () => {
       // Academic Background
       highSchoolName: "",
       highSchoolCity: "",
-      graduationYear: "",
-      averagePass: "",
+      graduationYear: 0,
+      averagePass: 0,
 
       // Program Information
       facultyId: "",
       departmentId: "",
       session: "",
       academicYear: "",
-      registerYear: new Date().getFullYear().toString(),
+      registerYear: new Date().getFullYear(),
       semester: "",
     },
   });
@@ -212,7 +216,7 @@ const RegistrationForm = () => {
       await addStudent(studentData);
       
       toast.success("Student registered successfully");
-      navigate("/admission/student-enrollment");
+      onOpenChange(false);
     } catch (error) {
       console.error("Error registering student:", error);
       toast.error("Failed to register student");
@@ -220,30 +224,14 @@ const RegistrationForm = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Student Registration"
-        description="Register a new student in the system"
-      />
-
-<Breadcrumb>
-      <BreadcrumbList>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/admission/student-enrollment">Student Enrollment</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator>
-          <Slash />
-        </BreadcrumbSeparator>       
-        <BreadcrumbItem>
-          <BreadcrumbPage>Registration</BreadcrumbPage>
-        </BreadcrumbItem>
-      </BreadcrumbList>
-    </Breadcrumb>
-      <Card>
-        <CardHeader>
-          <CardTitle>Student Registration Form</CardTitle>
-        </CardHeader>
-        <CardContent>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+    <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle>Student Registration</DialogTitle>
+        <DialogDescription>
+          Fill in the student details to register a new student.
+        </DialogDescription>
+      </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               {/* Personal Information Section */}
@@ -258,7 +246,7 @@ const RegistrationForm = () => {
                       <FormItem>
                         <FormLabel>Full Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="John Doe" {...field} />
+                          <Input placeholder="name" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -278,17 +266,13 @@ const RegistrationForm = () => {
                             className="flex flex-row space-x-4"
                           >
                             <FormItem className="flex items-center space-x-2 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem value="male" />
-                              </FormControl>
+                              <RadioGroupItem value="male" />
                               <FormLabel className="font-normal">
                                 Male
                               </FormLabel>
                             </FormItem>
                             <FormItem className="flex items-center space-x-2 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem value="female" />
-                              </FormControl>
+                              <RadioGroupItem value="female" />
                               <FormLabel className="font-normal">
                                 Female
                               </FormLabel>
@@ -335,7 +319,7 @@ const RegistrationForm = () => {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="john.doe@example.com" {...field} />
+                          <Input type="email" placeholder="name@example.com" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -526,23 +510,12 @@ const RegistrationForm = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Academic Year</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select academic year" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {ACADEMIC_YEARS.map((year) => (
-                              <SelectItem key={year.id} value={year.id}>
-                                {year.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                      
+                          <Input 
+                            type="text" 
+                            placeholder="Enter academic year" 
+                            {...field} 
+                          />
                         <FormMessage />
                       </FormItem>
                     )}
@@ -613,10 +586,9 @@ const RegistrationForm = () => {
               </div>
             </form>
           </Form>
-        </CardContent>
-      </Card>
-    </div>
+   </DialogContent>
+   </Dialog>
   );
 };
 
-export default RegistrationForm;
+export default StudentRegistrationDialog;

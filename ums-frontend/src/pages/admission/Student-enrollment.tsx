@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
-import { Search, Plus, Edit, Trash2, RefreshCw, UserPlus } from "lucide-react";
+import { Search, Plus, Edit, Trash2, RefreshCw, UserPlus, Eye } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 
@@ -39,7 +39,9 @@ import {
 } from "@/components/ui/card";
 import { useStudentStore } from "@/store/useStudentStore";
 import { Student } from "@/types/student";
+
 import StudentDetailDialog from "@/components/admission/StudentDetailDialog";
+import StudentRegistrationDialog from "@/components/admission/student-registration-dialog";
 
 
 
@@ -106,7 +108,7 @@ const StudentEnrollment = () => {
         action={{
           label: "Register New Student",
           icon: UserPlus,
-          onClick: () => navigate("/admission/registration"),
+          onClick: () => setIsEditDialogOpen(true),
         }}
       />
 
@@ -126,7 +128,6 @@ const StudentEnrollment = () => {
                 onClick={() => {
                   fetchStudents();
                   setSearchTerm("");
-                  toast.success("Student data refreshed");
                 }}
               >
                 <RefreshCw className="h-4 w-4 mr-1" /> Refresh
@@ -182,9 +183,7 @@ const StudentEnrollment = () => {
                       <TableCell>
                         <div>
                           <div className="font-medium">{student.fullName}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {student.email}
-                          </div>
+                        
                         </div>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
@@ -207,7 +206,7 @@ const StudentEnrollment = () => {
                             size="sm"
                             onClick={() => handleViewStudent(student)}
                           >
-                            <Search className="h-4 w-4" />
+                            <Eye className="h-4 w-4" />
                             <span className="sr-only">View</span>
                           </Button>
                           <Button
@@ -268,16 +267,16 @@ const StudentEnrollment = () => {
         student={selectedStudent}
         isOpen={isViewDialogOpen}
         onClose={() => setIsViewDialogOpen(false)}
-        onSave={() => {}}
-        viewOnly={true}
       />
 
       {/* Edit Dialog */}
-      <StudentDetailDialog
-        student={selectedStudent}
-        isOpen={isEditDialogOpen}
-        onClose={() => setIsEditDialogOpen(false)}
-        onSave={handleSaveStudent}
+      <StudentRegistrationDialog
+        open={isEditDialogOpen}
+        onOpenChange={() => setIsEditDialogOpen(false)}
+        onSuccess={() => {
+          setIsEditDialogOpen(false);
+          fetchStudents();
+        }}
       />
     </div>
   );

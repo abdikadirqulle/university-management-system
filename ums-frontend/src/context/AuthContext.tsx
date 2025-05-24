@@ -2,9 +2,9 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
-  AuthContextType,
   AuthState,
   LoginCredentials,
+  StudentLoginCredentials,
   User,
 } from "../types/auth";
 import { api } from "../services/api";
@@ -25,6 +25,13 @@ const initialAuthState: AuthState = {
   isLoading: false,
   error: null,
 };
+
+export interface AuthContextType extends AuthState {
+  login: (credentials: LoginCredentials) => Promise<void>;
+  loginStudent: (credentials: StudentLoginCredentials) => Promise<void>;
+  logout: () => void;
+  clearError: () => void;
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -158,6 +165,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const loginStudent = async (credentials: StudentLoginCredentials): Promise<void> => {
+    setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
+
+    try {
+      // Call the student login API
+      const { user, token } = await authService.loginStudent(credentials);
+
+      // Save to local storage
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      setAuthState({
+        user,
+        token,
+        isAuthenticated: true,
+        isLoading: false,
+        error: null,
+      });
+
+      // Navigate to student dashboard
+      navigate("/student/dashboard");
+
+      toast.success(`Welcome, ${user.name}!`);
+    } catch (error) {
+      let errorMessage = "An error occurred during student login";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      setAuthState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: errorMessage,
+      }));
+
+      toast.error(errorMessage);
+    }
+  };
+
   const logout = async (): Promise<void> => {
     try {
       // Call the authService logout method
@@ -192,7 +239,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <AuthContext.Provider value={{ ...authState, login, logout, clearError }}>
+    <AuthContext.Provider value={{ ...authState, login, loginStudent, logout, clearError }}>
       {children}
     </AuthContext.Provider>
   );
@@ -200,10 +247,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
-
   return context;
 };

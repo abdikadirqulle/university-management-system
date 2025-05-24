@@ -66,19 +66,10 @@ import {
 } from "@/components/ui/alert-dialog";
 
 // Define available semesters for filtering
-const semesters = [
-  "Fall 2022",
-  "Spring 2023",
-  "Summer 2023",
-  "Fall 2023",
-  "Spring 2024",
-];
+const semesters = Array.from({ length: 12 }, (_, i) => `${i + 1}`);
 
-// Define available sessions for filtering
-const sessions = ["2021-2022", "2022-2023", "2023-2024", "2024-2025"];
-
-const StudentManager = () => {
-  useAuthGuard(["admission"]);
+const StudentList = () => {
+  useAuthGuard(["admin", "admission"]);
 
   const { students, isLoading, fetchStudents, updateStudent, deleteStudent } =
     useStudentStore();
@@ -176,7 +167,6 @@ const StudentManager = () => {
                 onClick={() => {
                   fetchStudents();
                   clearFilters();
-                  toast.success("Student data refreshed");
                 }}
               >
                 <RefreshCw className="h-4 w-4 mr-1" /> Refresh
@@ -258,8 +248,8 @@ const StudentManager = () => {
                     <SelectItem value="all">All Statuses</SelectItem>
                     <SelectItem value="active">Active</SelectItem>
                     <SelectItem value="inactive">Inactive</SelectItem>
-                    <SelectItem value="graduated">Graduated</SelectItem>
-                    <SelectItem value="suspended">Suspended</SelectItem>
+                    {/* <SelectItem value="graduated">Graduated</SelectItem>
+                    <SelectItem value="suspended">Suspended</SelectItem> */}
                   </SelectContent>
                 </Select>
               </div>
@@ -354,13 +344,7 @@ const StudentManager = () => {
                               onClick={() => handleViewStudent(student)}
                             >
                               <Eye className="h-4 w-4 mr-2" /> View Details
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleEditStudent(student)}
-                            >
-                              <Pencil className="h-4 w-4 mr-2" /> Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
+                            </DropdownMenuItem>       
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <DropdownMenuItem
@@ -429,4 +413,4 @@ const StudentManager = () => {
   );
 };
 
-export default StudentManager;
+export default StudentList;

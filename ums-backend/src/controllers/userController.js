@@ -28,7 +28,7 @@ const registerUser = async (req, res) => {
       data: {
         name,
         email,
-        password,
+        password: hashedPassword,
         role,
       },
     })
@@ -67,54 +67,28 @@ const loginUser = async (req, res) => {
   try {
     // Find user by email
     const user = await prisma.user.findUnique({
-      where: { email },
-     
+      where: { email }
     })
 
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: "Invalid credentials",
+        message: "Invalid credentials"
       })
     }
 
-    // Check password
-    // const isPasswordValid = await bcrypt.compare(password, user.password)
-
-    // if (!isPasswordValid) {
-    //   return res.status(401).json({
-    //     success: false,
-    //     message: "Invalid credentials",
-    //   })
-    // }
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.password)
+    
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials"
+      })
+    }
 
     // Generate JWT token
     const token = generateToken(user.id)
-
-    // Extract role-specific data
-    let roleData = null
-    if (user.role === "student" && user.students.length > 0) {
-      const student = user.students[0]
-      roleData = {
-        studentId: student.studentId,
-        faculty: student.faculty?.name,
-        department: student.department?.name,
-        semester: student.semester,
-        academicYear: student.academicYear,
-      }
-    } else if (user.role === "admin") {
-      roleData = {
-        // Admin specific data can be added here if needed
-      }
-    } else if (user.role === "financial") {
-      roleData = {
-        // Financial role specific data can be added here
-      }
-    } else if (user.role === "admission") {
-      roleData = {
-        // Admission role specific data can be added here
-      }
-    }
 
     res.status(200).json({
       success: true,
@@ -124,16 +98,15 @@ const loginUser = async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role,
-        ...roleData,
-      },
+        role: user.role
+      }
     })
   } catch (error) {
     console.error("Login error:", error)
     res.status(500).json({
       success: false,
       message: "Server error during login",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+      error: process.env.NODE_ENV === "development" ? error.message : undefined
     })
   }
 }

@@ -13,25 +13,26 @@ const studentStats = [
     title: "Enrolled Courses",
     value: "5",
     icon: BookOpen,
-    iconColor: "text-blue-600",
+    bgColor: "bg-blue-600",
+    
   },
   {
     title: "Upcoming Exams",
     value: "3",
     icon: Calendar,
-    iconColor: "text-indigo-600",
+    bgColor: "bg-indigo-600",
   },
   {
     title: "Current GPA",
     value: "3.8",
     icon: GraduationCap,
-    iconColor: "text-emerald-600",
+    bgColor: "bg-emerald-600",
   },
   {
     title: "Payment Status",
     value: "Paid",
     icon: CreditCard,
-    iconColor: "text-green-600",
+    bgColor: "bg-green-600",
   },
 ];
 
@@ -104,7 +105,8 @@ const StudentDashboard = () => {
             title={stat.title}
             value={stat.value}
             icon={stat.icon}
-            iconColor={stat.iconColor}
+            // iconColor={stat.iconColor}
+            bgColor={stat.bgColor}
           />
         ))}
       </div>

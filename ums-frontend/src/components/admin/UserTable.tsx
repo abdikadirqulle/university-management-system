@@ -61,11 +61,7 @@ const UserTable: React.FC<UserTableProps> = ({
       accessorKey: "email",
       header: "Email",
     },
-    {
-      accessorKey: "password",
-      header: "Password",
-      cell: ({ row }) => row.getValue("password") || "-",
-    },
+  
 
     {
       id: "actions",

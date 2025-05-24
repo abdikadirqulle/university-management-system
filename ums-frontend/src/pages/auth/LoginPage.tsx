@@ -9,29 +9,65 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, LoaderCircle, School } from "lucide-react";
-import { useState } from "react";
+import { Loader2, LoaderCircle, School, UserCircle, GraduationCap } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const staffSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+const studentSchema = z.object({
+  studentId: z.string().min(1, "Student ID is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+type StaffFormData = z.infer<typeof staffSchema>;
+type StudentFormData = z.infer<typeof studentSchema>;
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { login, isLoading, error, clearError } = useAuth();
+  const { login, loginStudent, isLoading, error, clearError } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await login({ email, password });
+  const staffForm = useForm<StaffFormData>({
+    resolver: zodResolver(staffSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const studentForm = useForm<StudentFormData>({
+    resolver: zodResolver(studentSchema),
+    defaultValues: {
+      studentId: "",
+      password: "",
+    },
+  });
+
+  const onStaffSubmit = async (data: StaffFormData) => {
+    try {
+      await login(data);
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
   };
 
-  // Login info for demo
-  const demoAccounts = [
-    {
-      role: "Academic Admin",
-      email: "admin@university.edu",
-      password: "password",
-    },
-  ];
+  const onStudentSubmit = async (data: StudentFormData) => {
+    try {
+      await loginStudent({
+        studentId: data.studentId,
+        password: data.password
+      });
+    } catch (error) {
+      console.error('Student login failed:', error);
+    }
+  };
+
 
   return (
     <div className="w-full">
@@ -45,52 +81,98 @@ const LoginPage = () => {
             Enter your credentials to access your account
           </CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            {error && (
-              <Alert variant="destructive" className="text-sm">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="your.email@university.edu"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (error) clearError();
-                }}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                {/* <a href="#" className="text-xs text-primary underline">
-                  Forgot password?
-                </a> */}
-              </div>
-              <Input
-                id="password"
-                type="password"
-                placeholder="enter password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  if (error) clearError();
-                }}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Login"}
-            </Button>
-          </CardContent>
-        </form>
+        
+        <Tabs defaultValue="staff" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsTrigger value="staff" className="flex items-center gap-2">
+              <UserCircle className="h-4 w-4" /> Staff Login
+            </TabsTrigger>
+            <TabsTrigger value="student" className="flex items-center gap-2">
+              <GraduationCap className="h-4 w-4" /> Student Login
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="staff">
+            <form onSubmit={staffForm.handleSubmit(onStaffSubmit)} className="space-y-4">
+              <CardContent className="space-y-4">
+                {error && (
+                  <Alert variant="destructive" className="text-sm">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    {...staffForm.register("email")}
+                  />
+                  {staffForm.formState.errors.email && (
+                    <p className="text-sm text-red-500">{staffForm.formState.errors.email.message}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    {...staffForm.register("password")}
+                  />
+                  {staffForm.formState.errors.password && (
+                    <p className="text-sm text-red-500">{staffForm.formState.errors.password.message}</p>
+                  )}
+                </div>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Login"}
+                </Button>
+              </CardContent>
+            </form>
+          </TabsContent>
+          
+          <TabsContent value="student">
+            <form onSubmit={studentForm.handleSubmit(onStudentSubmit)} className="space-y-4">
+              <CardContent className="space-y-4">
+                {error && (
+                  <Alert variant="destructive" className="text-sm">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+                <div className="space-y-2">
+                  <Label htmlFor="studentId">Student ID</Label>
+                  <Input
+                    id="studentId"
+                    type="text"
+                    placeholder="Enter your student ID"
+                    {...studentForm.register("studentId")}
+                  />
+                  {studentForm.formState.errors.studentId && (
+                    <p className="text-sm text-red-500">{studentForm.formState.errors.studentId.message}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    {...studentForm.register("password")}
+                    onChange={() => error && clearError()}
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Login"}
+                </Button>
+              </CardContent>
+            </form>
+            <CardFooter className="text-xs text-center text-muted-foreground pt-0">
+          <p className="w-full">For students: Your default password is your Student ID</p>
+        </CardFooter>
+          </TabsContent>
+        </Tabs>
+        
+     
       </Card>
     </div>
   );

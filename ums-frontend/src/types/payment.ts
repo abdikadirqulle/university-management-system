@@ -14,6 +14,22 @@ export enum PaymentType {
   OTHER = "other",
 }
 
+export interface StudentFinancial {
+  studentId: string;
+  fullName: string;
+  batch: string;
+  sem: string;
+  session: string;
+  tuitionFee: number;
+  otherCharges: number;
+  forwards: number;
+  discount: number;
+  extra: number;
+  paid: number;
+  net: number;
+  type: string;
+}
+
 export interface Payment {
   id: string;
   studentId: string;
@@ -22,21 +38,16 @@ export interface Payment {
   dueDate: string;
   status: PaymentStatus;
   type: PaymentType;
-  tuitionFee?: number;
-  otherCharges?: number;
-  forwarded?: number;
-  extraFee?: number;
-  discount?: number;
+  tuitionFee: number;
+  otherCharges: number;
+  forwards: number;
+  extra: number;
+  discount: number;
+  paid: number;
+  net: number;
   createdAt: string;
   updatedAt: string;
-  student?: {
-    studentId: string;
-    fullName: string;
-    email: string;
-    department: {
-      name: string;
-    };
-  };
+  student?: StudentFinancial;
 }
 
 export interface PaymentFormData {
@@ -46,11 +57,13 @@ export interface PaymentFormData {
   dueDate: string;
   status: PaymentStatus;
   type: PaymentType;
-  tuitionFee?: number;
-  otherCharges?: number;
-  forwarded?: number;
-  extraFee?: number;
-  discount?: number;
+  tuitionFee: number;
+  otherCharges: number;
+  forwards: number;
+  extra: number;
+  discount: number;
+  paid: number;
+  net: number;
 }
 
 export interface PaymentStatistics {
