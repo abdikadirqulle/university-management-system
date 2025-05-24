@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
-import { Search, Plus, Edit, Trash2, RefreshCw, UserPlus } from "lucide-react";
+import { Search, Plus, Edit, Trash2, RefreshCw, UserPlus, Eye } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 
@@ -206,7 +206,7 @@ const StudentEnrollment = () => {
                             size="sm"
                             onClick={() => handleViewStudent(student)}
                           >
-                            <Search className="h-4 w-4" />
+                            <Eye className="h-4 w-4" />
                             <span className="sr-only">View</span>
                           </Button>
                           <Button
@@ -217,7 +217,7 @@ const StudentEnrollment = () => {
                             <Edit className="h-4 w-4" />
                             <span className="sr-only">Edit</span>
                           </Button>
-                          <AlertDialog>
+                          {/* <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button variant="ghost" size="sm">
                                 <Trash2 className="h-4 w-4 text-destructive" />
@@ -242,7 +242,7 @@ const StudentEnrollment = () => {
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
-                          </AlertDialog>
+                          </AlertDialog> */}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -267,8 +267,6 @@ const StudentEnrollment = () => {
         student={selectedStudent}
         isOpen={isViewDialogOpen}
         onClose={() => setIsViewDialogOpen(false)}
-        onSave={() => {}}
-        viewOnly={true}
       />
 
       {/* Edit Dialog */}
