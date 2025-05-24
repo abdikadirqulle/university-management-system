@@ -40,7 +40,7 @@ const LoginPage = () => {
           <div className="flex justify-center">
             <School className="h-12 w-12 text-primary" />
           </div>
-          <CardTitle className="text-3xl font-bold">Scholar Nexus</CardTitle>
+          <CardTitle className="text-3xl font-bold">university management system</CardTitle>
           <CardDescription>
             Enter your credentials to access your account
           </CardDescription>
