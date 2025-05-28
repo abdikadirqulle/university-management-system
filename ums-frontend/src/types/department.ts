@@ -3,6 +3,9 @@ export interface Department {
   name: string;
   facultyId: string;
   departmentHead: string;
+  price: number;
+  semester?: string;
+  batch?: string;
   createdAt?: string;
   updatedAt?: string;
   faculty?: {
@@ -25,10 +28,16 @@ export interface CreateDepartmentDto {
   name: string;
   facultyId: string;
   departmentHead: string;
+  price: number;
+  semester?: string;
+  batch?: string;
 }
 
 export interface UpdateDepartmentDto {
   name?: string;
   facultyId?: string;
   departmentHead?: string;
+  price?: number;
+  semester?: string;
+  batch?: string;
 }

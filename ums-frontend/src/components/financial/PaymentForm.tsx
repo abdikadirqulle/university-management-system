@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -33,6 +33,8 @@ import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 import { Payment, PaymentFormData, PaymentStatus, PaymentType } from "@/types/payment";
 import { Student } from "@/types/student";
+import { Card, CardContent } from "@/components/ui/card";
+import studentService from "@/services/studentService";
 
 // Form schema
 const formSchema = z.object({
@@ -46,11 +48,13 @@ const formSchema = z.object({
   }),
   status: z.string().min(1, "Status is required"),
   type: z.string().min(1, "Payment type is required"),
-  tuitionFee: z.coerce.number().optional(),
-  otherCharges: z.coerce.number().optional(),
-  forwarded: z.coerce.number().optional(),
-  extraFee: z.coerce.number().optional(),
-  discount: z.coerce.number().optional(),
+  tuitionFee: z.coerce.number().default(0),
+  otherCharges: z.coerce.number().default(0),
+  forwards: z.coerce.number().default(0),
+  extra: z.coerce.number().default(0),
+  discount: z.coerce.number().default(0),
+  paid: z.coerce.number().default(0),
+  net: z.coerce.number().default(0),
 });
 
 interface PaymentFormProps {
@@ -69,6 +73,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   onCancel,
 }) => {
   const isEditing = !!payment;
+  
+  // State for student search and selected student
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
 
   // Initialize form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -82,22 +92,70 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       type: payment?.type || PaymentType.TUITION,
       tuitionFee: payment?.tuitionFee || 0,
       otherCharges: payment?.otherCharges || 0,
-      forwarded: payment?.forwarded || 0,
-      extraFee: payment?.extraFee || 0,
+      forwards: payment?.forwards || 0,
+      extra: payment?.extra || 0,
       discount: payment?.discount || 0,
+      paid: payment?.paid || 0,
+      net: payment?.net || 0,
     },
   });
+  
+  // Filter students when search term changes
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setFilteredStudents([]);
+      return;
+    }
+    
+    const term = searchTerm.toLowerCase();
+    const filtered = students.filter(
+      (student) =>
+        student.fullName.toLowerCase().includes(term) ||
+        student.studentId.toLowerCase().includes(term) ||
+        student.email.toLowerCase().includes(term)
+    );
+    
+    setFilteredStudents(filtered);
+  }, [searchTerm, students]);
+  
+  // Update form when a student is selected
+  useEffect(() => {
+    if (selectedStudent) {
+      form.setValue("studentId", selectedStudent.studentId);
+    }
+  }, [selectedStudent, form]);
+  
+  // Handle student selection
+  const handleSelectStudent = (student: Student) => {
+    setSelectedStudent(student);
+    setSearchTerm(""); // Clear search after selection
+    setFilteredStudents([]);
+  };
 
   // Handle form submission
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     try {
-      onSubmit({
-        ...values,
+      // Calculate net amount if not set
+      const net = values.net || (values.tuitionFee + values.otherCharges + values.extra) - values.discount;
+      
+      // Ensure all required fields are included
+      const paymentData: PaymentFormData = {
+        studentId: values.studentId,
+        amount: values.amount,
         paymentDate: format(values.paymentDate, "yyyy-MM-dd"),
         dueDate: format(values.dueDate, "yyyy-MM-dd"),
         status: values.status as PaymentStatus,
         type: values.type as PaymentType,
-      });
+        tuitionFee: values.tuitionFee,
+        otherCharges: values.otherCharges,
+        forwards: values.forwards,
+        extra: values.extra,
+        discount: values.discount,
+        paid: values.paid,
+        net: net
+      };
+      
+      onSubmit(paymentData);
     } catch (error) {
       console.error("Form submission error:", error);
       toast.error("Failed to submit payment form");
@@ -107,36 +165,101 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        {/* Student Details Card */}
+        {selectedStudent && (
+          <Card className="mb-4">
+            <CardContent className="pt-6">
+              <h3 className="text-lg font-semibold mb-2">Student Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Full Name</p>
+                  <p className="font-medium">{selectedStudent.fullName}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Student ID</p>
+                  <p className="font-medium">{selectedStudent.studentId}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Email</p>
+                  <p className="font-medium">{selectedStudent.email}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Phone</p>
+                  <p className="font-medium">{selectedStudent.phoneNumber}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Department</p>
+                  <p className="font-medium">{selectedStudent.department?.name || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Faculty</p>
+                  <p className="font-medium">{selectedStudent.faculty?.name || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Academic Year</p>
+                  <p className="font-medium">{selectedStudent.academicYear}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Semester</p>
+                  <p className="font-medium">{selectedStudent.semester}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Student */}
-          <FormField
-            control={form.control}
-            name="studentId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Student</FormLabel>
-                <Select
-                  disabled={isLoading}
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select student" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {students.map((student) => (
-                      <SelectItem key={student.studentId} value={student.studentId}>
-                        {student.fullName} ({student.studentId})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {/* Student Search */}
+          <div className="col-span-2">
+            <FormLabel>Student</FormLabel>
+            <div className="relative">
+              <FormField
+                control={form.control}
+                name="studentId"
+                render={({ field }) => (
+                  <FormItem className="space-y-1">
+                    <FormControl>
+                      <div className="flex gap-2">
+                        <Input 
+                          placeholder="Search by name, ID or email" 
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          disabled={isLoading}
+                          className="w-full"
+                        />
+                        {isSearching && <Loader2 className="h-4 w-4 animate-spin absolute right-3 top-3" />}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                    
+                    {/* Hidden input to store the actual studentId value */}
+                    <input type="hidden" {...field} />
+                    
+                    {/* Search Results */}
+                    {filteredStudents.length > 0 && (
+                      <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-md max-h-60 overflow-auto">
+                        {filteredStudents.map((student) => (
+                          <div 
+                            key={student.studentId} 
+                            className="p-2 hover:bg-accent cursor-pointer flex justify-between items-center"
+                            onClick={() => handleSelectStudent(student)}
+                          >
+                            <div>
+                              <p className="font-medium">{student.fullName}</p>
+                              <p className="text-sm text-muted-foreground">{student.studentId}</p>
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              {student.department?.name || 'N/A'}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
 
           {/* Amount */}
           <FormField
@@ -349,13 +472,34 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             )}
           />
 
-          {/* Forwarded */}
+          {/* Forwards */}
           <FormField
             control={form.control}
-            name="forwarded"
+            name="forwards"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Forwarded Amount</FormLabel>
+                <FormLabel>Forwards Amount</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    placeholder="0.00"
+                    {...field}
+                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          {/* Paid */}
+          <FormField
+            control={form.control}
+            name="paid"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Paid Amount</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -370,10 +514,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             )}
           />
 
-          {/* Extra Fee */}
+          {/* Extra */}
           <FormField
             control={form.control}
-            name="extraFee"
+            name="extra"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Extra Fee</FormLabel>

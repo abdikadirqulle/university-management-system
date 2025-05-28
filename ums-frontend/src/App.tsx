@@ -42,7 +42,7 @@ import FinancialStudentsPage from "./pages/financial/Students";
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
 import Students from "./pages/admin/Students";
-import RegistrationForm from "./components/admission/student-registration-dialog";
+import TransactionsPage from "./pages/financial/Transactions";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -97,7 +97,6 @@ const App = () => (
                 element={<StudentEnrollment />}
               />
               <Route path="student-admission" element={<StudentAdmission />} />
-              <Route path="registration" element={<RegistrationForm />} />
               <Route path="students" element={<StudentList />} />
 
               {/* 404 Page */}
@@ -118,6 +117,7 @@ const App = () => (
               <Route path="dashboard" element={<FinancialDashboard />} />
               <Route path="students" element={<FinancialStudentsPage />} />
               <Route path="payments" element={<PaymentsPage />} />
+              <Route path="transactions" element={<TransactionsPage />} />
               <Route path="reports" element={<FinancialReportsPage />} />
 
               {/* 404 Page */}

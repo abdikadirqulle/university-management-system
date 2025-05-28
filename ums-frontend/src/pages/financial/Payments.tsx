@@ -1,8 +1,16 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { Plus, Trash2 } from "lucide-react";
+
 import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { usePaymentStore } from "@/store/usePaymentStore";
+import { useStudentStore } from "@/store/useStudentStore";
+import { Payment, PaymentFormData, PaymentStatus, PaymentType } from "@/types/payment";
+import { Student } from "@/types/student";
 import PageHeader from "@/components/PageHeader";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import StudentTable from "@/components/financial/StudentTable";
+import PaymentForm from "@/components/financial/PaymentForm";
+
 import {
   Dialog,
   DialogContent,
@@ -10,24 +18,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { 
-  AlertDialog, 
-  AlertDialogAction, 
-  AlertDialogCancel, 
-  AlertDialogContent, 
-  AlertDialogDescription, 
-  AlertDialogFooter, 
-  AlertDialogHeader, 
-  AlertDialogTitle 
-} from "@/components/ui/alert-dialog";
-import { CreditCard, FileText, Plus, Trash2 } from "lucide-react";
-import { toast } from "sonner";
 
-import PaymentForm from "@/components/financial/PaymentForm";
-import PaymentTable from "@/components/financial/PaymentTable";
-import { usePaymentStore } from "@/store/usePaymentStore";
-import { useStudentStore } from "@/store/useStudentStore";
-import { Payment, PaymentFormData, PaymentStatus, PaymentType } from "@/types/payment";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 
 
@@ -37,6 +38,7 @@ const PaymentsPage = () => {
   // State for dialogs
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   
   // Get data from stores
   const { 
@@ -73,15 +75,41 @@ const PaymentsPage = () => {
       }
       setIsFormOpen(false);
       setSelectedPayment(null);
+      setSelectedStudent(null);
     } catch (error) {
       console.error("Payment submission error:", error);
       toast.error("Failed to save payment");
     }
   };
   
+  // Handle student selection
+  const handleSelectStudent = (student: Student) => {
+    setSelectedStudent(student);
+    
+    // Find the most recent payment for this student
+    const studentPayments = payments.filter(p => p.studentId === student.studentId);
+    if (studentPayments.length > 0) {
+      // Sort by date descending and get the most recent
+      const latestPayment = studentPayments.sort((a, b) => 
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      )[0];
+      setSelectedPayment(latestPayment);
+    } else {
+      // No existing payment, create a new one
+      setSelectedPayment(null);
+    }
+    
+    setIsFormOpen(true);
+  };
+  
   // Handle payment edit
   const handleEditPayment = (payment: Payment) => {
     setSelectedPayment(payment);
+    // Find the student for this payment
+    const student = students.find(s => s.studentId === payment.studentId);
+    if (student) {
+      setSelectedStudent(student);
+    }
     setIsFormOpen(true);
   };
   
@@ -117,26 +145,25 @@ const PaymentsPage = () => {
   return (
     <div className="container mx-auto py-6 space-y-6">
       <PageHeader
-        title="Payments Management"
+        title="Student Payments"
         description="Manage student payments, invoices, and financial records"
         action={{
           label: "Add Payment",
           icon: Plus,
           onClick: () => {
             setSelectedPayment(null);
+            setSelectedStudent(null);
             setIsFormOpen(true);
           },
         }}
       />
 
-
-
-      {/* Payments Table */}
-      <PaymentTable 
+      {/* Students Table with Payment Information */}
+      <StudentTable 
+        students={students}
         payments={payments}
         isLoading={isLoading}
-        onEdit={handleEditPayment}
-        onDelete={handleDeletePayment}
+        onSelectStudent={handleSelectStudent}
       />
 
       {/* Payment Form Dialog */}
@@ -159,6 +186,7 @@ const PaymentsPage = () => {
             onCancel={() => {
               setIsFormOpen(false);
               setSelectedPayment(null);
+              setSelectedStudent(null);
             }}
           />
         </DialogContent>

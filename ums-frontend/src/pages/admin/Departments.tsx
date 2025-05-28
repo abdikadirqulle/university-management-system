@@ -35,17 +35,17 @@ import {
 } from "@/components/ui/select";
 import { Department, useDepartmentStore } from "@/store/useDepartmentStore";
 import { Faculty, useFacultyStore } from "@/store/useFacultyStore";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 // Form schema
 const departmentFormSchema = z.object({
   name: z.string().min(2, { message: "Department name is required" }),
-  description: z
-    .string()
-    .min(10, { message: "Description must be at least 10 characters" }),
   facultyId: z.string().min(1, { message: "Faculty is required" }),
   head: z.string().min(2, { message: "Department head name is required" }),
-  email: z.string().email({ message: "Please enter a valid email address" }),
   phone: z.string().min(6, { message: "Phone number is required" }),
+  price: z.coerce.number().min(0, { message: "Price must be a positive number" }),
+  semester: z.string().optional(),
+  batch: z.string().optional(),
 });
 
 type DepartmentFormValues = z.infer<typeof departmentFormSchema>;
@@ -70,11 +70,12 @@ const DepartmentsPage = () => {
     resolver: zodResolver(departmentFormSchema),
     defaultValues: {
       name: "",
-      description: "",
       facultyId: "",
       head: "",
-      email: "",
       phone: "",
+      price: 0,
+      semester: "",
+      batch: "",
     },
   });
 
@@ -99,23 +100,30 @@ const DepartmentsPage = () => {
       const selectedFaculty = faculties.find(
         (faculty) => faculty.id === data.facultyId,
       );
-      const facultyName = selectedFaculty ? selectedFaculty.name : "Unknown Faculty";
 
       if (editingDepartment) {
         // Update existing department
         await updateDepartment(editingDepartment.id, {
-          ...data,
+          name: data.name,
+          facultyId: data.facultyId,
           departmentHead: data.head,
-          facultyName,
+          price: data.price,
+          semester: data.semester,
+          batch: data.batch,
+          phone: data.phone,
         });
         toast.success("Department updated successfully");
       } else {
         // Add new department
         await addDepartment({
-          ...data,
+          name: data.name,
+          facultyId: data.facultyId,
           departmentHead: data.head,
-          facultyName,
-        });
+          price: data.price,
+          semester: data.semester,
+          batch: data.batch,
+          phone: data.phone,
+        } as Omit<Department, "id">);
         toast.success("Department added successfully");
       }
       handleDialogOpenChange(false);
@@ -130,11 +138,12 @@ const DepartmentsPage = () => {
     setEditingDepartment(department);
     form.reset({
       name: department.name,
-      description: department.description || "",
       facultyId: department.facultyId,
       head: department.departmentHead,
-      email: department.email || "",
       phone: department.phone || "",
+      price: department.price || 0,
+      semester: department.semester || "",
+      batch: department.batch || "",
     });
     setIsOpen(true);
   };
@@ -167,12 +176,28 @@ const DepartmentsPage = () => {
       header: "Department Head",
     },
     {
-      accessorKey: "email",
-      header: "Email",
+      accessorKey: "price",
+      header: "Tuition Price",
+      cell: ({ row }) => {
+        const price = parseFloat(row.getValue("price") || "0");
+        return new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(price);
+      },
     },
+
     {
       accessorKey: "phone",
       header: "Phone",
+    },
+    {
+      accessorKey: "semester",
+      header: "Semesters",
+    },
+    {
+      accessorKey: "batch",
+      header: "Batch",
     },
     {
       id: "actions",
@@ -189,15 +214,36 @@ const DepartmentsPage = () => {
               <Edit className="h-4 w-4" />
               <span className="sr-only">Edit</span>
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleDelete(department.id)}
-              disabled={isLoading}
-            >
-              <Trash2 className="h-4 w-4 text-destructive" />
-              <span className="sr-only">Delete</span>
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={isLoading}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                  <span className="sr-only">Delete</span>
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the department
+                    record for {department.name} and remove its data from the system.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => handleDelete(department.id)}
+                    className="bg-destructive hover:bg-destructive/90"
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         );
       },
@@ -250,24 +296,6 @@ const DepartmentsPage = () => {
                     <FormLabel>Department Name</FormLabel>
                     <FormControl>
                       <Input placeholder="Enter department name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Enter department description"
-                        className="min-h-[80px]"
-                        {...field}
-                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -333,6 +361,27 @@ const DepartmentsPage = () => {
 
                 <FormField
                   control={form.control}
+                  name="price"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tuition Price</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="0.00"
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
@@ -344,21 +393,51 @@ const DepartmentsPage = () => {
                     </FormItem>
                   )}
                 />
+           
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="semester"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Semester</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select number of semesters" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="6">6 Semesters</SelectItem>
+                          <SelectItem value="8">8 Semesters</SelectItem>
+                          <SelectItem value="12">12 Semesters</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="batch"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Batch</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter batch (e.g. BI02)" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter contact email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+
 
               <DialogFooter>
                 <Button

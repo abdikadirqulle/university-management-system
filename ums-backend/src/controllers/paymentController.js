@@ -159,7 +159,7 @@ const createPayment = async (req, res) => {
         dueDate: new Date(dueDate),
         status,
         type,
-        tuitionFee: tuitionFee ? parseFloat(tuitionFee) : null,
+        tuitionFee: tuitionFee ? parseFloat(tuitionFee) : departmentPrice,
         otherCharges: otherCharges ? parseFloat(otherCharges) : null,
         forwarded: forwarded ? parseFloat(forwarded) : null,
         extraFee: extraFee ? parseFloat(extraFee) : null,

@@ -6,7 +6,7 @@ import { prisma } from "../config/db.js"
  * @access  Private/Admin
  */
 const createDepartment = async (req, res) => {
-  const { name, facultyId, departmentHead } = req.body
+  const { name, facultyId, departmentHead, price, semester, batch } = req.body
 
   try {
     // Check if department with the same name already exists
@@ -39,6 +39,9 @@ const createDepartment = async (req, res) => {
         name,
         facultyId,
         departmentHead,
+        price: price ? parseFloat(price) : 0,
+        semester,
+        batch,
       },
     })
 
@@ -160,7 +163,7 @@ const getDepartmentById = async (req, res) => {
  * @access  Private/Admin
  */
 const updateDepartment = async (req, res) => {
-  const { name, facultyId, departmentHead } = req.body
+  const { name, facultyId, departmentHead, price, semester, batch } = req.body
 
   try {
     // Check if department exists
@@ -210,6 +213,9 @@ const updateDepartment = async (req, res) => {
         name: name || department.name,
         facultyId: facultyId || department.facultyId,
         departmentHead: departmentHead || department.departmentHead,
+        price: price !== undefined ? parseFloat(price) : department.price,
+        semester: semester !== undefined ? semester : department.semester,
+        batch: batch !== undefined ? batch : department.batch,
       },
     })
 

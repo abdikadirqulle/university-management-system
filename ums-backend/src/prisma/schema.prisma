@@ -75,6 +75,9 @@ model Department {
   name           String     @unique
   facultyId      String     @db.ObjectId
   departmentHead String
+  price          Float      @default(0)
+  semester       String?    
+  batch          String?
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 

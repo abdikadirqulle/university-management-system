@@ -10,6 +10,9 @@ export interface Department {
   facultyId: string;
   facultyName: string; // For display purposes
   departmentHead: string;
+  price: number; // Department tuition price
+  semester?: string; // Semester information
+  batch?: string; // Batch information
   description?: string; // UI-only field
   email?: string; // UI-only field
   phone?: string; // UI-only field
@@ -64,6 +67,9 @@ export const useDepartmentStore = create<DepartmentState>((set) => ({
             facultyId: department.facultyId,
             facultyName,
             departmentHead: department.departmentHead || "Not assigned",
+            price: department.price || 0, // Department tuition price
+            semester: department.semester || "", // Semester information
+            batch: department.batch || "", // Batch information
             description: "", // UI-only field with default
             email: "", // UI-only field with default
             phone: "", // UI-only field with default
@@ -90,6 +96,9 @@ export const useDepartmentStore = create<DepartmentState>((set) => ({
         name: department.name,
         facultyId: department.facultyId,
         departmentHead: department.departmentHead,
+        price: department.price,
+        semester: department.semester,
+        batch: department.batch,
       };
 
       // Call API to create department
@@ -99,13 +108,14 @@ export const useDepartmentStore = create<DepartmentState>((set) => ({
       set((state) => ({
         departments: [...state.departments, {
           id: newDepartment.id,
-          name: newDepartment.name,
-          facultyId: newDepartment.facultyId,
-          facultyName: department.facultyName, // Use the name we already have
-          departmentHead: newDepartment.departmentHead || "Not assigned",
-          description: department.description || "", // Keep UI-only field
-          email: department.email || "", // Keep UI-only field
-          phone: department.phone || "", // Keep UI-only field
+          name: department.name,
+          facultyId: department.facultyId,
+          facultyName: department.facultyName,
+          departmentHead: department.departmentHead,
+          price: department.price,
+          description: department.description || "",
+          email: department.email || "",
+          phone: department.phone || "",
           createdAt: newDepartment.createdAt,
           updatedAt: newDepartment.updatedAt,
         }],
@@ -128,6 +138,9 @@ export const useDepartmentStore = create<DepartmentState>((set) => ({
       if (departmentData.name) updateDto.name = departmentData.name;
       if (departmentData.facultyId) updateDto.facultyId = departmentData.facultyId;
       if (departmentData.departmentHead) updateDto.departmentHead = departmentData.departmentHead;
+      if (departmentData.price !== undefined) updateDto.price = departmentData.price;
+      if (departmentData.semester !== undefined) updateDto.semester = departmentData.semester;
+      if (departmentData.batch !== undefined) updateDto.batch = departmentData.batch;
 
       // Call API to update department
       const updatedDepartment = await departmentService.updateDepartment(id, updateDto);
@@ -142,6 +155,9 @@ export const useDepartmentStore = create<DepartmentState>((set) => ({
             name: updatedDepartment.name,
             facultyId: updatedDepartment.facultyId,
             departmentHead: updatedDepartment.departmentHead || "Not assigned",
+            price: updatedDepartment.price || 0,
+            semester: updatedDepartment.semester || "",
+            batch: updatedDepartment.batch || "",
             createdAt: updatedDepartment.createdAt,
             updatedAt: updatedDepartment.updatedAt,
             // Keep UI-only fields if they exist
