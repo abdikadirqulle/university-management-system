@@ -272,6 +272,7 @@ const StudentEnrollment = () => {
       {/* Edit Dialog */}
       <StudentRegistrationDialog
         open={isEditDialogOpen}
+        student={selectedStudent}
         onOpenChange={() => setIsEditDialogOpen(false)}
         onSuccess={() => {
           setIsEditDialogOpen(false);

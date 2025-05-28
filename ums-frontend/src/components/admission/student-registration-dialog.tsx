@@ -96,10 +96,11 @@ interface StudentRegistrationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
+  student?: Student;
 }
 
 
-const StudentRegistrationDialog = ({ open, onOpenChange, onSuccess }: StudentRegistrationDialogProps) => {
+const StudentRegistrationDialog = ({ open, onOpenChange, onSuccess, student }: StudentRegistrationDialogProps) => {
   useAuthGuard(["admission"]);
   const navigate = useNavigate();
 
@@ -130,26 +131,26 @@ const StudentRegistrationDialog = ({ open, onOpenChange, onSuccess }: StudentReg
     resolver: zodResolver(studentSchema),
     defaultValues: {
       // Personal Information
-      fullName: "",
-      gender: "male",
-      dateOfBirth: "",
-      placeOfBirth: "",
-      email: "",
-      phoneNumber: "",
+      fullName: student?.fullName || "",
+      gender: student?.gender || "male",
+      dateOfBirth: student?.dateOfBirth || "",
+      placeOfBirth: student?.placeOfBirth || "",
+      email: student?.email || "",
+      phoneNumber: student?.phoneNumber || "",
 
       // Academic Background
-      highSchoolName: "",
-      highSchoolCity: "",
-      graduationYear: 0,
-      averagePass: 0,
+      highSchoolName: student?.highSchoolName || "",
+      highSchoolCity: student?.highSchoolCity || "",
+      graduationYear: student?.graduationYear || 0,
+      averagePass: student?.averagePass || 0,
 
       // Program Information
-      facultyId: "",
-      departmentId: "",
-      session: "",
-      academicYear: "",
-      registerYear: new Date().getFullYear(),
-      semester: "",
+      facultyId: student?.facultyId || "",
+      departmentId: student?.departmentId || "",
+      session: student?.session || "",
+      academicYear: student?.academicYear || "",
+      registerYear: student?.registerYear || new Date().getFullYear(),
+      semester: student?.semester || "",
     },
   });
 
@@ -569,7 +570,7 @@ const StudentRegistrationDialog = ({ open, onOpenChange, onSuccess }: StudentReg
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate("/admission/students")}
+                  onClick={() => onOpenChange(false)}
                 >
                   Cancel
                 </Button>
