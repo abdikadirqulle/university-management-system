@@ -108,7 +108,10 @@ const StudentEnrollment = () => {
         action={{
           label: "Register New Student",
           icon: UserPlus,
-          onClick: () => setIsEditDialogOpen(true),
+          onClick: () => {
+            setSelectedStudent(null);
+            setIsEditDialogOpen(true);
+          },
         }}
       />
 
@@ -269,13 +272,14 @@ const StudentEnrollment = () => {
         onClose={() => setIsViewDialogOpen(false)}
       />
 
-      {/* Edit Dialog */}
+      {/* Registration/Edit Dialog */}
       <StudentRegistrationDialog
         open={isEditDialogOpen}
         student={selectedStudent}
         onOpenChange={() => setIsEditDialogOpen(false)}
         onSuccess={() => {
           setIsEditDialogOpen(false);
+          setSelectedStudent(null);
           fetchStudents();
         }}
       />

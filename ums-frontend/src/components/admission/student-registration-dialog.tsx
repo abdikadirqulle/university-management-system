@@ -103,11 +103,14 @@ interface StudentRegistrationDialogProps {
 const StudentRegistrationDialog = ({ open, onOpenChange, onSuccess, student }: StudentRegistrationDialogProps) => {
   useAuthGuard(["admission"]);
   const navigate = useNavigate();
+  
+  // Determine if we're in edit mode
+  const isEditMode = !!student;
 
   // Get data from stores
   const { faculties, fetchFaculties } = useFacultyStore();
   const { departments, fetchDepartments } = useDepartmentStore();
-  const { addStudent, isLoading } = useStudentStore();
+  const { addStudent, updateStudent, isLoading } = useStudentStore();
 
   const [selectedFaculty, setSelectedFaculty] = useState<string>("");
   const [filteredDepartments, setFilteredDepartments] = useState<any[]>([]);
@@ -125,32 +128,75 @@ const StudentRegistrationDialog = ({ open, onOpenChange, onSuccess, student }: S
 
     fetchData();
   }, [fetchFaculties, fetchDepartments]);
+  
+  // Populate form with student data when in edit mode and when dialog opens
+  useEffect(() => {
+    if (isEditMode && student && open) {
+      // Convert numeric values to strings for the form
+      const graduationYearStr = student.graduationYear?.toString() || '';
+      const registerYearStr = student.registerYear?.toString() || '';
+      const averagePassStr = student.averagePass?.toString() || '';
+      
+      // Reset the form with student data
+      form.reset({
+        // Personal Information
+        fullName: student.fullName || "",
+        gender: student.gender || "male",
+        dateOfBirth: student.dateOfBirth || "",
+        placeOfBirth: student.placeOfBirth || "",
+        email: student.email || "",
+        phoneNumber: student.phoneNumber || "",
 
-  // Setup form
+        // Academic Background
+        highSchoolName: student.highSchoolName || "",
+        highSchoolCity: student.highSchoolCity || "",
+        graduationYear: parseInt(graduationYearStr),
+        averagePass: parseFloat(averagePassStr),
+
+        // Program Information
+        facultyId: student.facultyId || "",
+        departmentId: student.departmentId || "",
+        session: student.session || "",
+        academicYear: student.academicYear || "",
+        registerYear: parseInt(registerYearStr),
+        semester: student.semester || "",
+      });
+      
+      // Set selected faculty to filter departments
+      if (student.facultyId) {
+        setSelectedFaculty(student.facultyId);
+      }
+    } else if (!isEditMode && open) {
+      // Reset form when opening for a new student
+      form.reset();
+    }
+  }, [ student, isEditMode, open]);
+
+  // Setup form with default values
   const form = useForm<StudentFormValues>({
     resolver: zodResolver(studentSchema),
     defaultValues: {
       // Personal Information
-      fullName: student?.fullName || "",
-      gender: student?.gender || "male",
-      dateOfBirth: student?.dateOfBirth || "",
-      placeOfBirth: student?.placeOfBirth || "",
-      email: student?.email || "",
-      phoneNumber: student?.phoneNumber || "",
+      fullName: "",
+      gender: "male",
+      dateOfBirth: "",
+      placeOfBirth: "",
+      email: "",
+      phoneNumber: "",
 
       // Academic Background
-      highSchoolName: student?.highSchoolName || "",
-      highSchoolCity: student?.highSchoolCity || "",
-      graduationYear: student?.graduationYear || 0,
-      averagePass: student?.averagePass || 0,
+      highSchoolName: "",
+      highSchoolCity: "",
+      graduationYear: new Date().getFullYear(),
+      averagePass: 0,
 
       // Program Information
-      facultyId: student?.facultyId || "",
-      departmentId: student?.departmentId || "",
-      session: student?.session || "",
-      academicYear: student?.academicYear || "",
-      registerYear: student?.registerYear || new Date().getFullYear(),
-      semester: student?.semester || "",
+      facultyId: "",
+      departmentId: "",
+      session: "",
+      academicYear: "",
+      registerYear: new Date().getFullYear(),
+      semester: "",
     },
   });
 
@@ -177,22 +223,8 @@ const StudentRegistrationDialog = ({ open, onOpenChange, onSuccess, student }: S
   // Handle form submission
   const onSubmit = async (data: StudentFormValues) => {
     try {
-      // Generate a student ID (this would normally be done by the backend)
-      const year = new Date().getFullYear().toString().slice(-2);
-      const facultyCode = faculties.find(f => f.id === data.facultyId)?.code || 'XX';
-      const deptCode = departments.find(d => d.id === data.departmentId)?.code || 'XX';
-      const randomNum = Math.floor(1000 + Math.random() * 9000); // 4-digit random number
-      
-      const studentId = `${year}${facultyCode}${deptCode}${randomNum}`;
-      
-      // Get current user ID from localStorage
-      const userJson = localStorage.getItem('user');
-      const userId = userJson ? JSON.parse(userJson).id : null;
-      
       // Prepare student data - ensure it matches the API expected structure
       const studentData = {
-        studentId,
-        userId: userId,
         fullName: data.fullName,
         gender: data.gender,
         dateOfBirth: data.dateOfBirth,
@@ -211,16 +243,45 @@ const StudentRegistrationDialog = ({ open, onOpenChange, onSuccess, student }: S
         semester: data.semester
       };
       
-      console.log('Submitting student data:', studentData);
       
-      // Add student to database
-      await addStudent(studentData);
+      if (isEditMode && student) {
+        // Update existing student
+        await updateStudent(student.id, studentData);
+        toast.success("Student updated successfully");
+      } else {
+        // Generate a student ID for new students (this would normally be done by the backend)
+        const year = new Date().getFullYear().toString().slice(-2);
+        const facultyCode = faculties.find(f => f.id === data.facultyId)?.code || 'XX';
+        const deptCode = departments.find(d => d.id === data.departmentId)?.code || 'XX';
+        const randomNum = Math.floor(1000 + Math.random() * 9000); // 4-digit random number
+        
+        const studentId = `${year}${facultyCode}${deptCode}${randomNum}`;
+        
+        // Get current user ID from localStorage
+        const userJson = localStorage.getItem('user');
+        const userId = userJson ? JSON.parse(userJson).id : null;
+        
+        // Add additional fields for new student
+        const newStudentData = {
+          ...studentData,
+          studentId,
+          userId: userId
+        };
+        
+        // Add student to database
+        await addStudent(newStudentData);
+        toast.success("Student registered successfully");
+      }
       
-      toast.success("Student registered successfully");
-      onOpenChange(false);
+      // Close dialog and refresh data
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        onOpenChange(false);
+      }
     } catch (error) {
-      console.error("Error registering student:", error);
-      toast.error("Failed to register student");
+      console.error("Error processing student data:", error);
+      toast.error(isEditMode ? "Failed to update student" : "Failed to register student");
     }
   };
 
@@ -228,9 +289,11 @@ const StudentRegistrationDialog = ({ open, onOpenChange, onSuccess, student }: S
     <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
       <DialogHeader>
-        <DialogTitle>Student Registration</DialogTitle>
+        <DialogTitle>{isEditMode ? "Edit Student" : "Student Registration"}</DialogTitle>
         <DialogDescription>
-          Fill in the student details to register a new student.
+          {isEditMode 
+            ? "Update the student's information below." 
+            : "Fill in the student details to register a new student."}
         </DialogDescription>
       </DialogHeader>
           <Form {...form}>
@@ -578,10 +641,10 @@ const StudentRegistrationDialog = ({ open, onOpenChange, onSuccess, student }: S
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Registering...
+                      {isEditMode ? "Updating..." : "Registering..."}
                     </>
                   ) : (
-                    "Register Student"
+                    isEditMode ? "Update Student" : "Register Student"
                   )}
                 </Button>
               </div>
