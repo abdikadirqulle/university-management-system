@@ -160,8 +160,12 @@ const StudentEnrollment = () => {
                 <TableRow>
                   <TableHead>Student ID</TableHead>
                   <TableHead>Name</TableHead>
+                  <TableHead className="hidden md:table-cell">Faculty</TableHead>
                   <TableHead className="hidden md:table-cell">Department</TableHead>
+                  <TableHead className="hidden md:table-cell">Batch</TableHead>
                   <TableHead className="hidden md:table-cell">Semester</TableHead>
+                  <TableHead className="hidden md:table-cell">Session</TableHead>
+                  <TableHead className="hidden md:table-cell">Tel</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -169,31 +173,46 @@ const StudentEnrollment = () => {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
+                    <TableCell colSpan={12} className="text-center py-8">
                       Loading student data...
                     </TableCell>
                   </TableRow>
                 ) : filteredStudents.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
+                    <TableCell colSpan={12} className="text-center py-8">
                       No students found matching your search criteria.
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredStudents.map((student) => (
-                    <TableRow key={student.id}>
+                    <TableRow 
+                      key={student.id} 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleViewStudent(student)}
+                    >
                       <TableCell>{student.studentId}</TableCell>
                       <TableCell>
                         <div>
                           <div className="font-medium">{student.fullName}</div>
-                        
                         </div>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {student.faculty?.name || 'N/A'}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         {student.department?.name || 'N/A'}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {student.semester}
+                        {student.registerYear || 'N/A'}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {student.semester || 'N/A'}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {student.session || 'N/A'}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {student.phoneNumber || 'N/A'}
                       </TableCell>
                       <TableCell>
                         <Badge
@@ -204,14 +223,7 @@ const StudentEnrollment = () => {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end space-x-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleViewStudent(student)}
-                          >
-                            <Eye className="h-4 w-4" />
-                            <span className="sr-only">View</span>
-                          </Button>
+                       
                           <Button
                             variant="ghost"
                             size="sm"

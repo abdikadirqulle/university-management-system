@@ -274,9 +274,15 @@ const StudentList = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Student ID</TableHead>
-                  <TableHead>Name</TableHead>
+                  <TableHead>Student Name</TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Faculty
+                  </TableHead>
                   <TableHead className="hidden md:table-cell">
                     Department
+                  </TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Batch
                   </TableHead>
                   <TableHead className="hidden md:table-cell">
                     Semester
@@ -284,43 +290,58 @@ const StudentList = () => {
                   <TableHead className="hidden md:table-cell">
                     Session
                   </TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Tel
+                  </TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  {/* <TableHead className="text-right">Actions</TableHead> */}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8">
+                    <TableCell colSpan={10} className="text-center py-8">
                       Loading student data...
                     </TableCell>
                   </TableRow>
                 ) : filteredStudents.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8">
+                    <TableCell colSpan={10} className="text-center py-8">
                       No students found matching your search criteria.
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredStudents.map((student) => (
-                    <TableRow key={student.id}>
+                    <TableRow 
+                      key={student.id} 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleViewStudent(student)}
+                    >
                       <TableCell>{student.studentId}</TableCell>
                       <TableCell>
                         <div>
                           <div className="font-medium">{student.fullName}</div>
                           <div className="text-sm text-muted-foreground">
-                            {student.email}
                           </div>
                         </div>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {student.faculty?.name || 'N/A'}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         {student.department?.name || 'N/A'}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {student.semester}
+                        {student.registerYear || 'N/A'}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {student.session}
+                        {student.semester || 'N/A'}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {student.session || 'N/A'}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {student.phoneNumber || 'N/A'}
                       </TableCell>
                       <TableCell>
                         <Badge
@@ -330,7 +351,14 @@ const StudentList = () => {
                         </Badge>
                       </TableCell>
 
-                      <TableCell className="text-right">
+                      {/* <TableCell className="text-right">
+                      <div
+                      className="flex justify-center item-center cursor-pointer"
+                              onClick={() => handleViewStudent(student)}
+                            >
+                              <Eye className="h-4 w-4 mr-2" /> 
+                            </div>  
+
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
@@ -375,7 +403,7 @@ const StudentList = () => {
                             </AlertDialog>
                           </DropdownMenuContent>
                         </DropdownMenu>
-                      </TableCell>
+                      </TableCell> */}
                     </TableRow>
                   ))
                 )}
