@@ -77,6 +77,14 @@ const StudentTable: React.FC<StudentTableProps> = ({
       header: "Semester",
     },
     {
+      accessorKey: "batch",
+      header: "Batch",
+      cell: ({ row }) => {
+        const batch = row.original.batch || 'N/A';
+        return <span>{batch}</span>;
+      },
+    },
+    {
       accessorKey: "createdAt",
       header: "Registration Date",
       cell: ({ row }) => {

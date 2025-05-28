@@ -122,6 +122,17 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   useEffect(() => {
     if (selectedStudent) {
       form.setValue("studentId", selectedStudent.studentId);
+      
+      // Set tuition fee based on department price if available
+      if (selectedStudent.department?.price) {
+        form.setValue("tuitionFee", selectedStudent.department.price);
+        
+        // Also update the amount field with the tuition fee
+        const currentAmount = form.getValues("amount");
+        if (currentAmount === 0) {
+          form.setValue("amount", selectedStudent.department.price);
+        }
+      }
     }
   }, [selectedStudent, form]);
   

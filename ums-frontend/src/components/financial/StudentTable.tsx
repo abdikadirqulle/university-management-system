@@ -28,7 +28,8 @@ const StudentTable: React.FC<StudentTableProps> = ({
   onSelectStudent,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
-
+  // Show student department and batch information
+  console.log("Student batches:", students.map(s =>  s).filter(Boolean));
   // Filter students based on search term
   const filteredStudents = students.filter(
     (student) =>
@@ -135,6 +136,8 @@ const StudentTable: React.FC<StudentTableProps> = ({
             <TableRow>
               <TableHead>Student ID</TableHead>
               <TableHead>Name</TableHead>
+              <TableHead>Faculty</TableHead>
+              <TableHead>Department</TableHead>
               <TableHead>Batch</TableHead>
               <TableHead>Semester</TableHead>
               <TableHead>Session</TableHead>
@@ -160,9 +163,16 @@ const StudentTable: React.FC<StudentTableProps> = ({
                   <TableCell>{student.studentId}</TableCell>
                   <TableCell>
                     <div className="font-medium">{student.fullName}</div>
-                    <div className="text-sm text-muted-foreground">{student.department?.name || 'N/A'}</div>
                   </TableCell>
-                  <TableCell>{student.academicYear || 'N/A'}</TableCell>
+                  <TableCell>
+                    <div className="uppercase">{student.faculty?.name || 'N/A'}</div>
+                  </TableCell>
+                  <TableCell> 
+                    <div className="uppercase">{student.department?.name || 'N/A'}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="uppercase">{student.department?.batch || 'N/A'}</div>
+                  </TableCell>
                   <TableCell>{student.semester || 'N/A'}</TableCell>
                   <TableCell>{student.session || 'N/A'}</TableCell>
                   <TableCell className="font-medium">

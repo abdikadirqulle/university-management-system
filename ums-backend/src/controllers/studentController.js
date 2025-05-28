@@ -19,6 +19,7 @@ const getAllStudents = async (req, res) => {
         department: {
           select: {
             name: true,
+            batch: true,
           },
         },
       },
@@ -60,6 +61,7 @@ const getStudentById = async (req, res) => {
         department: {
           select: {
             name: true,
+            batch: true,
           },
         },
         payments: true,

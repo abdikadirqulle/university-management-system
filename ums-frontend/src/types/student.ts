@@ -22,6 +22,7 @@ export interface Student {
   academicYear: string;
   registerYear: number;
   semester: string;
+  batch?: string;
   createdAt: string;
   updatedAt: string;
   
@@ -34,6 +35,9 @@ export interface Student {
   department?: {
     id: string;
     name: string;
+    price?: number;
+    semester?: string;
+    batch?: string;
   };
   payments?: Payment[];
 }
