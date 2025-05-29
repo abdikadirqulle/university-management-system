@@ -180,7 +180,6 @@ const FinancialStudentsPage = () => {
                       <TableCell className="font-medium">{student.studentId}</TableCell>
                       <TableCell>
                         <div className="font-medium">{student.fullName}</div>
-                        <div className="text-sm text-muted-foreground">{student.email}</div>
                       </TableCell>
                       <TableCell>{student.department?.name || "N/A"}</TableCell>
                       <TableCell>
@@ -285,7 +284,6 @@ const FinancialStudentsPage = () => {
                   <TableHead>Amount</TableHead>
                   <TableHead>Type</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Due Date</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -331,9 +329,6 @@ const FinancialStudentsPage = () => {
                       </TableCell>
                       <TableCell className="capitalize">{payment.type.toLowerCase()}</TableCell>
                       <TableCell>{getStatusBadge(payment.status)}</TableCell>
-                      <TableCell>
-                        {format(new Date(payment.dueDate), "MMM dd, yyyy")}
-                      </TableCell>
                     </TableRow>
                   ))
                 )}
@@ -341,18 +336,6 @@ const FinancialStudentsPage = () => {
             </Table>
           </div>
 
-          <div className="flex justify-end mt-4">
-            <Button
-              variant="outline"
-              onClick={() => setIsPaymentHistoryOpen(false)}
-            >
-              Close
-            </Button>
-            <Button className="ml-2">
-              <CreditCard className="mr-2 h-4 w-4" />
-              Add Payment
-            </Button>
-          </div>
         </DialogContent>
       </Dialog>
     </div>

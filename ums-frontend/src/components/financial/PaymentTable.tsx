@@ -43,7 +43,6 @@ const PaymentTable: React.FC<PaymentTableProps> = ({
     (payment) =>
       payment.student?.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       payment.student?.studentId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.student?.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       payment.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -102,7 +101,6 @@ const PaymentTable: React.FC<PaymentTableProps> = ({
                 <TableHead>Status</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Payment Date</TableHead>
-                <TableHead>Due Date</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -162,7 +160,6 @@ const PaymentTable: React.FC<PaymentTableProps> = ({
               <TableHead>Status</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Payment Date</TableHead>
-              <TableHead>Due Date</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -189,9 +186,6 @@ const PaymentTable: React.FC<PaymentTableProps> = ({
                   <TableCell>{getTypeBadge(payment.type)}</TableCell>
                   <TableCell>
                     {format(new Date(payment.paymentDate), "MMM dd, yyyy")}
-                  </TableCell>
-                  <TableCell>
-                    {format(new Date(payment.dueDate), "MMM dd, yyyy")}
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
