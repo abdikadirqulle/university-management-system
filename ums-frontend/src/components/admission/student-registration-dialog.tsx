@@ -55,9 +55,8 @@ const SEMESTERS = Array.from({ length: 12 }, (_, i) => ({
 }));
 
 const SESSIONS = [
-  { id: "morning", name: "Morning" },
-  { id: "afternoon", name: "Afternoon" },
-  { id: "evening", name: "Evening" },
+  { id: "regular", name: "Regular" },
+  { id: "distance", name: "Distance" },
   { id: "weekend", name: "Weekend" },
 ];
 
