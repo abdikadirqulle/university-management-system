@@ -182,7 +182,7 @@ const createPayment = async (req, res) => {
 // Update payment
 const updatePayment = async (req, res) => {
   try {
-    const { id, studentId } = req.params
+    const { id } = req.params
     const {
       amount,
       paymentDate,
@@ -222,7 +222,7 @@ const updatePayment = async (req, res) => {
     // Update the student account with the payment amount
   
       await prisma.studentAccount.updateMany({
-        where: { studentId },
+        where: { studentId: existingPayment.studentId },
         data: {
           paidAmount: {
             increment: parseFloat(amount)
@@ -249,7 +249,7 @@ const updatePayment = async (req, res) => {
 // Delete payment
 const deletePayment = async (req, res) => {
   try {
-    const { id, studentId } = req.params
+    const { id } = req.params
 
     // Check if payment exists
     const payment = await prisma.payment.findUnique({
@@ -270,7 +270,7 @@ const deletePayment = async (req, res) => {
 
     // Update the student account with the payment amount
     await prisma.studentAccount.updateMany({
-      where: { studentId },
+      where: { studentId: payment.studentId },
       data: {
         paidAmount: {
           decrement: parseFloat(payment.amount)
@@ -282,6 +282,7 @@ const deletePayment = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Payment deleted successfully",
+      payment,
     })
   } catch (error) {
     console.error("Error deleting payment:", error)

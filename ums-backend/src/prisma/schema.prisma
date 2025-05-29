@@ -137,6 +137,7 @@ model StudentAccount {
   id              String      @id @default(auto()) @map("_id") @db.ObjectId
   studentId       String
   academicYear    String
+  TuitionFeeType  String?
   semester        String
   tuitionFee      Float
   otherCharges    Float?

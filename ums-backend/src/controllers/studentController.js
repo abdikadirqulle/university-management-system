@@ -193,6 +193,7 @@ const createStudent = async (req, res) => {
         semester: student.semester,
         tuitionFee: department.price,
         discount: 0,
+        paidAmount: 0,
         totalDue: department.price,
         status: 'pending',
       },
