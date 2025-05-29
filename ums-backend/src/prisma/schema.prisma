@@ -158,7 +158,7 @@ model Payment {
   amount        Float
   paymentDate   DateTime
   dueDate       DateTime?
-  status        PaymentStatus
+  status        PaymentStatus?
   type          PaymentType
   paymentMethod String?
   forwarded     Float?

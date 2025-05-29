@@ -322,6 +322,7 @@ const updateStudent = async (req, res) => {
         semester: updatedStudent.semester,
         tuitionFee: department.price,
         discount: 0,
+        paidAmount: 0,
         totalDue: department.price,
         status: 'pending',
       },

@@ -49,6 +49,7 @@ export interface PaymentFormData {
   studentId: string;
   amount: number;
   paymentDate: string;
+  paymentMethod: string;
   dueDate: string;
   status: PaymentStatus;
   type: PaymentType;

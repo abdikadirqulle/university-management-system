@@ -124,20 +124,11 @@ const getPaymentsByStudentId = async (req, res) => {
 // Create payment
 const createPayment = async (req, res) => {
   try {
-    const {
-      studentId,
-      amount,
-      paymentDate,
-      dueDate,
-      status,
-      type,
-      forwarded,
-      extraFee,
-    } = req.body
+    const body = req.body
 
     // Check if student exists
     const student = await prisma.student.findUnique({
-      where: { studentId },
+      where: { studentId: body.studentId },
     })
 
     if (!student) {
@@ -150,30 +141,27 @@ const createPayment = async (req, res) => {
     // Create payment
     const payment = await prisma.payment.create({
       data: {
-        studentId,
-        amount: parseFloat(amount),
-        paymentDate: new Date(paymentDate),
-        type,
+        studentId: body.studentId,
+        amount: parseFloat(body.amount),
+        paymentDate: new Date(body.paymentDate),
+        type: body.type,
         // kuwan ka saar
-        dueDate: new Date(dueDate),
-        status,
-        forwarded: forwarded ? parseFloat(forwarded) : null,
-        extraFee: extraFee ? parseFloat(extraFee) : null,
+        // dueDate: new Date(dueDate),
+        status: body.status,
+        forwarded: body.forwarded ? parseFloat(body.forwarded) : null,
+        extraFee: body.extraFee ? parseFloat(body.extraFee) : null,
       },
     })
 
 // Update the student account with the payment amount
-// if (status === "paid" || status === "partial") {
   await prisma.studentAccount.updateMany({
-    where: { studentId },
+    where: { studentId: body.studentId },
     data: {
       paidAmount: {
-        increment: parseFloat(amount)
+        increment:  parseFloat(body.amount)
       }
-      
     }
   });
-// }
     
 
     res.status(201).json({

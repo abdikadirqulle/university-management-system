@@ -38,21 +38,14 @@ import { Badge } from "../ui/badge";
 
 // Form schema
 const formSchema = z.object({
-  studentId: z.string().min(1, "Student is required"),
   amount: z.coerce.number().positive("Amount must be positive"),
   paymentDate: z.date({
     required_error: "Payment date is required",
   }),
-  dueDate: z.date({
-    required_error: "Due date is required",
-  }),
-  status: z.string().min(1, "Status is required"),
+ 
   type: z.string().min(1, "Payment type is required"),
   paymentMethod: z.string().min(1, "Payment method is required"),
-  tuitionFee: z.coerce.number().default(0),
-  discount: z.coerce.number().default(0),
-  paid: z.coerce.number().default(0),
-  net: z.coerce.number().default(0),
+ 
 });
 
 interface PaymentFormProps {
@@ -81,17 +74,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      studentId: payment?.studentId || "",
       amount: 0,
       paymentDate: payment?.paymentDate ? new Date(payment.paymentDate) : new Date(),
-      dueDate: payment?.dueDate ? new Date(payment.dueDate) : new Date(),
-      status: payment?.status || PaymentStatus.PENDING,
       type: "",
       paymentMethod:"",
-      tuitionFee: selectedStudent?.studentAccount[0]?.tuitionFee || 0,
-      discount: selectedStudent?.studentAccount[0]?.discount || 0,
-      paid: selectedStudent?.studentAccount[0]?.paidAmount || 0,
-      net: 0,
     },
   });
   
@@ -117,22 +103,24 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
   // Handle form submission
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
+    console.log("Form values:", values);
     try {
       // Calculate net amount if not set
-      const net = values.net || values.tuitionFee - values.discount;
+      
       
       // Ensure all required fields are included
       const paymentData: PaymentFormData = {
-        studentId: values.studentId,
         amount: values.amount,
         paymentDate: format(values.paymentDate, "yyyy-MM-dd"),
-        dueDate: format(values.dueDate, "yyyy-MM-dd"),
-        status: values.status as PaymentStatus,
         type: values.type as PaymentType,
-        tuitionFee: values.tuitionFee,
-        discount: values.discount,
-        paid: values.paid,
-        net: net
+        paymentMethod: values.paymentMethod,
+        studentId: selectedStudent?.studentId,
+        // dueDate: format(values.dueDate, "yyyy-MM-dd"),
+        // status: values.status as PaymentStatus,
+        tuitionFee: selectedStudent?.studentAccount[0]?.tuitionFee || 0,
+        discount: selectedStudent?.studentAccount[0]?.discount || 0,
+        paid: selectedStudent?.studentAccount[0]?.paidAmount || 0,
+        net: selectedStudent?.studentAccount[0]?.netAmount || 0,
       };
       
       onSubmit(paymentData);
@@ -217,7 +205,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                     <p className="text-sm text-muted-foreground mb-1">TUITION FEE</p>
                     <p className="font-semibold">
                       {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
-                        .format(form.getValues('tuitionFee') || 0)}
+                        .format(selectedStudent?.studentAccount[0]?.tuitionFee || 0)}
                     </p>
                   </div>
                   <p>-</p>
@@ -227,7 +215,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                     <p className="text-sm text-muted-foreground mb-1">DISCOUNT</p>
                     <p className="font-semibold">
                       {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
-                        .format(form.getValues('discount') || 0)}
+                        .format(selectedStudent?.studentAccount[0]?.discount || 0)}
                     </p>
                   </div>
                   <p>-</p>
@@ -236,7 +224,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                       <p className="text-sm text-muted-foreground mb-1">PAID</p>
                       <p className="font-semibold">
                         {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
-                          .format(form.getValues('paid') || 0)}
+                          .format(selectedStudent?.studentAccount[0]?.paidAmount || 0)}
                       </p>
                     </div>
                     <div>
@@ -244,9 +232,9 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                       <p className="font-semibold text-primary bg-primary/10 px-2 py-1 rounded">
                         {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
                           .format(
-                            (form.getValues('tuitionFee') || 0) - 
-                            (form.getValues('discount') || 0) -
-                            (form.getValues('paid') || 0)
+                            (selectedStudent?.studentAccount[0]?.tuitionFee || 0) - 
+                            (selectedStudent?.studentAccount[0]?.discount || 0) -
+                            (selectedStudent?.studentAccount[0]?.paidAmount || 0)
                           )}
                       </p>
                     </div>

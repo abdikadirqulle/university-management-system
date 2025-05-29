@@ -6,7 +6,7 @@ import { prisma } from "../config/db.js"
  * @access  Private/Admin
  */
 const createDepartment = async (req, res) => {
-  const { name, facultyId, departmentHead, price, semester, batch } = req.body
+  const body = req.body
 
   try {
     // Check if department with the same name already exists
@@ -23,7 +23,7 @@ const createDepartment = async (req, res) => {
 
     // Check if faculty exists
     const faculty = await prisma.faculty.findUnique({
-      where: { id: facultyId },
+      where: { id: body.facultyId },
     })
 
     if (!faculty) {
@@ -36,12 +36,12 @@ const createDepartment = async (req, res) => {
     // Create the department
     const newDepartment = await prisma.department.create({
       data: {
-        name,
-        facultyId,
-        departmentHead,
-        price: price ? parseFloat(price) : 0,
-        semester,
-        batch,
+        name: body.name,
+        facultyId: body.facultyId,
+        departmentHead: body.departmentHead,
+        price: body.price ? parseFloat(body.price) : 0,
+        semester: body.semester,
+        batch: body.batch,
       },
     })
 
