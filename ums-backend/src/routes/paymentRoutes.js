@@ -28,7 +28,7 @@ router.get(
 router.get(
   "/:id",
   authenticateUser,
-  authorize(["admin", "financial"]),
+  // authorize(["admin", "financial"]),
   getPaymentById
 )
 router.get(

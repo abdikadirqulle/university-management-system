@@ -39,6 +39,7 @@ const PaymentsPage = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+
   
   // Get data from stores
   const { 
@@ -66,13 +67,15 @@ const PaymentsPage = () => {
   // Handle form submission
   const handleSubmitPayment = async (data: PaymentFormData) => {
     try {
-      if (selectedPayment) {
-        await updatePayment(selectedPayment.id, data);
-        toast.success("Payment updated successfully");
-      } else {
-        await createPayment(data);
-        toast.success("Payment created successfully");
-      }
+      // if (selectedPayment) {
+      //   await updatePayment(selectedPayment.id, data);
+      //   toast.success("Payment updated successfully");
+      // } else {
+      //   await createPayment(data);
+      //   toast.success("Payment created successfully");
+      // }
+      await createPayment(data);
+      toast.success("Payment created successfully");
       setIsFormOpen(false);
       setSelectedPayment(null);
       setSelectedStudent(null);
@@ -147,15 +150,15 @@ const PaymentsPage = () => {
       <PageHeader
         title="Student Payments"
         description="Manage student payments, invoices, and financial records"
-        action={{
-          label: "Add Payment",
-          icon: Plus,
-          onClick: () => {
-            setSelectedPayment(null);
-            setSelectedStudent(null);
-            setIsFormOpen(true);
-          },
-        }}
+        // action={{
+        //   label: "Add Payment",
+        //   icon: Plus,
+        //   onClick: () => {
+        //     setSelectedPayment(null);
+        //     setSelectedStudent(null);
+        //     setIsFormOpen(true);
+        //   },
+        // }}
       />
 
       {/* Students Table with Payment Information */}
@@ -168,7 +171,7 @@ const PaymentsPage = () => {
 
       {/* Payment Form Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="sm:max-w-[700px]">
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{selectedPayment ? "Edit Payment" : "Add New Payment"}</DialogTitle>
             <DialogDescription>
@@ -180,13 +183,14 @@ const PaymentsPage = () => {
 
           <PaymentForm
             payment={selectedPayment || undefined}
+            selectedStudent={selectedStudent}
             students={students}
             onSubmit={handleSubmitPayment}
             isLoading={isLoading}
             onCancel={() => {
               setIsFormOpen(false);
               setSelectedPayment(null);
-              setSelectedStudent(null);
+              // setSelectedStudent(null);
             }}
           />
         </DialogContent>

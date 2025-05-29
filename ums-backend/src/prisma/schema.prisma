@@ -130,21 +130,39 @@ model Student {
   faculty           Faculty    @relation(fields: [facultyId], references: [id])
   department        Department @relation(fields: [departmentId], references: [id])
   payments          Payment[]
+  studentAccount    StudentAccount[]
 }
+
+model StudentAccount {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  studentId       String
+  academicYear    String
+  semester        String
+  tuitionFee      Float
+  otherCharges    Float?
+  discount        Float?
+  totalDue        Float
+  paidAmount      Float?
+  status          PaymentStatus // e.g. UNPAID, PARTIAL, PAID
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relations
+  student         Student     @relation(fields: [studentId], references: [studentId])
+}
+
 
 model Payment {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
   studentId     String
   amount        Float
   paymentDate   DateTime
-  dueDate       DateTime
+  dueDate       DateTime?
   status        PaymentStatus
   type          PaymentType
-  tuitionFee    Float?
-  otherCharges  Float?
+  paymentMethod String?
   forwarded     Float?
   extraFee      Float?
-  discount      Float?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 

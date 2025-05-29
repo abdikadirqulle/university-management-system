@@ -22,6 +22,16 @@ const getAllStudents = async (req, res) => {
             batch: true,
           },
         },
+        payments: true,
+        studentAccount: {
+          select: {
+            tuitionFee: true,
+            discount: true,
+            totalDue: true,
+            paidAmount: true,
+            status: true,
+          },
+        }
       },
     });
 
@@ -65,6 +75,15 @@ const getStudentById = async (req, res) => {
           },
         },
         payments: true,
+        studentAccount: {
+          select: {
+            tuitionFee: true,
+            discount: true,
+            totalDue: true,
+            paidAmount: true,
+            status: true,
+          },
+        }
       },
     });
 
@@ -143,17 +162,6 @@ const createStudent = async (req, res) => {
       });
     }
 
-    // Check if user exists
-    // const user = await prisma.user.findUnique({
-    //   where: { id: userId },
-    // });
-
-    // if (!user) {
-    //   return res.status(404).json({
-    //     success: false,
-    //     message: 'User not found',
-    //   });
-    // }
 
     const student = await prisma.student.create({
       data: {
@@ -178,10 +186,25 @@ const createStudent = async (req, res) => {
       },
     });
 
+    const account = await prisma.studentAccount.create({
+      data: {
+        studentId: student.studentId,
+        academicYear: student.academicYear,
+        semester: student.semester,
+        tuitionFee: department.price,
+        discount: 0,
+        totalDue: department.price,
+        status: 'pending',
+      },
+    });
+    
     res.status(201).json({
       success: true,
       message: 'Student created successfully',
-      data: student,
+      data: {
+        ...student,
+        studentAccount: account
+      },
     });
   } catch (error) {
     console.error('Error creating student:', error);
@@ -257,18 +280,17 @@ const updateStudent = async (req, res) => {
     }
 
     // Check if department exists
-    if (departmentId) {
+   
       const department = await prisma.department.findUnique({
         where: { id: departmentId },
       });
-
+   
       if (!department) {
         return res.status(404).json({
           success: false,
           message: 'Department not found',
         });
       }
-    }
 
     const updatedStudent = await prisma.student.update({
       where: { id },
@@ -292,6 +314,19 @@ const updateStudent = async (req, res) => {
       },
     });
 
+    // Update the student account with the payment amount
+    await prisma.studentAccount.create({
+      data: {
+        studentId: updatedStudent.studentId,
+        academicYear: updatedStudent.academicYear,
+        semester: updatedStudent.semester,
+        tuitionFee: department.price,
+        discount: 0,
+        totalDue: department.price,
+        status: 'pending',
+      },
+    });
+    
     res.status(200).json({
       success: true,
       message: 'Student updated successfully',

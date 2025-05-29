@@ -131,11 +131,8 @@ const createPayment = async (req, res) => {
       dueDate,
       status,
       type,
-      tuitionFee,
-      otherCharges,
       forwarded,
       extraFee,
-      discount,
     } = req.body
 
     // Check if student exists
@@ -156,16 +153,28 @@ const createPayment = async (req, res) => {
         studentId,
         amount: parseFloat(amount),
         paymentDate: new Date(paymentDate),
+        type,
+        // kuwan ka saar
         dueDate: new Date(dueDate),
         status,
-        type,
-        tuitionFee: tuitionFee ? parseFloat(tuitionFee) : departmentPrice,
-        otherCharges: otherCharges ? parseFloat(otherCharges) : null,
         forwarded: forwarded ? parseFloat(forwarded) : null,
         extraFee: extraFee ? parseFloat(extraFee) : null,
-        discount: discount ? parseFloat(discount) : null,
       },
     })
+
+// Update the student account with the payment amount
+// if (status === "paid" || status === "partial") {
+  await prisma.studentAccount.updateMany({
+    where: { studentId },
+    data: {
+      paidAmount: {
+        increment: parseFloat(amount)
+      }
+      
+    }
+  });
+// }
+    
 
     res.status(201).json({
       success: true,
@@ -185,18 +194,15 @@ const createPayment = async (req, res) => {
 // Update payment
 const updatePayment = async (req, res) => {
   try {
-    const { id } = req.params
+    const { id, studentId } = req.params
     const {
       amount,
       paymentDate,
       dueDate,
       status,
       type,
-      tuitionFee,
-      otherCharges,
       forwarded,
       extraFee,
-      discount,
     } = req.body
 
     // Check if payment exists
@@ -220,14 +226,23 @@ const updatePayment = async (req, res) => {
         dueDate: dueDate ? new Date(dueDate) : undefined,
         status: status || undefined,
         type: type || undefined,
-        tuitionFee: tuitionFee ? parseFloat(tuitionFee) : undefined,
-        otherCharges: otherCharges ? parseFloat(otherCharges) : undefined,
         forwarded: forwarded ? parseFloat(forwarded) : undefined,
         extraFee: extraFee ? parseFloat(extraFee) : undefined,
-        discount: discount ? parseFloat(discount) : undefined,
       },
     })
 
+    // Update the student account with the payment amount
+  
+      await prisma.studentAccount.updateMany({
+        where: { studentId },
+        data: {
+          paidAmount: {
+            increment: parseFloat(amount)
+          }
+        }
+      });
+    
+    
     res.status(200).json({
       success: true,
       message: "Payment updated successfully",
@@ -246,7 +261,7 @@ const updatePayment = async (req, res) => {
 // Delete payment
 const deletePayment = async (req, res) => {
   try {
-    const { id } = req.params
+    const { id, studentId } = req.params
 
     // Check if payment exists
     const payment = await prisma.payment.findUnique({
@@ -265,6 +280,17 @@ const deletePayment = async (req, res) => {
       where: { id },
     })
 
+    // Update the student account with the payment amount
+    await prisma.studentAccount.updateMany({
+      where: { studentId },
+      data: {
+        paidAmount: {
+          decrement: parseFloat(payment.amount)
+          }
+        }
+      });
+  
+    
     res.status(200).json({
       success: true,
       message: "Payment deleted successfully",

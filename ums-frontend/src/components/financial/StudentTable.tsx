@@ -28,8 +28,6 @@ const StudentTable: React.FC<StudentTableProps> = ({
   onSelectStudent,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  // Show student department and batch information
-  console.log("Student batches:", students.map(s =>  s).filter(Boolean));
   // Filter students based on search term
   const filteredStudents = students.filter(
     (student) =>
@@ -69,11 +67,16 @@ const StudentTable: React.FC<StudentTableProps> = ({
   };
 
   // Get net amount for a student
-  const getNetAmount = (studentId: string) => {
-    const studentPayments = payments.filter(p => p.studentId === studentId);
-    if (studentPayments.length === 0) return 0;
-    
-    return studentPayments.reduce((total, payment) => total + payment.net, 0);
+  const getNetAmount = (student: Student) => {
+    const studentAccount = student.studentAccount?.[0];
+    if (studentAccount) {
+      const tuition = studentAccount.tuitionFee || 0;
+      const paid = studentAccount.paidAmount || 0;
+      const discount = studentAccount.discount || 0;
+      return tuition - paid - discount;
+    }
+    return 0;
+       
   };
 
   if (isLoading) {
@@ -176,10 +179,10 @@ const StudentTable: React.FC<StudentTableProps> = ({
                   <TableCell>{student.semester || 'N/A'}</TableCell>
                   <TableCell>{student.session || 'N/A'}</TableCell>
                   <TableCell className="font-medium">
-                    {formatCurrency(getTotalPaid(student.studentId))}
+                    {formatCurrency((student.studentAccount[0]?.paidAmount || 0))}
                   </TableCell>
                   <TableCell className="font-medium">
-                    {formatCurrency(getNetAmount(student.studentId))}
+                    {formatCurrency(getNetAmount(student))}
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline">{getPaymentType(student.studentId)}</Badge>

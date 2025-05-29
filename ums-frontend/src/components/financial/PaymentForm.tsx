@@ -34,7 +34,7 @@ import { CalendarIcon } from "lucide-react";
 import { Payment, PaymentFormData, PaymentStatus, PaymentType } from "@/types/payment";
 import { Student } from "@/types/student";
 import { Card, CardContent } from "@/components/ui/card";
-import studentService from "@/services/studentService";
+import { Badge } from "../ui/badge";
 
 // Form schema
 const formSchema = z.object({
@@ -48,10 +48,8 @@ const formSchema = z.object({
   }),
   status: z.string().min(1, "Status is required"),
   type: z.string().min(1, "Payment type is required"),
+  paymentMethod: z.string().min(1, "Payment method is required"),
   tuitionFee: z.coerce.number().default(0),
-  otherCharges: z.coerce.number().default(0),
-  forwards: z.coerce.number().default(0),
-  extra: z.coerce.number().default(0),
   discount: z.coerce.number().default(0),
   paid: z.coerce.number().default(0),
   net: z.coerce.number().default(0),
@@ -59,6 +57,7 @@ const formSchema = z.object({
 
 interface PaymentFormProps {
   payment?: Payment;
+  selectedStudent: Student | null,  // Change from Student[] | null to Student | null
   students: Student[];
   onSubmit: (data: PaymentFormData) => void;
   isLoading: boolean;
@@ -67,17 +66,15 @@ interface PaymentFormProps {
 
 const PaymentForm: React.FC<PaymentFormProps> = ({
   payment,
+  selectedStudent,
   students,
   onSubmit,
   isLoading,
   onCancel,
 }) => {
-  const isEditing = !!payment;
   
   // State for student search and selected student
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-  const [isSearching, setIsSearching] = useState(false);
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
 
   // Initialize form
@@ -85,18 +82,16 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       studentId: payment?.studentId || "",
-      amount: payment?.amount || 0,
+      amount: 0,
       paymentDate: payment?.paymentDate ? new Date(payment.paymentDate) : new Date(),
       dueDate: payment?.dueDate ? new Date(payment.dueDate) : new Date(),
       status: payment?.status || PaymentStatus.PENDING,
-      type: payment?.type || PaymentType.TUITION,
-      tuitionFee: payment?.tuitionFee || 0,
-      otherCharges: payment?.otherCharges || 0,
-      forwards: payment?.forwards || 0,
-      extra: payment?.extra || 0,
-      discount: payment?.discount || 0,
-      paid: payment?.paid || 0,
-      net: payment?.net || 0,
+      type: "",
+      paymentMethod:"",
+      tuitionFee: selectedStudent?.studentAccount[0]?.tuitionFee || 0,
+      discount: selectedStudent?.studentAccount[0]?.discount || 0,
+      paid: selectedStudent?.studentAccount[0]?.paidAmount || 0,
+      net: 0,
     },
   });
   
@@ -118,36 +113,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     setFilteredStudents(filtered);
   }, [searchTerm, students]);
   
-  // Update form when a student is selected
-  useEffect(() => {
-    if (selectedStudent) {
-      form.setValue("studentId", selectedStudent.studentId);
-      
-      // Set tuition fee based on department price if available
-      if (selectedStudent.department?.price) {
-        form.setValue("tuitionFee", selectedStudent.department.price);
-        
-        // Also update the amount field with the tuition fee
-        const currentAmount = form.getValues("amount");
-        if (currentAmount === 0) {
-          form.setValue("amount", selectedStudent.department.price);
-        }
-      }
-    }
-  }, [selectedStudent, form]);
-  
-  // Handle student selection
-  const handleSelectStudent = (student: Student) => {
-    setSelectedStudent(student);
-    setSearchTerm(""); // Clear search after selection
-    setFilteredStudents([]);
-  };
+
 
   // Handle form submission
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     try {
       // Calculate net amount if not set
-      const net = values.net || (values.tuitionFee + values.otherCharges + values.extra) - values.discount;
+      const net = values.net || values.tuitionFee - values.discount;
       
       // Ensure all required fields are included
       const paymentData: PaymentFormData = {
@@ -158,9 +130,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         status: values.status as PaymentStatus,
         type: values.type as PaymentType,
         tuitionFee: values.tuitionFee,
-        otherCharges: values.otherCharges,
-        forwards: values.forwards,
-        extra: values.extra,
         discount: values.discount,
         paid: values.paid,
         net: net
@@ -176,410 +145,263 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        {/* Student Details Card */}
-        {selectedStudent && (
-          <Card className="mb-4">
+        {/* Student Search Section (only shown when no student is selected) */}
+      
+
+        {/* Student Personal Information Section */}
+        {/* {selectedStudent && ( */}
+          <Card className="mb-4 border-primary/20">
             <CardContent className="pt-6">
-              <h3 className="text-lg font-semibold mb-2">Student Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold">PERSONAL INFORMATION</h3>
+                <Badge variant="outline" className="text-xs px-2 py-1">
+                  Batch:<span className="uppercase">
+                  {selectedStudent?.department?.batch || 'N/A'}
+                  </span>
+                </Badge>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                 <div>
-                  <p className="text-sm text-muted-foreground">Full Name</p>
-                  <p className="font-medium">{selectedStudent.fullName}</p>
+                  <p className="text-sm text-muted-foreground">Student Status</p>
+                  <div className="flex items-center mt-1">
+                    <Badge variant="outline" className="bg-primary/10">Active</Badge>
+                  </div>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Student ID</p>
-                  <p className="font-medium">{selectedStudent.studentId}</p>
+                  <p className="font-medium">{selectedStudent?.studentId}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium">{selectedStudent.email}</p>
+                  <p className="text-sm text-muted-foreground">Full Name</p>
+                  <p className="font-medium">{selectedStudent?.fullName}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Phone</p>
-                  <p className="font-medium">{selectedStudent.phoneNumber}</p>
+                  <p className="text-sm text-muted-foreground">WhatsApp</p>
+                  <p className="font-medium">{selectedStudent?.phoneNumber}</p>
                 </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground">Department</p>
-                  <p className="font-medium">{selectedStudent.department?.name || 'N/A'}</p>
+                  <p className="font-medium uppercase">{selectedStudent?.department?.name || 'N/A'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Faculty</p>
-                  <p className="font-medium">{selectedStudent.faculty?.name || 'N/A'}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Academic Year</p>
-                  <p className="font-medium">{selectedStudent.academicYear}</p>
+                  <p className="font-medium uppercase">{selectedStudent?.faculty?.name || 'N/A'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Semester</p>
-                  <p className="font-medium">{selectedStudent.semester}</p>
+                  <p className="font-medium">{selectedStudent?.semester}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Session</p>
+                  <p className="font-medium">{selectedStudent?.session}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
-        )}
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Student Search */}
-          <div className="col-span-2">
-            <FormLabel>Student</FormLabel>
-            <div className="relative">
-              <FormField
-                control={form.control}
-                name="studentId"
-                render={({ field }) => (
-                  <FormItem className="space-y-1">
-                    <FormControl>
-                      <div className="flex gap-2">
-                        <Input 
-                          placeholder="Search by name, ID or email" 
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          disabled={isLoading}
-                          className="w-full"
-                        />
-                        {isSearching && <Loader2 className="h-4 w-4 animate-spin absolute right-3 top-3" />}
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                    
-                    {/* Hidden input to store the actual studentId value */}
-                    <input type="hidden" {...field} />
-                    
-                    {/* Search Results */}
-                    {filteredStudents.length > 0 && (
-                      <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-md max-h-60 overflow-auto">
-                        {filteredStudents.map((student) => (
-                          <div 
-                            key={student.studentId} 
-                            className="p-2 hover:bg-accent cursor-pointer flex justify-between items-center"
-                            onClick={() => handleSelectStudent(student)}
-                          >
-                            <div>
-                              <p className="font-medium">{student.fullName}</p>
-                              <p className="text-sm text-muted-foreground">{student.studentId}</p>
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                              {student.department?.name || 'N/A'}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+        {/* )} */}
+      
+              
+        {/* Payment Information Section - Only shown when a student is selected */}
+        {/* {selectedStudent && ( */}
+          <>
+            {/* Tuition Fee Section */}
+            <Card className="mb-4 border-primary/20">
+              <CardContent className="pt-6">                
+                <div className="grid grid-cols-1 md:grid-cols-6 ">
+                  {/* Tuition Fee */}
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">TUITION FEE</p>
+                    <p className="font-semibold">
+                      {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
+                        .format(form.getValues('tuitionFee') || 0)}
+                    </p>
+                  </div>
+                  <p>-</p>
+              
+                  {/* Discount */}
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">DISCOUNT</p>
+                    <p className="font-semibold">
+                      {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
+                        .format(form.getValues('discount') || 0)}
+                    </p>
+                  </div>
+                  <p>-</p>
+              {/* Paid */}
+                  <div>
+                      <p className="text-sm text-muted-foreground mb-1">PAID</p>
+                      <p className="font-semibold">
+                        {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
+                          .format(form.getValues('paid') || 0)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">NET</p>
+                      <p className="font-semibold text-primary bg-primary/10 px-2 py-1 rounded">
+                        {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
+                          .format(
+                            (form.getValues('tuitionFee') || 0) - 
+                            (form.getValues('discount') || 0) -
+                            (form.getValues('paid') || 0)
+                          )}
+                      </p>
+                    </div>
+                </div>
+                
+                {/* Total Calculation */}
+             
+              </CardContent>
+            </Card>
+            
+            {/* Payment Information Section */}
+            <Card className="mb-4 border-primary/20">
+              <CardContent className="pt-6">
+                <h3 className="text-lg font-semibold mb-4">PAYMENT INFORMATION</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                  {/* Payment Type */}
+                  <FormField
+                    control={form.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Payment Type</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value={PaymentType.TUITION}>Tuition Fee</SelectItem>
+                            <SelectItem value={PaymentType.ACCOMMODATION}>Accommodation</SelectItem>
+                            <SelectItem value={PaymentType.LIBRARY}>Library</SelectItem>
+                            <SelectItem value={PaymentType.OTHER}>Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
                     )}
-                  </FormItem>
-                )}
-              />
-            </div>
-          </div>
-
-          {/* Amount */}
-          <FormField
-            control={form.control}
-            name="amount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Amount</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="0.00"
-                    {...field}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                    disabled={isLoading}
                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Payment Date */}
-          <FormField
-            control={form.control}
-            name="paymentDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Payment Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                        disabled={isLoading}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Due Date */}
-          <FormField
-            control={form.control}
-            name="dueDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Due Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                        disabled={isLoading}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) => date < new Date("1900-01-01")}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Payment Status */}
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Status</FormLabel>
-                <Select
-                  disabled={isLoading}
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value={PaymentStatus.PENDING}>Pending</SelectItem>
-                    <SelectItem value={PaymentStatus.PAID}>Paid</SelectItem>
-                    <SelectItem value={PaymentStatus.OVERDUE}>Overdue</SelectItem>
-                    <SelectItem value={PaymentStatus.PARTIAL}>Partial</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Payment Type */}
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Payment Type</FormLabel>
-                <Select
-                  disabled={isLoading}
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value={PaymentType.TUITION}>Tuition</SelectItem>
-                    <SelectItem value={PaymentType.ACCOMMODATION}>
-                      Accommodation
-                    </SelectItem>
-                    <SelectItem value={PaymentType.LIBRARY}>Library</SelectItem>
-                    <SelectItem value={PaymentType.OTHER}>Other</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Tuition Fee */}
-          <FormField
-            control={form.control}
-            name="tuitionFee"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tuition Fee</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="0.00"
-                    {...field}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                    disabled={isLoading}
+                  
+                  {/* Amount */}
+                  <FormField
+                    control={form.control}
+                    name="amount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Amount</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="0.00"
+                            {...field}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Other Charges */}
-          <FormField
-            control={form.control}
-            name="otherCharges"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Other Charges</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="0.00"
-                    {...field}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                    disabled={isLoading}
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                  {/* Payment Method */}
+                  <FormField
+                    control={form.control}
+                    name="paymentMethod"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Payment Method</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select method" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="cash">Cash</SelectItem>
+                            <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                            <SelectItem value="mobile_money">Mobile Money</SelectItem>
+                            <SelectItem value="check">Check</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Forwards */}
-          <FormField
-            control={form.control}
-            name="forwards"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Forwards Amount</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="0.00"
-                    {...field}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                    disabled={isLoading}
+                  
+                  {/* Payment Date */}
+                  <FormField
+                    control={form.control}
+                    name="paymentDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Current Month</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "w-full pl-3 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "MMMM, yyyy")
+                                ) : (
+                                  <span>Select month</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={(date) =>
+                                date > new Date() || date < new Date("1900-01-01")
+                              }
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          {/* Paid */}
-          <FormField
-            control={form.control}
-            name="paid"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Paid Amount</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="0.00"
-                    {...field}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Extra */}
-          <FormField
-            control={form.control}
-            name="extra"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Extra Fee</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="0.00"
-                    {...field}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Discount */}
-          <FormField
-            control={form.control}
-            name="discount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Discount</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="0.00"
-                    {...field}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+                </div>
+                
+              
+              </CardContent>
+            </Card>
+          </>
+        {/* )} */}
 
         <div className="flex justify-end space-x-2">
           <Button
             type="button"
             variant="outline"
             onClick={onCancel}
-            disabled={isLoading}
           >
             Cancel
           </Button>
           <Button type="submit" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isEditing ? "Update Payment" : "Create Payment"}
+           Submit
           </Button>
         </div>
       </form>

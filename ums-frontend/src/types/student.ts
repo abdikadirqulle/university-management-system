@@ -40,6 +40,34 @@ export interface Student {
     batch?: string;
   };
   payments?: Payment[];
+  studentAccount?: {
+    id: string;
+    studentId: string;
+    academicYear: string;
+    semester: string;
+    tuitionFee: number;
+    otherCharges: number;
+    discount: number;
+    totalDue: number;
+    status: "pending" | "paid" | "overdue" | "partial";
+    createdAt: string;
+    updatedAt: string;
+  }
+}
+
+export interface StudentAccount {
+  id: string;
+  studentId: string;
+  academicYear: string;
+  semester: string;
+  tuitionFee: number;
+  otherCharges: number;
+  discount: number;
+  totalDue: number;
+  paidAmount: number;
+  status: "pending" | "paid" | "overdue" | "partial";
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Payment {

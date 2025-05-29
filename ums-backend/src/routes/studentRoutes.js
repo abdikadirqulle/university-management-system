@@ -15,7 +15,8 @@ import { authenticateUser, authorize } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 // Get all students - Admin and Admission access
-router.get('/', authenticateUser,
+router.get('/', 
+  // authenticateUser,
   // authorize(['admin', 'admission', 'financial']),
    getAllStudents);
 
@@ -25,7 +26,8 @@ router.get('/:id', authenticateUser,
     getStudentById);
 
 // Create new student - Admin and Admission access
-router.post('/', authenticateUser,
+router.post('/',
+  //  authenticateUser,
   // authorize(['admin', 'admission']),
    createStudent);
 

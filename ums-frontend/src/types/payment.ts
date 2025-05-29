@@ -21,10 +21,8 @@ export interface StudentFinancial {
   sem: string;
   session: string;
   tuitionFee: number;
-  otherCharges: number;
-  forwards: number;
+  
   discount: number;
-  extra: number;
   paid: number;
   net: number;
   type: string;
@@ -39,9 +37,6 @@ export interface Payment {
   status: PaymentStatus;
   type: PaymentType;
   tuitionFee: number;
-  otherCharges: number;
-  forwards: number;
-  extra: number;
   discount: number;
   paid: number;
   net: number;
@@ -58,9 +53,6 @@ export interface PaymentFormData {
   status: PaymentStatus;
   type: PaymentType;
   tuitionFee: number;
-  otherCharges: number;
-  forwards: number;
-  extra: number;
   discount: number;
   paid: number;
   net: number;
