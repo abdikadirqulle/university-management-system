@@ -36,7 +36,7 @@ export const AuthLayout = () => {
       </div>
       
       {/* Right side - Gradient background */}
-      <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-university-500 via-university-900 to-university-800 flex-col items-center justify-center p-8">
+      <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-primary via-primary/90 to-primary/80 flex-col items-center justify-center p-8">
         <div className="text-center animate-fade-in">
           <School className="h-20 w-20 text-white mb-6 mx-auto" />
           <h1 className="text-4xl font-bold text-white mb-4">Scholar Nexus</h1>

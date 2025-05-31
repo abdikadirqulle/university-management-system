@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, School, LockKeyhole, IdCard, ArrowRight } from "lucide-react";
+import { Loader2, School, LockKeyhole, IdCard, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useForm } from "react-hook-form";
@@ -47,7 +47,7 @@ const StudentLoginPage = () => {
     <div className="w-full">
       <div className="mb-8">
         <div className="flex items-center justify-center mb-2">
-          <School className="h-10 w-10 text-university-600" />
+          <School className="h-10 w-10 text-primary" />
         </div>
         <h1 className="text-3xl font-bold text-center text-gray-900 dark:text-white">Student Sign in</h1>
       </div>
@@ -68,7 +68,7 @@ const StudentLoginPage = () => {
             <Input
               id="studentId"
               type="text"
-              className="pl-10 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 focus:ring-university-600 focus:border-university-600"
+              className="pl-10 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 focus:ring-primary focus:border-primary"
               placeholder="Enter your student ID"
               {...studentForm.register("studentId")}
               onChange={() => error && clearError()}
@@ -80,16 +80,16 @@ const StudentLoginPage = () => {
         </div>
 
         <div className="space-y-1">
-          <div className="flex items-center justify-between">
+          {/* <div className="flex items-center justify-between">
             <Label htmlFor="password" className="text-sm font-medium">Password</Label>
             <button 
               type="button" 
-              className="text-sm text-university-600 hover:text-university-800 dark:text-university-400 dark:hover:text-university-300"
-              onClick={() => {/* Handle forgot password */}}
+              className="text-sm text-primary hover:text-primary/90 dark:text-university-400 dark:hover:text-university-300"
+              onClick={() => {}}
             >
               Forgot password?
             </button>
-          </div>
+          </div> */}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
               <LockKeyhole className="h-5 w-5 text-gray-400" />
@@ -97,7 +97,7 @@ const StudentLoginPage = () => {
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
-              className="pl-10 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 focus:ring-university-600 focus:border-university-600"
+              className="pl-10 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 focus:ring-primary focus:border-primary"
               placeholder="Enter your password"
               {...studentForm.register("password")}
               onChange={() => error && clearError()}
@@ -107,7 +107,7 @@ const StudentLoginPage = () => {
               className="absolute inset-y-0 right-0 flex items-center pr-3 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? "Hide" : "Show"}
+              {showPassword ? <Eye /> : <EyeOff />}
             </button>
           </div>
           {studentForm.formState.errors.password && (
@@ -117,7 +117,7 @@ const StudentLoginPage = () => {
 
         <Button 
           type="submit" 
-          className="w-full bg-university-600 hover:bg-university-700 text-white py-3 flex items-center justify-center gap-2"
+          className="w-full bg-primary hover:bg-primary/90 text-white py-3 flex items-center justify-center gap-2"
           disabled={isLoading}
         >
           {isLoading ? (
@@ -139,7 +139,7 @@ const StudentLoginPage = () => {
 
       <div className="mt-8 text-center">
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Not a student? <Link to="/login" className="text-university-600 hover:text-university-800 font-medium">Staff login</Link>
+          Not a student? <Link to="/login" className="text-primary hover:text-primary/90 font-medium">Staff login</Link>
         </p>
       </div>
     </div>
