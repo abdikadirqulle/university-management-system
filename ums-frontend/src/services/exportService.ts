@@ -5,36 +5,83 @@ import { api } from './api';
  */
 class ExportService {
   /**
-   * Download a file from a URL and save it with the given filename
-   * @param url - The URL to download the file from
-   * @param filename - The name to save the file as
+   * Download a file from the specified endpoint
+   * @param endpoint - API endpoint to fetch the file from
+   * @param filename - Name to save the file as
+   * @param openInBrowser - Whether to open the file in browser (true) or download it (false)
    */
-  private async downloadFile(url: string, filename: string): Promise<void> {
+  /**
+   * Download a file from the specified endpoint
+   * @param endpoint - API endpoint to fetch the file from
+   * @param filename - Name to save the file as
+   * @param openInBrowser - Whether to open the file in browser (true) or download it (false)
+   */
+  private async downloadFile(endpoint: string, filename: string, openInBrowser: boolean = false): Promise<void> {
     try {
-      // Make a request to the API with responseType blob to handle binary data
-      const response = await api.get(url, {
-        responseType: 'blob',
+      const response = await api.get(endpoint, {
+        responseType: 'blob'
       });
       
-      // Create a blob URL from the response data
-      const blob = new Blob([response.data]);
-      const downloadUrl = window.URL.createObjectURL(blob);
+      // Determine content type based on file extension
+      const isPdf = filename.toLowerCase().endsWith('.pdf');
+      const contentType = isPdf ? 'application/pdf' : 'application/octet-stream';
       
-      // Create a temporary anchor element to trigger the download
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.setAttribute('download', filename);
+      // Create a blob with the correct MIME type
+      const blob = new Blob([response.data], { type: contentType });
+      const url = window.URL.createObjectURL(blob);
       
-      // Append to the document, click to download, then remove
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      if (openInBrowser && isPdf) {
+        // Open PDF in a new tab
+        this.openPdfInBrowser(url);
+      } else {
+        // Download the file
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
       
-      // Clean up the blob URL
-      window.URL.revokeObjectURL(downloadUrl);
+      // Clean up the blob URL after a delay to ensure it's used
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+      }, 1000);
     } catch (error) {
       console.error('Error downloading file:', error);
       throw error;
+    }
+  }
+  
+  /**
+   * Opens a PDF in the browser
+   * @param url - The blob URL of the PDF
+   */
+  private openPdfInBrowser(url: string): void {
+    // Create an iframe to display the PDF
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+    
+    try {
+      // Try to open in a new tab first
+      const newWindow = window.open(url, '_blank');
+      
+      // If popup is blocked or fails, fallback to embedded viewer
+      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+        // Create a more reliable fallback using Google PDF Viewer
+        const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+        window.open(googleViewerUrl, '_blank');
+      }
+    } catch (error) {
+      console.error('Error opening PDF in browser:', error);
+      // Final fallback - just try direct URL
+      window.open(url, '_blank');
+    } finally {
+      // Clean up the iframe
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 1000);
     }
   }
   
@@ -91,7 +138,7 @@ class ExportService {
    * @param studentId - The ID of the student
    */
   async exportStudentTransactionPDF(studentId: string): Promise<void> {
-    return this.downloadFile(`/student-transactions/${studentId}/pdf`, `student_${studentId}_transactions.pdf`);
+    return this.downloadFile(`/student-transactions/${studentId}/pdf`, `student_${studentId}_transactions.pdf`, true);
   }
 }
 

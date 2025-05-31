@@ -43,9 +43,11 @@ export const exportStudentTransactionPDF = async (req, res) => {
     // Generate PDF
     const doc = generateStudentTransactionPDF(student, transactions);
     
-    // Set response headers
+    // Set response headers for inline viewing instead of download
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=student_${studentId}_transactions.pdf`);
+    res.setHeader('Content-Disposition', `inline; filename=student_${studentId}_transactions.pdf`);
+    res.setHeader('Cache-Control', 'public, max-age=0');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
     
     // Pipe the PDF to the response
     doc.pipe(res);
