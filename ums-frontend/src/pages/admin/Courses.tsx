@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
 import { Plus, Edit, Trash2, Loader2 } from "lucide-react";
+import { exportService } from "@/services/exportService";
+import ExportButtons from "@/components/ui/ExportButtons";
 import PageHeader from "@/components/PageHeader";
 import { Course, useCourseStore } from "@/store/useCourseStore";
 import {
@@ -234,16 +236,23 @@ const CoursesPage = () => {
   ];
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="space-y-6">
       <PageHeader
-        title="Courses Management"
-        description="Create, view, and manage university courses"
+        title="Course Management"
+        description="Manage courses, assign instructors, and organize academic offerings"
         action={{
           label: "Add Course",
           icon: Plus,
           onClick: () => setIsOpen(true),
         }}
       />
+      
+      <div className="flex justify-end mb-4">
+        <ExportButtons
+          onExportPDF={() => exportService.exportCoursesPDF()}
+          onExportExcel={() => exportService.exportCoursesExcel()}
+        />
+      </div>
         
      
 

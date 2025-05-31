@@ -4,6 +4,8 @@ import { useAuthGuard } from "@/hooks/useAuthGuard";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { exportService } from "@/services/exportService";
+import ExportButtons from "@/components/ui/ExportButtons";
 import { Student } from "@/types/student";
 
 import {
@@ -84,9 +86,16 @@ const Students = () => {
         action={{
           label: "Add Student",
           icon: Plus,
-          onClick: () => setIsOpen(true),
+          onClick: handleAddStudent,
         }}
       />
+      
+      <div className="flex justify-end mb-4">
+        <ExportButtons
+          onExportPDF={() => exportService.exportStudentsPDF()}
+          onExportExcel={() => exportService.exportStudentsExcel()}
+        />
+      </div>
         
 
       <StudentTable

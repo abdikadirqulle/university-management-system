@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Plus, Trash2 } from "lucide-react";
+import { exportService } from "@/services/exportService";
+import ExportButtons from "@/components/ui/ExportButtons";
 
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { usePaymentStore } from "@/store/usePaymentStore";
@@ -160,6 +162,13 @@ const PaymentsPage = () => {
         //   },
         // }}
       />
+      
+      <div className="flex justify-end mb-4">
+        <ExportButtons
+          onExportPDF={() => exportService.exportPaymentsPDF()}
+          onExportExcel={() => exportService.exportPaymentsExcel()}
+        />
+      </div>
 
       {/* Students Table with Payment Information */}
       <StudentTable 
