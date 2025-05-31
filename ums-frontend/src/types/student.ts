@@ -25,6 +25,8 @@ export interface Student {
   batch?: string;
   createdAt: string;
   updatedAt: string;
+  is_active?: boolean;
+  
   
   // Relations
   user?: User;

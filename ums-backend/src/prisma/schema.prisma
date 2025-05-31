@@ -116,7 +116,7 @@ model Student {
   highSchoolCity    String?
   graduationYear    Int
   averagePass       Float
-  
+  is_active         Boolean?    @default(true)
   facultyId         String     @db.ObjectId
   departmentId      String     @db.ObjectId
   session           String
