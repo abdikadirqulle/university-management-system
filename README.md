@@ -9,29 +9,33 @@ The **University Management System (UMS)** is a web-based platform that streamli
 - **User Management** (Admins)
 - **Student Enrollment & Management**
 - **Course  Management**
-- **Faculty Management**
-- **Fee & Finance Management**
+- **Faculty & Department Management**
 - **Authentication & Role-Based Access**
-- **Real-time Data Handling with React Query**
+- **Real-time Data Handling**
 
 ## 👥 User Roles & Permissions
 
 ### 1️⃣ **Admin**
 
 - Manages academic calendar
-- Creates users
-- Manages courses and classes
+- Creates users by roles
+- Manages faculties, departments and courses
 
-### 2️⃣ **Admins**
+## 2️⃣ **Finance Admin** → 
 
-- **Finance Admin** → Handles student payments
-- **Admission Officer** → Registers students
+- Handles/manages student payments
+- View Transactions
+
+
+## **Admission Officer** → 
+
+- Registers students
+- 
 
 ### 3️⃣ **Students**
 
-- Registers for courses
-- Views grades and results
-- Pays fees
+
+- 
 
 ## 🛠 Tech Stack
 
@@ -56,7 +60,7 @@ The **University Management System (UMS)** is a web-based platform that streamli
 ## 📂 Folder Structure
 
 ```
-/ums-project
+/ums
 ├── frontend/ (React + Vite)
 │   ├── src/
 │   │   ├── components/
@@ -108,7 +112,7 @@ npm install
 
 ### **3️⃣ Set Up Environment Variables**
 
-Create a `.env` file in the `ums-backend/` directory:
+Create a `.env` file in the `backend/` directory:
 
 ```env
 PORT=5000
@@ -120,11 +124,11 @@ JWT_SECRET=your-secret-key
 
 ```sh
 # Run frontend
-cd ums-frontend
+cd frontend
 npm run dev
 
 # Run backend
-cd ums-backend
+cd backend
 npm run dev
 ```
 
@@ -141,9 +145,9 @@ vercel
 
 1. Go to [Render](https://render.com/).
 2. Create a new Web Service and connect your GitHub repository.
-3. Set the **Root Directory** as `ums-backend/`.
+3. Set the **Root Directory** as `backend/`.
 4. Use the following commands:
-   - **Build Command:** `cd ums-backend && npm install`
+   - **Build Command:** `cd backend && npm install`
    - **Start Command:** `npm start`
 
 ## 📌 Next Steps
