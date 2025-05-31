@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { School } from "lucide-react";
 
-const AuthLayout = () => {
+export const AuthLayout = () => {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
@@ -26,10 +27,26 @@ const AuthLayout = () => {
   }, [isAuthenticated, user, navigate]);
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-university-500 via-university-900 to-university-800">
-      <div className="w-full max-w-md">
-        <Outlet />
+    <div className="w-full min-h-screen flex">
+      {/* Left side - Login form */}
+      <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-white dark:bg-gray-950">
+        <div className="w-full max-w-md">
+          <Outlet />
+        </div>
+      </div>
+      
+      {/* Right side - Gradient background */}
+      <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-university-500 via-university-900 to-university-800 flex-col items-center justify-center p-8">
+        <div className="text-center animate-fade-in">
+          <School className="h-20 w-20 text-white mb-6 mx-auto" />
+          <h1 className="text-4xl font-bold text-white mb-4">Scholar Nexus</h1>
+          <p className="text-white/80 text-lg max-w-md">
+            Welcome to the University Management System. Access your academic resources, courses, and more.
+          </p>
+        </div>
       </div>
     </div>
   );
 };
+
+export default AuthLayout;

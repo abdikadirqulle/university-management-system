@@ -12,6 +12,7 @@ import AppLayout from "./layouts/AppLayout";
 
 // Auth Pages
 import LoginPage from "./pages/auth/LoginPage";
+import StudentLoginPage from "./pages/auth/StudentLoginPage";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -66,8 +67,8 @@ const App = () => (
             {/* Auth routes */}
             <Route element={<AuthLayout />}>
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/auth/student-login" element={<StudentLoginPage />} />
               {/* Root redirect to login */}
-
               <Route path="/" element={<LoginPage />} />
             </Route>
 

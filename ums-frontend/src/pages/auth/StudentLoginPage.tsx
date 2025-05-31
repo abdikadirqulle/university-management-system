@@ -3,43 +3,43 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, School, LockKeyhole, Mail, ArrowRight } from "lucide-react";
+import { Loader2, School, LockKeyhole, IdCard, ArrowRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { LoginCredentials } from "@/types/auth";
+import { StudentLoginCredentials } from "@/types/auth";
 
-const staffSchema = z.object({
-  email: z.string().email("Invalid email address"),
+const studentSchema = z.object({
+  studentId: z.string().min(1, "Student ID is required"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-type StaffFormData = z.infer<typeof staffSchema>;
+type StudentFormData = z.infer<typeof studentSchema>;
 
-const LoginPage = () => {
-  const { login, isLoading, error, clearError } = useAuth();
+const StudentLoginPage = () => {
+  const { loginStudent, isLoading, error, clearError } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
-  const staffForm = useForm<StaffFormData>({
-    resolver: zodResolver(staffSchema),
+  const studentForm = useForm<StudentFormData>({
+    resolver: zodResolver(studentSchema),
     defaultValues: {
-      email: "",
+      studentId: "",
       password: "",
     },
   });
 
-  const onStaffSubmit = async (data: StaffFormData) => {
+  const onStudentSubmit = async (data: StudentFormData) => {
     try {
-      // Create a properly typed LoginCredentials object
-      const credentials: LoginCredentials = {
-        email: data.email,
+      // Create a properly typed StudentLoginCredentials object
+      const credentials: StudentLoginCredentials = {
+        studentId: data.studentId,
         password: data.password
       };
-      await login(credentials);
+      await loginStudent(credentials);
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('Student login failed:', error);
     }
   };
 
@@ -49,7 +49,7 @@ const LoginPage = () => {
         <div className="flex items-center justify-center mb-2">
           <School className="h-10 w-10 text-university-600" />
         </div>
-        <h1 className="text-3xl font-bold text-center text-gray-900 dark:text-white">Sign in</h1>
+        <h1 className="text-3xl font-bold text-center text-gray-900 dark:text-white">Student Sign in</h1>
       </div>
 
       {error && (
@@ -58,24 +58,24 @@ const LoginPage = () => {
         </Alert>
       )}
 
-      <form onSubmit={staffForm.handleSubmit(onStaffSubmit)} className="space-y-6">
+      <form onSubmit={studentForm.handleSubmit(onStudentSubmit)} className="space-y-6">
         <div className="space-y-1">
-          <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+          <Label htmlFor="studentId" className="text-sm font-medium">Student ID</Label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <Mail className="h-5 w-5 text-gray-400" />
+              <IdCard className="h-5 w-5 text-gray-400" />
             </div>
             <Input
-              id="email"
-              type="email"
+              id="studentId"
+              type="text"
               className="pl-10 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 focus:ring-university-600 focus:border-university-600"
-              placeholder="Enter your email"
-              {...staffForm.register("email")}
+              placeholder="Enter your student ID"
+              {...studentForm.register("studentId")}
               onChange={() => error && clearError()}
             />
           </div>
-          {staffForm.formState.errors.email && (
-            <p className="text-sm text-red-500">{staffForm.formState.errors.email.message}</p>
+          {studentForm.formState.errors.studentId && (
+            <p className="text-sm text-red-500">{studentForm.formState.errors.studentId.message}</p>
           )}
         </div>
 
@@ -99,7 +99,7 @@ const LoginPage = () => {
               type={showPassword ? "text" : "password"}
               className="pl-10 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 focus:ring-university-600 focus:border-university-600"
               placeholder="Enter your password"
-              {...staffForm.register("password")}
+              {...studentForm.register("password")}
               onChange={() => error && clearError()}
             />
             <button
@@ -110,8 +110,8 @@ const LoginPage = () => {
               {showPassword ? "Hide" : "Show"}
             </button>
           </div>
-          {staffForm.formState.errors.password && (
-            <p className="text-sm text-red-500">{staffForm.formState.errors.password.message}</p>
+          {studentForm.formState.errors.password && (
+            <p className="text-sm text-red-500">{studentForm.formState.errors.password.message}</p>
           )}
         </div>
 
@@ -131,13 +131,19 @@ const LoginPage = () => {
         </Button>
       </form>
 
+      <div className="mt-6 text-center">
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          Your default password is your Student ID
+        </p>
+      </div>
+
       <div className="mt-8 text-center">
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Are you a student? <Link to="/auth/student-login" className="text-university-600 hover:text-university-800 font-medium">Login here</Link>
+          Not a student? <Link to="/login" className="text-university-600 hover:text-university-800 font-medium">Staff login</Link>
         </p>
       </div>
     </div>
   );
 };
 
-export default LoginPage;
+export default StudentLoginPage;
