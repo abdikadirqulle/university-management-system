@@ -6,42 +6,44 @@
   :root {
     --background: 210 40% 98%;
     --foreground: 222.2 84% 4.9%;
-
+  
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-
+  
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 235 46% 50%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
+  
+    /* Updated primary color: UB Blue (#005bbb) in HSL approx */
+    --primary: 215 100% 36%; /* #005bbb */
+    --primary-foreground: 0 0% 100%; /* white */
+  
+    /* Updated secondary color: White (#ffffff) */
+    --secondary: 0 0% 100%; /* white */
+    --secondary-foreground: 215 100% 36%; /* UB Blue for text on white */
+  
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
+  
     --accent: 235 30% 92%;
     --accent-foreground: 222.2 47.4% 11.2%;
-
+  
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
+  
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 235 46% 50%;
-
+    --ring: 215 100% 36%;
+  
     --radius: 0.5rem;
-
-    --sidebar-background: 235 46% 15%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 235 46% 50%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 235 30% 25%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 235 30% 25%;
-    --sidebar-ring: 235 46% 50%;
+  
+    --sidebar-background: 215 100% 15%; /* Darker blue for sidebar background */
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 215 100% 36%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 100% 25%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 215 100% 25%;
+    --sidebar-ring: 215 100% 36%;
   }
 
   .dark {

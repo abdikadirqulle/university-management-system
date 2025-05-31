@@ -46,8 +46,8 @@ const StudentTable: React.FC<StudentTableProps> = ({
   };
 
   // Get payment type for a student
-  const getPaymentType = (studentId: string) => {
-    const studentPayments = payments.filter(p => p.studentId === studentId);
+  const getPaymentType = (student: Student) => {
+    const studentPayments = payments.filter(p => p.studentId === student.studentId);
     if (studentPayments.length === 0) return "Not set";
     
     // Get the most recent payment type
@@ -58,13 +58,6 @@ const StudentTable: React.FC<StudentTableProps> = ({
     return latestPayment.type.charAt(0).toUpperCase() + latestPayment.type.slice(1);
   };
 
-  // Get total paid amount for a student
-  const getTotalPaid = (studentId: string) => {
-    const studentPayments = payments.filter(p => p.studentId === studentId);
-    if (studentPayments.length === 0) return 0;
-    
-    return studentPayments.reduce((total, payment) => total + payment.paid, 0);
-  };
 
   // Get net amount for a student
   const getNetAmount = (student: Student) => {
@@ -96,7 +89,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
                 <TableHead>Session</TableHead>
                 <TableHead>Paid</TableHead>
                 <TableHead>Net</TableHead>
-                <TableHead>Payment Type</TableHead>
+                <TableHead>TF Type</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -146,7 +139,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
               <TableHead>Session</TableHead>
               <TableHead>Paid</TableHead>
               <TableHead>Net</TableHead>
-              <TableHead>Payment Type</TableHead>
+              <TableHead>TF Type</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -185,7 +178,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
                     {formatCurrency(getNetAmount(student))}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline">{getPaymentType(student.studentId)}</Badge>
+                    <Badge variant="outline">{getPaymentType(student)}</Badge>
                   </TableCell>
                 </TableRow>
               ))

@@ -29,13 +29,7 @@ import {
 import { usePaymentStore } from "@/store/usePaymentStore";
 import { PaymentStatus } from "@/types/payment";
 
-// Mock financial data for demonstration
-const mockFinancialStats = {
-  totalRevenue: "$5,890",
-  pendingPayments: "$250",
-  completedTransactions: 125,
-  outstandingFees: "$450",
-};
+
 
 const mockMonthlyRevenue = [
   { month: "Jan", revenue: 65000 },
@@ -88,14 +82,6 @@ const FinancialDashboard = () => {
     }).format(amount);
   };
   
-  // Use existing mock data for charts
-  const { data: stats, isLoading: isStatsLoading } = useQuery({
-    queryKey: ["financial-stats"],
-    queryFn: () =>
-      new Promise((resolve) =>
-        setTimeout(() => resolve(mockFinancialStats), 1000),
-      ),
-  });
 
   return (
     <div className="space-y-6">
