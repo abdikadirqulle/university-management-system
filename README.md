@@ -10,6 +10,7 @@ The **University Management System (UMS)** is a web-based platform that streamli
 - **Student Enrollment & Management**
 - **Course  Management**
 - **Faculty & Department Management**
+- **Payment Management**
 - **Authentication & Role-Based Access**
 - **Real-time Data Handling**
 
@@ -21,7 +22,7 @@ The **University Management System (UMS)** is a web-based platform that streamli
 - Creates users by roles
 - Manages faculties, departments and courses
 
-## 2️⃣ **Finance Admin** → 
+## 2️⃣ **Finance Admin** 
 
 - Handles/manages student payments
 - View Transactions
@@ -30,12 +31,12 @@ The **University Management System (UMS)** is a web-based platform that streamli
 ## **Admission Officer** → 
 
 - Registers students
-- 
+  
 
 ### 3️⃣ **Students**
 
 
-- 
+
 
 ## 🛠 Tech Stack
 
