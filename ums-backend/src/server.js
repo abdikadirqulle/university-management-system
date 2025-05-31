@@ -12,6 +12,7 @@ import applicationRoutes from "./routes/applicationRoutes.js"
 import paymentRoutes from "./routes/paymentRoutes.js"
 import studentAuthRoutes from "./routes/studentAuthRoutes.js"
 import exportRoutes from "./routes/exportRoutes.js"
+import studentTransactionRoutes from "./routes/studentTransactionRoutes.js"
 import { connectDB } from "./config/db.js"
 
 // Load environment variables
@@ -39,6 +40,7 @@ app.use("/api/applications", applicationRoutes)
 app.use("/api/payments", paymentRoutes)
 app.use("/api/student-auth", studentAuthRoutes)
 app.use("/api/export", exportRoutes)
+app.use("/api/student-transactions", studentTransactionRoutes)
 
 // Default route
 app.get("/", (req, res) => {

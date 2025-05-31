@@ -85,6 +85,14 @@ class ExportService {
   async exportPaymentsExcel(): Promise<void> {
     return this.downloadFile('/export/payments/excel', 'payments.xlsx');
   }
+  
+  /**
+   * Export transaction history for a specific student as PDF
+   * @param studentId - The ID of the student
+   */
+  async exportStudentTransactionPDF(studentId: string): Promise<void> {
+    return this.downloadFile(`/student-transactions/${studentId}/pdf`, `student_${studentId}_transactions.pdf`);
+  }
 }
 
 export const exportService = new ExportService();

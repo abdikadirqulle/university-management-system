@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import PageHeader from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { exportService } from "@/services/exportService";
+import { toast } from "sonner";
 import {
   Table,
   TableBody,
@@ -21,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, Eye, CreditCard } from "lucide-react";
+import { Search, Eye, CreditCard, FileText, Loader2 } from "lucide-react";
 import { useStudentStore } from "@/store/useStudentStore";
 import { usePaymentStore } from "@/store/usePaymentStore";
 import { Payment, PaymentStatus } from "@/types/payment";
@@ -35,6 +37,7 @@ const FinancialStudentsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [isPaymentHistoryOpen, setIsPaymentHistoryOpen] = useState(false);
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
 
   // Get data from stores
   const { students, isLoading: isStudentsLoading, fetchStudents } = useStudentStore();
@@ -274,6 +277,36 @@ const FinancialStudentsPage = () => {
                 )}
               </CardContent>
             </Card>
+          </div>
+          
+          <div className="flex justify-end mb-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                if (!selectedStudent) return;
+                
+                try {
+                  setIsExportingPDF(true);
+                  await exportService.exportStudentTransactionPDF(selectedStudent.studentId);
+                  toast.success('Transaction PDF exported successfully');
+                } catch (error) {
+                  console.error('Error exporting transaction PDF:', error);
+                  toast.error('Failed to export transaction PDF');
+                } finally {
+                  setIsExportingPDF(false);
+                }
+              }}
+              disabled={isExportingPDF}
+              className="flex items-center gap-1"
+            >
+              {isExportingPDF ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <FileText className="h-4 w-4" />
+              )}
+              Export Transaction PDF
+            </Button>
           </div>
 
           <div className="rounded-md border">
