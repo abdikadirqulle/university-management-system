@@ -102,7 +102,7 @@ export const generatePDF = (data, title, columns) => {
   
   // Add footer
   doc.fontSize(10)
-     .text('University Management System', 50, doc.page.height - 50, { align: 'center' });
+     .text('AqoonMaamul', 50, doc.page.height - 50, { align: 'center' });
   
   return doc;
 };

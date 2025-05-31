@@ -286,7 +286,7 @@ const Index = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center mb-6 md:mb-0">
               <School className="h-8 w-8 text-primary mr-2" />
-              <span className="text-xl font-semibold">Scholar Nexus</span>
+              <span className="text-xl font-semibold">AqoonMaamul</span>
             </div>
             <div className="flex flex-wrap gap-4 md:gap-8 justify-center">
               <a
@@ -316,7 +316,7 @@ const Index = () => {
             </div>
           </div>
           <div className="border-t border-white/10 mt-8 pt-8 text-center text-sm text-white/60">
-            &copy; {new Date().getFullYear()} Scholar Nexus. All rights
+            &copy; {new Date().getFullYear()} AqoonMaamul. All rights
             reserved.
           </div>
         </div>

@@ -39,9 +39,9 @@ export const AuthLayout = () => {
       <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-primary via-primary/90 to-primary/80 flex-col items-center justify-center p-8">
         <div className="text-center animate-fade-in">
           <School className="h-20 w-20 text-white mb-6 mx-auto" />
-          <h1 className="text-4xl font-bold text-white mb-4">Scholar Nexus</h1>
+          <h1 className="text-4xl font-bold text-white mb-4">AqoonMaamul</h1>
           <p className="text-white/80 text-lg max-w-md">
-            Welcome to the University Management System. Access your academic resources, courses, and more.
+            Welcome to the AqoonMaamul. Access your academic resources, courses, and more.
           </p>
         </div>
       </div>

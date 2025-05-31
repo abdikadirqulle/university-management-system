@@ -205,7 +205,7 @@ const AppSidebar = () => {
           <School className="h-8 w-8 " />
           <div>
             <h1 className="text-lg font-bold text-sidebar-foreground">
-              Scholar Nexus
+              AqoonMaamul
             </h1>
             <span className="text-xs text-sidebar-foreground/70">
               University Management

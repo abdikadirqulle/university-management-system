@@ -21,7 +21,7 @@ const Header = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 md:gap-4">
           <SidebarTrigger className="lg:hidden" />
-          <h1 className="text-xl font-semibold">Scholar Nexus</h1>
+          <h1 className="text-xl font-semibold">AqoonMaamul</h1>
         </div>
 
         <div className="flex items-center gap-4">

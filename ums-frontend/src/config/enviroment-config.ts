@@ -13,7 +13,7 @@ const API_URL = {
 const config = {
   apiUrl: isProduction ? API_URL.production : API_URL.development,
   isProduction,
-  appName: 'University Management System',
+  appName: 'AqoonMaamul',
 };
 
 export default config;

@@ -44,7 +44,7 @@ app.use("/api/student-transactions", studentTransactionRoutes)
 
 // Default route
 app.get("/", (req, res) => {
-  res.send("University Management System API is running")
+  res.send("AqoonMaamul API is running")
 })
 
 // Error handling middleware
