@@ -79,7 +79,7 @@ const AppSidebar = () => {
       {
         title: "Academic Calendar",
         icon: Calendar,
-        path: "/admin/calendar",
+        path: "/admin/academic-calendar",
       },
       {
         title: "Reports",

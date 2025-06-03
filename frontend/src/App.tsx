@@ -22,7 +22,7 @@ import CoursesPage from "./pages/admin/Courses";
 import DepartmentsPage from "./pages/admin/Departments";
 import ReportsPage from "./pages/admin/Reports";
 import SettingsPage from "./pages/admin/Settings";
-import CalendarPage from "./pages/admin/Calendar";
+import AcademicCalendarPage from "./pages/admin/academic-calendar";
 
 // admission Pages
 import AdmissionDashboard from "./pages/admission/admission-dashboard";
@@ -84,7 +84,7 @@ const App = () => (
               <Route path="departments" element={<DepartmentsPage />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="settings" element={<SettingsPage />} />
-              <Route path="calendar" element={<CalendarPage />} />
+              <Route path="academic-calendar" element={<AcademicCalendarPage />} />
 
               {/* 404 Page */}
               <Route path="*" element={<NotFound />} />

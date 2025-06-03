@@ -187,3 +187,29 @@ model Application {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 }
+
+enum EventType {
+  semesterStart
+  semesterEnd
+  holiday
+  examPeriod
+  registrationPeriod
+  paymentDeadline
+  other
+}
+
+model AcademicCalendar {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  eventType   EventType
+  semester    String    // e.g., "1", "2", etc.
+  academicYear String   // e.g., "2024-2025"
+  affectedDepartments String[] @default([]) // List of department IDs this event affects
+  createdBy   String    // User ID who created this event
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
