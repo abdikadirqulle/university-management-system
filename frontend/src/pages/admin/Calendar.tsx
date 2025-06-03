@@ -82,7 +82,7 @@ const initialEvents: CalendarEvent[] = [
     type: "academic",
     description: "Start of the Fall semester classes",
     academicYear: "2023-2024",
-    semester: "Fall",
+    semester: "semester one",
   },
   {
     id: "2",
@@ -92,7 +92,7 @@ const initialEvents: CalendarEvent[] = [
     type: "holiday",
     description: "Fall break for all students and faculty",
     academicYear: "2023-2024",
-    semester: "Fall",
+    semester: "semester one",
   },
   {
     id: "3",
@@ -102,7 +102,7 @@ const initialEvents: CalendarEvent[] = [
     type: "registration",
     description: "Registration period for Spring semester",
     academicYear: "2023-2024",
-    semester: "Spring",
+    semester: "semester two",
   },
   {
     id: "4",
@@ -112,7 +112,7 @@ const initialEvents: CalendarEvent[] = [
     type: "exam",
     description: "Fall semester final examination period",
     academicYear: "2023-2024",
-    semester: "Fall",
+    semester: "semester one",
   },
   {
     id: "5",
@@ -122,7 +122,7 @@ const initialEvents: CalendarEvent[] = [
     type: "academic",
     description: "Start of the Spring semester classes",
     academicYear: "2023-2024",
-    semester: "Spring",
+    semester: "semester two",
   },
 ];
 
@@ -165,7 +165,7 @@ const CalendarPage = () => {
       type: "academic",
       description: "",
       academicYear: "2023-2024",
-      semester: "Fall",
+      semester: "semester one",
     },
   });
 
@@ -377,9 +377,8 @@ const CalendarPage = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Semesters</SelectItem>
-                <SelectItem value="Fall">Fall</SelectItem>
-                <SelectItem value="Spring">Spring</SelectItem>
-                <SelectItem value="Summer">Summer</SelectItem>
+                <SelectItem value="semester one">Semester One</SelectItem>
+                <SelectItem value="semester two">Semester Two</SelectItem>
               </SelectContent>
             </Select>
 
@@ -689,9 +688,8 @@ const CalendarPage = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="Fall">Fall</SelectItem>
-                          <SelectItem value="Spring">Spring</SelectItem>
-                          <SelectItem value="Summer">Summer</SelectItem>
+                          <SelectItem value="semester one">Semester One</SelectItem>
+                          <SelectItem value="semester two">Semester Two</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

@@ -236,6 +236,14 @@ const ReportsPage = () => {
             <Button
               variant="outline"
               className="flex items-center gap-2"
+              onClick={() => handleDownloadReport("Student")}
+            >
+              <FileText className="h-4 w-4" />
+              Student Report
+            </Button>
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
               onClick={() => handleDownloadReport("Faculty")}
             >
               <FileText className="h-4 w-4" />
@@ -257,6 +265,15 @@ const ReportsPage = () => {
               <FileText className="h-4 w-4" />
               Financial Report
             </Button>
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+              onClick={() => handleDownloadReport("Academic")}
+            >
+              <FileText className="h-4 w-4" />
+              Academic Report
+            </Button>
+            
           </CardContent>
         </Card>
       </div>
