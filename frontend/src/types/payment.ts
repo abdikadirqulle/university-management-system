@@ -1,4 +1,3 @@
-import { Student } from "./student";
 
 export enum PaymentStatus {
   PENDING = "pending",
@@ -50,8 +49,7 @@ export interface PaymentFormData {
   amount: number;
   paymentDate: string;
   paymentMethod: string;
-  dueDate: string;
-  status: PaymentStatus;
+  status?: PaymentStatus;
   type: PaymentType;
   tuitionFee: number;
   discount: number;

@@ -110,11 +110,6 @@ const AppSidebar = () => {
         path: "/financial/students",
       },
       {
-        title: "Transections",
-        icon: DollarSign,
-        path: "/financial/transactions",
-      },
-      {
         title: "Reports",
         icon: BarChart,
         path: "/financial/reports",

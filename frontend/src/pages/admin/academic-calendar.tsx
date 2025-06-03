@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlusCircle } from 'lucide-react';
+import { Download, PlusCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
@@ -55,6 +55,9 @@ const AcademicCalendarPage: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [filterYear, setFilterYear] = useState('all');
+  const [filterSemester, setFilterSemester] = useState('all');
+  const [filterType, setFilterType] = useState('all');
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [activeTab, setActiveTab] = useState('list');
 
@@ -104,6 +107,17 @@ const AcademicCalendarPage: React.FC = () => {
       toast.error('Failed to save calendar event');
     }
   };
+
+    // Filter events
+    const filteredEvents = events.filter((event) => {
+      return (
+        (filterYear === "all" || event.academicYear === filterYear) &&
+        (filterSemester === "all" || event.semester === filterSemester) &&
+        (filterType === "all" || event.type === filterType)
+      );
+    });
+
+    
 
   // Handle event deletion
   const handleDeleteEvent = async (eventId: string) => {
@@ -259,6 +273,49 @@ const AcademicCalendarPage: React.FC = () => {
             </div>
           </div>
 
+          <div className="flex items-center gap-2">
+                      <Select value={filterYear} onValueChange={setFilterYear}>
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Filter by Year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Years</SelectItem>
+                          <SelectItem value="2022-2023">2022-2023</SelectItem>
+                          <SelectItem value="2023-2024">2023-2024</SelectItem>
+                          <SelectItem value="2024-2025">2024-2025</SelectItem>
+                        </SelectContent>
+                      </Select>
+          
+                      <Select value={filterSemester} onValueChange={setFilterSemester}>
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Filter by Semester" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Semesters</SelectItem>
+                          <SelectItem value="semester one">Semester One</SelectItem>
+                          <SelectItem value="semester two">Semester Two</SelectItem>
+                        </SelectContent>
+                      </Select>
+          
+                      <Select value={filterType} onValueChange={setFilterType}>
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Filter by Type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Types</SelectItem>
+                          <SelectItem value="academic">Academic</SelectItem>
+                          <SelectItem value="exam">Exam</SelectItem>
+                          <SelectItem value="holiday">Holiday</SelectItem>
+                          <SelectItem value="registration">Registration</SelectItem>
+                        </SelectContent>
+                      </Select>
+          
+                      <Button variant="outline" className="flex items-center gap-2">
+                        <Download className="h-4 w-4" />
+                        Export
+                      </Button>
+                    </div>
+
           <TabsContent value="list" className="space-y-4">
             <Card>
               <CardContent className="pt-6">
@@ -266,7 +323,7 @@ const AcademicCalendarPage: React.FC = () => {
                   <div className="text-center py-8">Loading events...</div>
                 ) : (
                   <CalendarEventsList
-                    events={events}
+                    events={filteredEvents}
                     onEdit={handleEditEvent}
                     onDelete={handleDeleteEvent}
                     onView={handleViewEvent}

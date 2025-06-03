@@ -10,9 +10,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Student } from "@/types/student";
-import { Search } from "lucide-react";
+import { PrinterIcon, Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Payment } from "@/types/payment";
+import { Button } from "../ui/button";
+import { exportService } from "@/services/exportService";
 
 interface StudentTableProps {
   students: Student[];
@@ -114,7 +116,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center">
+      <div className="flex items-center justify-between">
         <div className="relative w-full max-w-sm">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -124,6 +126,15 @@ const StudentTable: React.FC<StudentTableProps> = ({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+        <Button 
+                          variant="secondary" 
+                          size="sm" 
+                          className="flex items-center gap-2"
+                          onClick={() => exportService.exportPaymentsPDF()}
+                          >
+                          <PrinterIcon className="h-4 w-4" />
+                          Print
+                        </Button>
       </div>
 
       <div className="rounded-md border">
@@ -161,23 +172,23 @@ const StudentTable: React.FC<StudentTableProps> = ({
                     <div className="font-medium">{student.fullName}</div>
                   </TableCell>
                   <TableCell>
-                    <div className="uppercase">{student.faculty?.name || 'N/A'}</div>
+                    <div className="uppercase text-nowrap font-medium">{student.faculty?.name || 'N/A'}</div>
                   </TableCell>
                   <TableCell> 
-                    <div className="uppercase">{student.department?.name || 'N/A'}</div>
+                    <div className="uppercase text-nowrap font-medium" >{student.department?.name || 'N/A'}</div>
                   </TableCell>
                   <TableCell>
                     <div className="uppercase">{student.department?.batch || 'N/A'}</div>
                   </TableCell>
                   <TableCell>{student.semester || 'N/A'}</TableCell>
-                  <TableCell>{student.session || 'N/A'}</TableCell>
+                  <TableCell className="uppercase">{student.session || 'N/A'}</TableCell>
                   <TableCell className="font-medium">
                     {formatCurrency((student.studentAccount[0]?.paidAmount || 0))}
                   </TableCell>
                   <TableCell className="font-medium">
                     {formatCurrency(getNetAmount(student))}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="font-medium uppercase text-nowrap">
                     <Badge variant="outline">{getPaymentType(student)}</Badge>
                   </TableCell>
                 </TableRow>

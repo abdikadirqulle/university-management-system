@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import PageHeader from "@/components/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { exportService } from "@/services/exportService";
-import { toast } from "sonner";
 import {
   Table,
   TableBody,
@@ -12,22 +10,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, Eye, CreditCard, FileText, Loader2 } from "lucide-react";
+import { Search } from "lucide-react";
 import { useStudentStore } from "@/store/useStudentStore";
-import { usePaymentStore } from "@/store/usePaymentStore";
-import { Payment, PaymentStatus } from "@/types/payment";
-import { format } from "date-fns";
 
 const FinancialStudentsPage = () => {
   // Use auth guard to protect this page
@@ -35,17 +21,9 @@ const FinancialStudentsPage = () => {
 
   // State for search and dialogs
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStudent, setSelectedStudent] = useState<any>(null);
-  const [isPaymentHistoryOpen, setIsPaymentHistoryOpen] = useState(false);
-  const [isExportingPDF, setIsExportingPDF] = useState(false);
 
   // Get data from stores
   const { students, isLoading: isStudentsLoading, fetchStudents } = useStudentStore();
-  const { 
-    payments, 
-    isLoading: isPaymentsLoading, 
-    fetchPaymentsByStudentId 
-  } = usePaymentStore();
 
   // Fetch students on component mount
   useEffect(() => {
@@ -62,65 +40,15 @@ const FinancialStudentsPage = () => {
         student.department.name.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  // View student payment history
-  const handleViewPaymentHistory = async (student: any) => {
-    setSelectedStudent(student);
-    await fetchPaymentsByStudentId(student.studentId);
-    setIsPaymentHistoryOpen(true);
-  };
-
-  // Format currency
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
-  };
-
-  // Get status badge
-  const getStatusBadge = (status: PaymentStatus) => {
-    switch (status) {
-      case PaymentStatus.PAID:
-        return <Badge className="bg-green-500">Paid</Badge>;
-      case PaymentStatus.PENDING:
-        return <Badge className="bg-yellow-500">Pending</Badge>;
-      case PaymentStatus.OVERDUE:
-        return <Badge className="bg-red-500">Overdue</Badge>;
-      case PaymentStatus.PARTIAL:
-        return <Badge className="bg-blue-500">Partial</Badge>;
-      default:
-        return <Badge>{status}</Badge>;
-    }
-  };
-
-  // Calculate total paid, pending, and overdue for a student
-  const calculateStudentPaymentSummary = (studentId: string) => {
-    const studentPayments = payments.filter(p => p.studentId === studentId);
-    
-    const total = studentPayments.reduce((sum, payment) => sum + payment.amount, 0);
-    const paid = studentPayments
-      .filter(p => p.status === PaymentStatus.PAID)
-      .reduce((sum, payment) => sum + payment.amount, 0);
-    const pending = studentPayments
-      .filter(p => p.status === PaymentStatus.PENDING)
-      .reduce((sum, payment) => sum + payment.amount, 0);
-    const overdue = studentPayments
-      .filter(p => p.status === PaymentStatus.OVERDUE)
-      .reduce((sum, payment) => sum + payment.amount, 0);
-    
-    return { total, paid, pending, overdue };
-  };
-
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Student Financial Records"
-        description="View and manage student financial information"
+        title="Student Information"
       />
 
       {/* Search */}
       <div className="flex items-center">
-        <div className="relative w-full max-w-sm">
+        <div className="relative w-full max-w-sm ml-auto">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search students by name, ID, or department..."
@@ -142,10 +70,14 @@ const FinancialStudentsPage = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Student ID</TableHead>
-                  <TableHead>Name</TableHead>
+                  <TableHead>Student Name</TableHead>
+                  <TableHead>Faculty</TableHead>
                   <TableHead>Department</TableHead>
-                  <TableHead>Financial Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>Batch</TableHead>
+                  <TableHead>Semester</TableHead>
+                  <TableHead>Session</TableHead>
+                  <TableHead>Phone Number</TableHead>
+                  <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -167,7 +99,19 @@ const FinancialStudentsPage = () => {
                           <Skeleton className="h-6 w-[100px]" />
                         </TableCell>
                         <TableCell className="text-right">
-                          <Skeleton className="h-6 w-[80px] ml-auto" />
+                          <Skeleton className="h-6 w-[80px]" />
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Skeleton className="h-6 w-[80px]" />
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Skeleton className="h-6 w-[80px]" />
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Skeleton className="h-6 w-[80px]" />
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Skeleton className="h-6 w-[80px]" />
                         </TableCell>
                       </TableRow>
                     ))
@@ -184,38 +128,12 @@ const FinancialStudentsPage = () => {
                       <TableCell>
                         <div className="font-medium">{student.fullName}</div>
                       </TableCell>
+                      <TableCell>{student.faculty?.name || "N/A"}</TableCell>
                       <TableCell>{student.department?.name || "N/A"}</TableCell>
-                      <TableCell>
-                        {student.payments?.length > 0 ? (
-                          student.payments.some(
-                            (p: any) => p.status === PaymentStatus.OVERDUE
-                          ) ? (
-                            <Badge variant="destructive">Overdue</Badge>
-                          ) : student.payments.some(
-                            (p: any) => p.status === PaymentStatus.PENDING
-                          ) ? (
-                            <Badge variant="outline" className="bg-yellow-500 text-white">
-                              Pending
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline" className="bg-green-500 text-white">
-                              Paid
-                            </Badge>
-                          )
-                        ) : (
-                          <Badge variant="outline">No Records</Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleViewPaymentHistory(student)}
-                        >
-                          <Eye className="mr-2 h-4 w-4" />
-                          Payment History
-                        </Button>
-                      </TableCell>
+                      <TableCell className="uppercase">{student.department?.batch || "N/A"}</TableCell>
+                      <TableCell>{student.semester || "N/A"}</TableCell>
+                      <TableCell className="uppercase">{student.session || "N/A"}</TableCell>
+                      <TableCell>{student.phoneNumber || "N/A"}</TableCell>
                     </TableRow>
                   ))
                 )}
@@ -224,153 +142,6 @@ const FinancialStudentsPage = () => {
           </div>
         </CardContent>
       </Card>
-
-      {/* Payment History Dialog */}
-      <Dialog open={isPaymentHistoryOpen} onOpenChange={setIsPaymentHistoryOpen}>
-        <DialogContent className="sm:max-w-[800px]">
-          <DialogHeader>
-            <DialogTitle>
-              Payment History - {selectedStudent?.fullName} ({selectedStudent?.studentId})
-            </DialogTitle>
-            <DialogDescription>
-              View all payment records for this student
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <Card>
-              <CardHeader className="p-4 pb-2">
-                <CardTitle className="text-sm">Total Payments</CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 pt-0">
-                {selectedStudent && (
-                  <div className="text-2xl font-bold">
-                    {formatCurrency(calculateStudentPaymentSummary(selectedStudent.studentId).total)}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="p-4 pb-2">
-                <CardTitle className="text-sm">Paid Amount</CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 pt-0">
-                {selectedStudent && (
-                  <div className="text-2xl font-bold text-green-500">
-                    {formatCurrency(calculateStudentPaymentSummary(selectedStudent.studentId).paid)}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="p-4 pb-2">
-                <CardTitle className="text-sm">Outstanding Amount</CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 pt-0">
-                {selectedStudent && (
-                  <div className="text-2xl font-bold text-red-500">
-                    {formatCurrency(
-                      calculateStudentPaymentSummary(selectedStudent.studentId).pending +
-                        calculateStudentPaymentSummary(selectedStudent.studentId).overdue
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-          
-          <div className="flex justify-end mb-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={async () => {
-                if (!selectedStudent) return;
-                
-                try {
-                  setIsExportingPDF(true);
-                  await exportService.exportStudentTransactionPDF(selectedStudent.studentId);
-                  toast.success('Transaction PDF exported successfully');
-                } catch (error) {
-                  console.error('Error exporting transaction PDF:', error);
-                  toast.error('Failed to export transaction PDF');
-                } finally {
-                  setIsExportingPDF(false);
-                }
-              }}
-              disabled={isExportingPDF}
-              className="flex items-center gap-1"
-            >
-              {isExportingPDF ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <FileText className="h-4 w-4" />
-              )}
-              Export Transaction PDF
-            </Button>
-          </div>
-
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isPaymentsLoading ? (
-                  Array(3)
-                    .fill(0)
-                    .map((_, index) => (
-                      <TableRow key={index}>
-                        <TableCell>
-                          <Skeleton className="h-6 w-[100px]" />
-                        </TableCell>
-                        <TableCell>
-                          <Skeleton className="h-6 w-[80px]" />
-                        </TableCell>
-                        <TableCell>
-                          <Skeleton className="h-6 w-[100px]" />
-                        </TableCell>
-                        <TableCell>
-                          <Skeleton className="h-6 w-[80px]" />
-                        </TableCell>
-                        <TableCell>
-                          <Skeleton className="h-6 w-[100px]" />
-                        </TableCell>
-                      </TableRow>
-                    ))
-                ) : payments.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={5}
-                      className="text-center py-6 text-muted-foreground"
-                    >
-                      No payment records found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  payments.map((payment: Payment) => (
-                    <TableRow key={payment.id}>
-                      <TableCell>
-                        {format(new Date(payment.paymentDate), "MMM dd, yyyy")}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {formatCurrency(payment.amount)}
-                      </TableCell>
-                      <TableCell className="capitalize">{payment.type.toLowerCase()}</TableCell>
-                      <TableCell>{getStatusBadge(payment.status)}</TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

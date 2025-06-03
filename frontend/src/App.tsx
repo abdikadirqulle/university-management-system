@@ -42,8 +42,6 @@ import FinancialStudentsPage from "./pages/financial/Students";
 // Not Found
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
-import Students from "./pages/admin/Students";
-import TransactionsPage from "./pages/financial/Transactions";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -76,7 +74,6 @@ const App = () => (
             <Route path="/admin" element={<AppLayout />}>
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<UsersPage />} />
-              {/* <Route path="students" element={<Students />} /> */}
               <Route path="students" element={<StudentList />} />
 
               <Route path="faculties" element={<FacultiesPage />} />
@@ -118,7 +115,6 @@ const App = () => (
               <Route path="dashboard" element={<FinancialDashboard />} />
               <Route path="students" element={<FinancialStudentsPage />} />
               <Route path="payments" element={<PaymentsPage />} />
-              <Route path="transactions" element={<TransactionsPage />} />
               <Route path="reports" element={<FinancialReportsPage />} />
 
               {/* 404 Page */}

@@ -22,7 +22,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Search } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Loader2, PrinterIcon, Trash2 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -31,10 +41,26 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
-import { Payment, PaymentFormData, PaymentStatus, PaymentType } from "@/types/payment";
+import { Payment, PaymentFormData, PaymentType } from "@/types/payment";
 import { Student } from "@/types/student";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "../ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import { usePaymentStore } from "@/store/usePaymentStore";
+import { exportService } from "@/services/exportService";
 
 // Form schema
 const formSchema = z.object({
@@ -50,7 +76,7 @@ const formSchema = z.object({
 
 interface PaymentFormProps {
   payment?: Payment;
-  selectedStudent: Student | null,  // Change from Student[] | null to Student | null
+  selectedStudent: Student | null,
   students: Student[];
   onSubmit: (data: PaymentFormData) => void;
   isLoading: boolean;
@@ -69,6 +95,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   // State for student search and selected student
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [studentTransactions, setStudentTransactions] = useState(selectedStudent?.payments || []);
+  
+
+const {deletePayment, fetchPayments} = usePaymentStore()
 
   // Initialize form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -100,12 +132,38 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   }, [searchTerm, students]);
   
 
+    // Fetch data on component mount
+    useEffect(() => {
+      fetchPayments();
+    }, [fetchPayments]);
+
+  // Handle payment delete
+  const handleDeletePayment = (payment: Payment) => {
+    setSelectedPayment(payment);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  // Confirm delete payment
+  const confirmDeletePayment = async () => {
+    if (selectedPayment) {
+      try {
+        await deletePayment(selectedPayment.id);
+        fetchPayments();
+        toast.success("Payment deleted successfully");
+        
+      } catch (error) {
+        console.error("Delete payment error:", error);
+        toast.error("Failed to delete payment");
+      }
+      setIsDeleteDialogOpen(false);
+      setSelectedPayment(null);
+    }
+  };
 
   // Handle form submission
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     console.log("Form values:", values);
     try {
-      // Calculate net amount if not set
       
       
       // Ensure all required fields are included
@@ -131,13 +189,9 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        {/* Student Search Section (only shown when no student is selected) */}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
       
-
-        {/* Student Personal Information Section */}
-        {/* {selectedStudent && ( */}
           <Card className="mb-4 border-primary/20">
             <CardContent className="pt-6">
               <div className="flex justify-between items-center mb-4">
@@ -192,10 +246,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           </Card>
         {/* )} */}
       
-              
-        {/* Payment Information Section - Only shown when a student is selected */}
-        {/* {selectedStudent && ( */}
-          <>
+    
+         
             {/* Tuition Fee Section */}
             <Card className="mb-4 border-primary/20">
               <CardContent className="pt-6">                
@@ -245,6 +297,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               </CardContent>
             </Card>
             
+      <Tabs defaultValue="payment" className="w-full">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="payment">Payment Information</TabsTrigger>
+        <TabsTrigger value="transaction">Transaction Information</TabsTrigger>
+      </TabsList>
+      
+      <TabsContent value="payment" className="mt-4">
             {/* Payment Information Section */}
             <Card className="mb-4 border-primary/20">
               <CardContent className="pt-6">
@@ -376,8 +435,85 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               
               </CardContent>
             </Card>
-          </>
-        {/* )} */}
+      </TabsContent>
+    
+
+      <TabsContent value="transaction" className="mt-4">
+          <Card>
+        <CardContent className="pt-6">
+          <div className="flex justify-between items-center mb-4">
+
+          <h3 className="text-lg font-semibold mb-4">Transaction History</h3>
+            <div className="flex justify-end mb-4">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-2"
+                onClick={() => exportService.exportStudentTransactionPDF(selectedStudent?.id)}
+                >
+                <PrinterIcon className="h-4 w-4" />
+                Print
+              </Button>
+            </div>
+        </div>
+
+          {studentTransactions && studentTransactions.length > 0 ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Academic Year</TableHead>
+                    <TableHead>Paid Amount</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {studentTransactions?.map((transaction) => (
+                    <TableRow key={transaction.id}>
+                      <TableCell>{transaction.createdAt.substring(0, 4)}</TableCell>
+                      <TableCell>${transaction.amount.toFixed(2)}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="capitalize">
+                          {transaction.type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{format(new Date(transaction.paymentDate), "MMM dd, yyyy")}</TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          {/* <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEditPayment(transaction)}
+                            title="Edit transaction"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button> */}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeletePayment(transaction)}
+                            title="Delete transaction"
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="py-8 text-center text-muted-foreground">
+              No transaction history found for this student.
+            </div>
+          )}
+        </CardContent>
+         </Card>
+      </TabsContent>
+    </Tabs>
 
         <div className="flex justify-end space-x-2">
           <Button
@@ -389,12 +525,40 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           </Button>
           <Button type="submit" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-           Submit
+            Submit
           </Button>
         </div>
       </form>
-    </Form>
-  );
-};
 
+          {/* Delete Confirmation Dialog */}
+          <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the payment
+              record for {selectedStudent?.fullName || "this student"}.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setIsDeleteDialogOpen(false);
+            }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDeletePayment}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </Form>
+   
+   )}
+
+   
 export default PaymentForm;

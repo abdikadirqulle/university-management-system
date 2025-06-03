@@ -34,6 +34,8 @@ import {
   Legend,
 } from "recharts";
 import { Download, FileText } from "lucide-react";
+import ExportButtons from "@/components/ui/ExportButtons";
+import { exportService } from "@/services/exportService";
 
 // Mock data for reports
 const monthlyRevenueData = [
@@ -195,6 +197,12 @@ const FinancialReportsPage = () => {
         }}
       />
 
+   <div className="flex justify-end mb-4">
+        <ExportButtons
+          onExportPDF={() => exportService.exportPaymentsPDF()}
+          onExportExcel={() => exportService.exportPaymentsExcel()}
+        />
+      </div>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
         <Tabs defaultValue="revenue" className="w-full">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
