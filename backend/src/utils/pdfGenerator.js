@@ -48,7 +48,10 @@ export const generatePDF = (data, title, columns) => {
   // Draw table rows
   let rowTop = tableTop + rowHeight;
   
-  data.forEach((row, rowIndex) => {
+  // Handle data as array or convert if it's not
+  const dataArray = Array.isArray(data) ? data : Object.values(data);
+  
+  dataArray.forEach((row, rowIndex) => {
     // Check if we need a new page
     if (rowTop > doc.page.height - 50) {
       doc.addPage();
@@ -151,10 +154,87 @@ export const generatePaymentsPDF = (payments) => {
     { header: 'ID', key: 'id' },
     { header: 'Student', key: 'student' },
     { header: 'Amount', key: 'amount' },
-    { header: 'Date', key: 'date' },
     { header: 'Type', key: 'type' },
+    { header: 'Date', key: 'date' },
     { header: 'Status', key: 'status' }
   ];
   
   return generatePDF(payments, 'Payment Records', columns);
+};
+
+/**
+ * Generate a PDF for enrollment trends report
+ * @param {Array} data - Array of enrollment data objects
+ * @param {Object} filters - Report filters (academicYear, semester)
+ * @returns {PDFDocument} - The generated PDF document
+ */
+export const generateEnrollmentTrendsPDF = (data, filters) => {
+  const { academicYear, semester } = filters;
+  const columns = [
+    { header: 'Month', key: 'name' },
+    { header: 'Enrollment Count', key: 'value' }
+  ];
+  
+  const title = `Enrollment Trends - ${academicYear} ${semester}`;
+  return generatePDF(data, title, columns);
+};
+
+/**
+ * Generate a PDF for faculty distribution report
+ * @param {Array} data - Array of faculty distribution data objects
+ * @param {Object} filters - Report filters (academicYear, semester)
+ * @returns {PDFDocument} - The generated PDF document
+ */
+export const generateFacultyDistributionPDF = (data, filters) => {
+  const { academicYear, semester } = filters;
+  const columns = [
+    { header: 'Faculty', key: 'name' },
+    { header: 'Student Count', key: 'value' }
+  ];
+  
+  const title = `Faculty Distribution - ${academicYear} ${semester}`;
+  return generatePDF(data, title, columns);
+};
+
+/**
+ * Generate a PDF for course enrollment report
+ * @param {Array} data - Array of course enrollment data objects
+ * @param {Object} filters - Report filters (academicYear, semester)
+ * @returns {PDFDocument} - The generated PDF document
+ */
+export const generateCourseEnrollmentPDF = (data, filters) => {
+  const { academicYear, semester } = filters;
+  const columns = [
+    { header: 'Course', key: 'title' },
+    { header: 'Code', key: 'code' },
+    { header: 'Students Enrolled', key: 'students' },
+    { header: 'Department', key: 'department' },
+    { header: 'Credits', key: 'credits' },
+    { header: 'Instructor', key: 'instructor' }
+
+  ];
+  
+  const title = `Course Enrollment - ${academicYear} Semester - ${semester}`;
+  return generatePDF(data, title, columns);
+};
+
+/**
+ * Generate a PDF for enrollment by department report
+ * @param {Array} data - Array of enrollment by department data objects
+ * @param {Object} filters - Report filters (academicYear, semester)
+ * @returns {PDFDocument} - The generated PDF document
+ */
+export const generateEnrollmentByDepartmentPDF = (data, filters) => {
+  const { academicYear, semester } = filters;
+  const columns = [
+    { header: 'Department', key: 'department' },
+    { header: 'Total Students', key: 'totalStudents' },
+    { header: 'Male Students', key: 'maleStudents' },
+    { header: 'Female Students', key: 'femaleStudents' },
+    { header: 'Full Time', key: 'fullTime' },
+    { header: 'Part Time', key: 'partTime' }
+  ];
+  
+  const title = `Enrollment by Department - ${academicYear} ${semester}`;
+  return generatePDF(data, title, columns);
 };

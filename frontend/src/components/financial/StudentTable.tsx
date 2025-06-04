@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Student } from "@/types/student";
-import { PrinterIcon, Search } from "lucide-react";
+import { PrinterIcon, Search, FileTextIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Payment } from "@/types/payment";
 import { Button } from "../ui/button";
@@ -127,14 +127,14 @@ const StudentTable: React.FC<StudentTableProps> = ({
           />
         </div>
         <Button 
-                          variant="secondary" 
-                          size="sm" 
-                          className="flex items-center gap-2"
-                          onClick={() => exportService.exportPaymentsPDF()}
-                          >
-                          <PrinterIcon className="h-4 w-4" />
-                          Print
-                        </Button>
+          variant="secondary" 
+          size="sm" 
+          className="flex items-center gap-2"
+          onClick={() => exportService.exportStudentTransactionPDF(filteredStudents.map((student) => student.studentId)[0])}
+          >
+          <FileTextIcon className="h-4 w-4" />
+          View PDF
+        </Button>
       </div>
 
       <div className="rounded-md border">

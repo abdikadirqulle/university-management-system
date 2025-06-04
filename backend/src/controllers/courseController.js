@@ -82,8 +82,6 @@ const getAllCourses = async (req, res) => {
         },
       },
     })
-
-    console.log(courses)
     res.status(200).json({
       success: true,
       count: courses.length,

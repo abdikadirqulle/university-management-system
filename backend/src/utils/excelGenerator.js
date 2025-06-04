@@ -106,10 +106,78 @@ export const generatePaymentsExcel = async (payments) => {
     { header: 'ID', key: 'id', width: 10 },
     { header: 'Student', key: 'student', width: 25 },
     { header: 'Amount', key: 'amount', width: 15 },
-    { header: 'Date', key: 'date', width: 15 },
     { header: 'Type', key: 'type', width: 15 },
+    { header: 'Date', key: 'date', width: 20 },
     { header: 'Status', key: 'status', width: 15 }
   ];
   
   return generateExcel(payments, 'Payment Records', columns);
+};
+
+/**
+ * Generate an Excel file for enrollment trends report
+ * @param {Array} data - Array of enrollment data objects
+ * @param {Object} filters - Report filters (academicYear, semester)
+ * @returns {ExcelJS.Workbook} - The generated Excel workbook
+ */
+export const generateEnrollmentTrendsExcel = async (data, filters) => {
+  const { academicYear, semester } = filters;
+  const columns = [
+    { header: 'Month', key: 'name', width: 20 },
+    { header: 'Enrollment Count', key: 'value', width: 20 }
+  ];
+  
+  return generateExcel(data, `Enrollment Trends - ${academicYear} ${semester}`, columns);
+};
+
+/**
+ * Generate an Excel file for faculty distribution report
+ * @param {Array} data - Array of faculty distribution data objects
+ * @param {Object} filters - Report filters (academicYear, semester)
+ * @returns {ExcelJS.Workbook} - The generated Excel workbook
+ */
+export const generateFacultyDistributionExcel = async (data, filters) => {
+  const { academicYear, semester } = filters;
+  const columns = [
+    { header: 'Faculty', key: 'name', width: 25 },
+    { header: 'Student Count', key: 'value', width: 20 }
+  ];
+  
+  return generateExcel(data, `Faculty Distribution - ${academicYear} ${semester}`, columns);
+};
+
+/**
+ * Generate an Excel file for course enrollment report
+ * @param {Array} data - Array of course enrollment data objects
+ * @param {Object} filters - Report filters (academicYear, semester)
+ * @returns {ExcelJS.Workbook} - The generated Excel workbook
+ */
+export const generateCourseEnrollmentExcel = async (data, filters) => {
+  const { academicYear, semester } = filters;
+  const columns = [
+    { header: 'Course', key: 'name', width: 30 },
+    { header: 'Students Enrolled', key: 'students', width: 20 }
+  ];
+  
+  return generateExcel(data, `Course Enrollment - ${academicYear} ${semester}`, columns);
+};
+
+/**
+ * Generate an Excel file for enrollment by department report
+ * @param {Array} data - Array of enrollment by department data objects
+ * @param {Object} filters - Report filters (academicYear, semester)
+ * @returns {ExcelJS.Workbook} - The generated Excel workbook
+ */
+export const generateEnrollmentByDepartmentExcel = async (data, filters) => {
+  const { academicYear, semester } = filters;
+  const columns = [
+    { header: 'Department', key: 'department', width: 25 },
+    { header: 'Total Students', key: 'totalStudents', width: 15 },
+    { header: 'Male Students', key: 'maleStudents', width: 15 },
+    { header: 'Female Students', key: 'femaleStudents', width: 15 },
+    { header: 'Full Time', key: 'fullTime', width: 15 },
+    { header: 'Part Time', key: 'partTime', width: 15 }
+  ];
+  
+  return generateExcel(data, `Enrollment by Department - ${academicYear} ${semester}`, columns);
 };

@@ -39,6 +39,8 @@ import {
 import { DataTable } from "@/components/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
+import ExportButtons from "@/components/ui/ExportButtons";
+import { exportService } from "@/services/exportService";
 
 // Sample data for enrollment chart
 const enrollmentData = [
@@ -162,12 +164,65 @@ const columns: ColumnDef<EnrollmentRecord>[] = [
 ];
 
 const ReportsPage = () => {
-  const [academicYear, setAcademicYear] = useState("2023-2024");
-  const [semester, setSemester] = useState("Fall");
+  const [academicYear, setAcademicYear] = useState("2024-2025");
+  const [semester, setSemester] = useState("1");
 
-  // Function to handle report download (mock)
-  const handleDownloadReport = (reportType: string) => {
-    toast.success(`${reportType} report is being downloaded`);
+  // Function to handle report download
+  const handleDownloadReport = async (
+    reportIdentifier: string, // e.g., "enrollmentTrends"
+    reportTitle: string,     // e.g., "Enrollment Trends"
+    fileType: "pdf" | "excel"
+  ) => {
+    try {
+      const filters = { academicYear, semester };
+      let downloadPromise;
+
+      if (fileType === "pdf") {
+        switch (reportIdentifier) {
+          case "enrollmentTrends":
+            downloadPromise = exportService.exportEnrollmentTrendsPDF(filters);
+            break;
+          case "facultyDistribution":
+            downloadPromise = exportService.exportFacultyDistributionPDF(filters);
+            break;
+          case "courseEnrollment":
+            downloadPromise = exportService.exportCourseEnrollmentPDF(filters);
+            break;
+          case "enrollmentByDepartment":
+            downloadPromise = exportService.exportEnrollmentByDepartmentPDF(filters);
+            break;
+          default:
+            throw new Error(`Unknown report identifier for PDF export: ${reportIdentifier}`);
+        }
+      } else if (fileType === "excel") {
+        switch (reportIdentifier) {
+          case "enrollmentTrends":
+            downloadPromise = exportService.exportEnrollmentTrendsExcel(filters);
+            break;
+          case "facultyDistribution":
+            downloadPromise = exportService.exportFacultyDistributionExcel(filters);
+            break;
+          case "courseEnrollment":
+            downloadPromise = exportService.exportCourseEnrollmentExcel(filters);
+            break;
+          case "enrollmentByDepartment":
+            downloadPromise = exportService.exportEnrollmentByDepartmentExcel(filters);
+            break;
+          default:
+            throw new Error(`Unknown report identifier for Excel export: ${reportIdentifier}`);
+        }
+      }
+
+      if (downloadPromise) {
+        await downloadPromise;
+        // toast.success(`${reportTitle} ${fileType.toUpperCase()} report downloaded successfully!`);
+      } else {
+        throw new Error("Could not determine download action.");
+      }
+    } catch (error: any) {
+      console.error(`Error downloading ${reportTitle} ${fileType} report:`, error);
+      toast.error(`Failed to download ${reportTitle} ${fileType} report. ${error.message}`);
+    }
   };
 
   return (
@@ -208,72 +263,14 @@ const ReportsPage = () => {
                   <SelectValue placeholder="Select Semester" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Fall">Fall</SelectItem>
-                  <SelectItem value="Spring">Spring</SelectItem>
-                  <SelectItem value="Summer">Summer</SelectItem>
+                  {Array.from({ length: 12 }, (_, i) => (
+                    <SelectItem key={i + 1} value={`${i + 1}`}>
+                      Semester {i + 1}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Export Reports</CardTitle>
-            <CardDescription>
-              Download reports in different formats
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-wrap gap-3">
-            <Button
-              variant="outline"
-              className="flex items-center gap-2"
-              onClick={() => handleDownloadReport("Enrollment")}
-            >
-              <FileText className="h-4 w-4" />
-              Enrollment Report
-            </Button>
-            <Button
-              variant="outline"
-              className="flex items-center gap-2"
-              onClick={() => handleDownloadReport("Student")}
-            >
-              <FileText className="h-4 w-4" />
-              Student Report
-            </Button>
-            <Button
-              variant="outline"
-              className="flex items-center gap-2"
-              onClick={() => handleDownloadReport("Faculty")}
-            >
-              <FileText className="h-4 w-4" />
-              Faculty Report
-            </Button>
-            <Button
-              variant="outline"
-              className="flex items-center gap-2"
-              onClick={() => handleDownloadReport("Course")}
-            >
-              <FileText className="h-4 w-4" />
-              Course Report
-            </Button>
-            <Button
-              variant="outline"
-              className="flex items-center gap-2"
-              onClick={() => handleDownloadReport("Financial")}
-            >
-              <FileText className="h-4 w-4" />
-              Financial Report
-            </Button>
-            <Button
-              variant="outline"
-              className="flex items-center gap-2"
-              onClick={() => handleDownloadReport("Academic")}
-            >
-              <FileText className="h-4 w-4" />
-              Academic Report
-            </Button>
-            
           </CardContent>
         </Card>
       </div>
@@ -297,10 +294,18 @@ const ReportsPage = () => {
         <TabsContent value="enrollment" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Student Enrollment Trends</CardTitle>
-              <CardDescription>
-                Monthly enrollment data for {academicYear}
-              </CardDescription>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>Enrollment Trends</CardTitle>
+                  <CardDescription>
+                    Monthly student enrollment for {academicYear}
+                  </CardDescription>
+                </div>
+                <ExportButtons 
+                  onExportPDF={() => handleDownloadReport("enrollmentTrends", "Enrollment Trends", "pdf")} 
+                  onExportExcel={() => handleDownloadReport("enrollmentTrends", "Enrollment Trends", "excel")} 
+                />
+              </div>
             </CardHeader>
             <CardContent className="h-80">
               <BarChart
@@ -320,12 +325,17 @@ const ReportsPage = () => {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Enrollment by Department</CardTitle>
-              <CardDescription>
-                Student distribution across departments for {semester}{" "}
-                {academicYear}
-              </CardDescription>
+            <CardHeader className="flex flex-row justify-between items-center">
+              <div>
+                <CardTitle>Enrollment by Department</CardTitle>
+                <CardDescription>
+                  Student distribution across departments for {semester} {academicYear}
+                </CardDescription>
+              </div>
+              <ExportButtons 
+                onExportPDF={() => handleDownloadReport("enrollmentByDepartment", "Enrollment by Department", "pdf")} 
+                onExportExcel={() => handleDownloadReport("enrollmentByDepartment", "Enrollment by Department", "excel")} 
+              />
             </CardHeader>
             <CardContent>
               <DataTable columns={columns} data={enrollmentByDepartment} />
@@ -336,10 +346,18 @@ const ReportsPage = () => {
         <TabsContent value="faculty" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Faculty Distribution</CardTitle>
-              <CardDescription>
-                Number of faculty members by department
-              </CardDescription>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>Faculty Distribution</CardTitle>
+                  <CardDescription>
+                    Distribution of students across faculties
+                  </CardDescription>
+                </div>
+                <ExportButtons 
+                  onExportPDF={() => handleDownloadReport("facultyDistribution", "Faculty Distribution", "pdf")} 
+                  onExportExcel={() => handleDownloadReport("facultyDistribution", "Faculty Distribution", "excel")} 
+                />
+              </div>
             </CardHeader>
             <CardContent className="h-80">
               <PieChart
@@ -366,11 +384,17 @@ const ReportsPage = () => {
 
         <TabsContent value="courses" className="space-y-4">
           <Card>
-            <CardHeader>
-              <CardTitle>Course Enrollment</CardTitle>
-              <CardDescription>
-                Top courses by enrollment for {semester} {academicYear}
-              </CardDescription>
+            <CardHeader className="flex flex-row justify-between items-center">
+              <div>
+                <CardTitle>Course Enrollment</CardTitle>
+                <CardDescription>
+                  Top courses by enrollment for {semester} {academicYear}
+                </CardDescription>
+              </div>
+              <ExportButtons 
+                onExportPDF={() => handleDownloadReport("courseEnrollment", "Course Enrollment", "pdf")} 
+                onExportExcel={() => handleDownloadReport("courseEnrollment", "Course Enrollment", "excel")} 
+              />
             </CardHeader>
             <CardContent className="h-80">
               <LineChart

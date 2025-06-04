@@ -1,6 +1,14 @@
 import { api } from './api';
 
 /**
+ * Interface for report filters
+ */
+interface ReportFilters {
+  academicYear: string;
+  semester: string;
+}
+
+/**
  * Service for handling PDF and Excel exports
  */
 class ExportService {
@@ -25,6 +33,7 @@ class ExportService {
       // Determine content type based on file extension
       const isPdf = filename.toLowerCase().endsWith('.pdf');
       const contentType = isPdf ? 'application/pdf' : 'application/octet-stream';
+
       
       // Create a blob with the correct MIME type
       const blob = new Blob([response.data], { type: contentType });
@@ -107,7 +116,7 @@ class ExportService {
    * Export courses data as PDF
    */
   async exportCoursesPDF(): Promise<void> {
-    return this.downloadFile('/export/courses/pdf', 'courses.pdf');
+    return this.downloadFile('/export/courses/pdf', 'courses.pdf', true);
   }
   
   /**
@@ -121,9 +130,10 @@ class ExportService {
   
   /**
    * Export payments data as PDF
+   * @param viewInBrowser - Whether to view the PDF in browser (true) or download it (false)
    */
-  async exportPaymentsPDF(): Promise<void> {
-    return this.downloadFile('/export/payments/pdf', 'payments.pdf');
+  async exportPaymentsPDF(viewInBrowser: boolean = false): Promise<void> {
+    return this.downloadFile('/export/payments/pdf', 'payments.pdf', viewInBrowser);
   }
   
   /**
@@ -139,6 +149,110 @@ class ExportService {
    */
   async exportStudentTransactionPDF(studentId: string): Promise<void> {
     return this.downloadFile(`/student-transactions/${studentId}/pdf`, `student_${studentId}_transactions.pdf`, true);
+  }
+
+  // Report exports
+
+  /**
+   * Export enrollment trends report as PDF
+   * @param filters - Report filters (academicYear, semester)
+   */
+  async exportEnrollmentTrendsPDF(filters: ReportFilters): Promise<void> {
+    const { academicYear, semester } = filters;
+    return this.downloadFile(
+      `/reports/enrollment-trends/pdf?academicYear=${encodeURIComponent(academicYear)}&semester=${encodeURIComponent(semester)}`,
+      `enrollment-trends-${academicYear}-${semester}.pdf`,
+      true
+    );
+  }
+
+  /**
+   * Export enrollment trends report as Excel
+   * @param filters - Report filters (academicYear, semester)
+   */
+  async exportEnrollmentTrendsExcel(filters: ReportFilters): Promise<void> {
+    const { academicYear, semester } = filters;
+    return this.downloadFile(
+      `/reports/enrollment-trends/excel?academicYear=${encodeURIComponent(academicYear)}&semester=${encodeURIComponent(semester)}`,
+      `enrollment-trends-${academicYear}-${semester}.xlsx`
+      
+    );
+  }
+
+  /**
+   * Export faculty distribution report as PDF
+   * @param filters - Report filters (academicYear, semester)
+   */
+  async exportFacultyDistributionPDF(filters: ReportFilters): Promise<void> {
+    const { academicYear, semester } = filters;
+    return this.downloadFile(
+      `/reports/faculty-distribution/pdf?academicYear=${encodeURIComponent(academicYear)}&semester=${encodeURIComponent(semester)}`,
+      `faculty-distribution-${academicYear}-${semester}.pdf`,
+      true
+    );
+  }
+
+  /**
+   * Export faculty distribution report as Excel
+   * @param filters - Report filters (academicYear, semester)
+   */
+  async exportFacultyDistributionExcel(filters: ReportFilters): Promise<void> {
+    const { academicYear, semester } = filters;
+    return this.downloadFile(
+      `/reports/faculty-distribution/excel?academicYear=${encodeURIComponent(academicYear)}&semester=${encodeURIComponent(semester)}`,
+      `faculty-distribution-${academicYear}-${semester}.xlsx`
+    );
+  }
+
+  /**
+   * Export course enrollment report as PDF
+   * @param filters - Report filters (academicYear, semester)
+   */
+  async exportCourseEnrollmentPDF(filters: ReportFilters): Promise<void> {
+    console.log(filters)
+    const { academicYear, semester } = filters;
+    return this.downloadFile(
+      `/reports/course-enrollment/pdf?academicYear=${encodeURIComponent(academicYear)}&semester=${encodeURIComponent(semester)}`,
+      `course-enrollment-${academicYear}-${semester}.pdf`,
+        true
+    );
+  }
+
+  /**
+   * Export course enrollment report as Excel
+   * @param filters - Report filters (academicYear, semester)
+   */
+  async exportCourseEnrollmentExcel(filters: ReportFilters): Promise<void> {
+    const { academicYear, semester } = filters;
+    return this.downloadFile(
+      `/reports/course-enrollment/excel?academicYear=${encodeURIComponent(academicYear)}&semester=${encodeURIComponent(semester)}`,
+      `course-enrollment-${academicYear}-${semester}.xlsx`
+    );
+  }
+
+  /**
+   * Export enrollment by department report as PDF
+   * @param filters - Report filters (academicYear, semester)
+   */
+  async exportEnrollmentByDepartmentPDF(filters: ReportFilters): Promise<void> {
+    const { academicYear, semester } = filters;
+    return this.downloadFile(
+      `/reports/enrollment-by-department/pdf?academicYear=${encodeURIComponent(academicYear)}&semester=${encodeURIComponent(semester)}`,
+      `enrollment-by-department-${academicYear}-${semester}.pdf`,
+      true
+    );
+  }
+
+  /**
+   * Export enrollment by department report as Excel
+   * @param filters - Report filters (academicYear, semester)
+   */
+  async exportEnrollmentByDepartmentExcel(filters: ReportFilters): Promise<void> {
+    const { academicYear, semester } = filters;
+    return this.downloadFile(
+      `/reports/enrollment-by-department/excel?academicYear=${encodeURIComponent(academicYear)}&semester=${encodeURIComponent(semester)}`,
+      `enrollment-by-department-${academicYear}-${semester}.xlsx`
+    );
   }
 }
 

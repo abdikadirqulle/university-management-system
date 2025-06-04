@@ -12,6 +12,7 @@ import applicationRoutes from "./routes/applicationRoutes.js"
 import paymentRoutes from "./routes/paymentRoutes.js"
 import studentAuthRoutes from "./routes/studentAuthRoutes.js"
 import exportRoutes from "./routes/exportRoutes.js"
+import reportRoutes from "./routes/reportRoutes.js"
 import studentTransactionRoutes from "./routes/studentTransactionRoutes.js"
 import academicCalendarRoutes from "./routes/academicCalendarRoutes.js"
 import { connectDB } from "./config/db.js"
@@ -41,6 +42,7 @@ app.use("/api/applications", applicationRoutes)
 app.use("/api/payments", paymentRoutes)
 app.use("/api/student-auth", studentAuthRoutes)
 app.use("/api/export", exportRoutes)
+app.use("/api/reports", reportRoutes)
 app.use("/api/student-transactions", studentTransactionRoutes)
 app.use("/api/academic-calendar", academicCalendarRoutes)
 
