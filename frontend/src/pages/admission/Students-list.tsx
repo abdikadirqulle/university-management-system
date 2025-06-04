@@ -20,14 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import {
   Card,
   CardContent,
@@ -40,30 +33,15 @@ import { Student } from "@/types/student";
 import { toast } from "sonner";
 import StudentDetailDialog from "@/components/admission/StudentDetailDialog";
 import {
-  MoreHorizontal,
   Search,
   Filter,
   RefreshCw,
-  Eye,
-  Pencil,
-  UserPlus,
-  X,
-  UploadCloud,
-  Download,
-  Trash2,
+
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+
+import { exportService } from "@/services/exportService";
+import ExportButtons from "@/components/ui/ExportButtons";
 
 // Define available semesters for filtering
 const semesters = Array.from({ length: 12 }, (_, i) => `${i + 1}`);
@@ -171,23 +149,11 @@ const StudentList = () => {
               >
                 <RefreshCw className="h-4 w-4 mr-1" /> Refresh
               </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-1" /> Export
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuLabel>Export Options</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <Download className="h-4 w-4 mr-2" /> Export as CSV
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Download className="h-4 w-4 mr-2" /> Export as PDF
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <ExportButtons
+              onExportPDF={() => exportService.exportStudentsPDF()}
+              onExportExcel={() => exportService.exportStudentsExcel()}
+              />
+           
             </div>
           </div>
         </CardHeader>
@@ -426,8 +392,6 @@ const StudentList = () => {
         student={selectedStudent}
         isOpen={isViewDialogOpen}
         onClose={() => setIsViewDialogOpen(false)}
-        onSave={() => {}}
-        viewOnly={true}
       />
 
       {/* Edit Dialog */}
@@ -435,7 +399,6 @@ const StudentList = () => {
         student={selectedStudent}
         isOpen={isEditDialogOpen}
         onClose={() => setIsEditDialogOpen(false)}
-        onSave={handleSaveStudent}
       />
     </div>
   );

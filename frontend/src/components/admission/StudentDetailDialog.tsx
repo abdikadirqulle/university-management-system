@@ -31,6 +31,7 @@ const StudentDetailDialog = ({
     </div>
   );
 
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[700px]">
@@ -52,7 +53,7 @@ const StudentDetailDialog = ({
             <Card className="p-6">
               <div className="grid grid-cols-2 gap-6">
                 <InfoRow label="Student ID" value={student.studentId} />
-                <InfoRow label="Status" value={student.status} />
+                <InfoRow label="Status" value={`${student.is_active? "Active": "InActive"}`} />
                 <InfoRow label="Full Name" value={student.fullName} />
                 <InfoRow label="Email" value={student.email} />
                 <InfoRow label="Gender" value={student.gender} />
@@ -64,8 +65,9 @@ const StudentDetailDialog = ({
           <TabsContent value="academic">
             <Card className="p-6">
               <div className="grid grid-cols-2 gap-6">
+                <InfoRow label="Faculty" value={student.faculty.name} />
                 <InfoRow label="Department" value={student.department.name} />
-                <InfoRow label="Enrollment Date" value={student.registerYear.toString()} />
+
                 <InfoRow label="Semester" value={student.semester} />
                 <InfoRow label="Session" value={student.session} />
               </div>
@@ -75,12 +77,10 @@ const StudentDetailDialog = ({
           <TabsContent value="personal">
             <Card className="p-6">
               <div className="grid grid-cols-2 gap-6">
-                <InfoRow label="Date of Birth" value={student.dateOfBirth} />
-                <InfoRow label="Guardian Name" value={student.guardianName} />
-                <InfoRow label="Guardian Contact" value={student.guardianContact} />
-                <div className="col-span-2">
-                  <InfoRow label="Address" value={student.address} />
-                </div>
+                <InfoRow label="Date of Birth" value={ student.dateOfBirth.toString()} />
+                <InfoRow label="High School Name" value={student.highSchoolName} />
+                <InfoRow label="High School City" value={student.highSchoolCity} />
+                  <InfoRow label="Graduation Year" value={student.graduationYear} />
               </div>
             </Card>
           </TabsContent>

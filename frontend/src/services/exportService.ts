@@ -100,7 +100,7 @@ class ExportService {
    * Export students data as PDF
    */
   async exportStudentsPDF(): Promise<void> {
-    return this.downloadFile('/export/students/pdf', 'students.pdf');
+    return this.downloadFile('/export/students/pdf', 'students.pdf', true);
   }
   
   /**
