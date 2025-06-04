@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Download, PlusCircle } from 'lucide-react';
+import { Download, PlusCircle, RefreshCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
@@ -61,6 +61,7 @@ const AcademicCalendarPage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [activeTab, setActiveTab] = useState('list');
 
+  console.log(events);
   // Fetch data on component mount
   useEffect(() => {
     if (!user) {
@@ -113,7 +114,7 @@ const AcademicCalendarPage: React.FC = () => {
       return (
         (filterYear === "all" || event.academicYear === filterYear) &&
         (filterSemester === "all" || event.semester === filterSemester) &&
-        (filterType === "all" || event.type === filterType)
+        (filterType === "all" || event.eventType === filterType)
       );
     });
 
@@ -155,6 +156,17 @@ const AcademicCalendarPage: React.FC = () => {
     setIsViewOpen(true);
   };
 
+  const handleRefresh = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      fetchEvents(token);
+    }
+    // filters.academicYear = "all";
+    // filters.semester = "all";
+    // // filters.eventType = ;
+    // filters.isActive = true;
+
+  };
   // Handle filter changes
   const handleFilterChange = (key: string, value: string | boolean) => {
     setFilters({ [key]: key === 'isActive' ? value === 'true' : value });
@@ -184,79 +196,70 @@ const AcademicCalendarPage: React.FC = () => {
           </Button>
         </div>
 
-        {error && (
-          <div className="bg-red-50 text-red-700 p-4 rounded-md mb-6">
-            {error}
-          </div>
-        )}
+     
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+         <div className='flex justify-between '>
+
           <TabsList>
             <TabsTrigger value="list">List View</TabsTrigger>
             <TabsTrigger value="calendar">Calendar View</TabsTrigger>
           </TabsList>
 
-          <div className="flex flex-wrap gap-4 mb-4">
-            <div className="w-full md:w-auto">
-              <Select
-                value={filters.academicYear || ''}
-                onValueChange={(value) => handleFilterChange('academicYear', value)}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Academic Year" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Years</SelectItem>
-                  {academicYearOptions.map((year) => (
-                    <SelectItem key={year} value={year}>
-                      {year}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <Button variant="outline" className="flex items-center gap-2">
+            <Download className="h-4 w-4" />
+             Export
+            </Button>
+         </div>
 
-            <div className="w-full md:w-auto">
-              <Select
-                value={filters.semester || ''}
-                onValueChange={(value) => handleFilterChange('semester', value)}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Semester" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Semesters</SelectItem>
-                  {Array.from({ length: 8 }, (_, i) => (
-                    <SelectItem key={i + 1} value={(i + 1).toString()}>
-                      Semester {i + 1}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
 
-            <div className="w-full md:w-auto">
-              <Select
-                value={filters.eventType || ''}
-                onValueChange={(value) => handleFilterChange('eventType', value)}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Event Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value={EventType.SEMESTER_START}>Semester Start</SelectItem>
-                  <SelectItem value={EventType.SEMESTER_END}>Semester End</SelectItem>
-                  <SelectItem value={EventType.HOLIDAY}>Holiday</SelectItem>
-                  <SelectItem value={EventType.EXAM_PERIOD}>Exam Period</SelectItem>
-                  <SelectItem value={EventType.REGISTRATION_PERIOD}>Registration</SelectItem>
-                  <SelectItem value={EventType.PAYMENT_DEADLINE}>Payment Deadline</SelectItem>
-                  <SelectItem value={EventType.OTHER}>Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="flex items-center gap-2">
+                      <Select value={filters.academicYear} onValueChange={setFilterYear}>
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Filter by Year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                      <SelectItem value="all">All Years</SelectItem>
+                      {academicYearOptions.map((year) => (
+                        <SelectItem key={year} value={year}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                                              
+                        </SelectContent>
+                      </Select>
+          
+                      <Select value={filters.semester} onValueChange={setFilterSemester}>
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Filter by Semester" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Semesters</SelectItem>
+                          {Array.from({ length: 2 }, (_, i) => (
+                            <SelectItem key={i + 1} value={(i + 1).toString()}>
+                              Semester {i + 1}
+                            </SelectItem>
+                          ))}
+                          
+                        </SelectContent>
+                      </Select>
+          
+                      <Select value={filters.eventType} onValueChange={setFilterType}>
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Filter by Type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Types</SelectItem>
+                          <SelectItem value={EventType.SEMESTER_START}>Semester Start</SelectItem>
+                          <SelectItem value={EventType.SEMESTER_END}>Semester End</SelectItem>
+                          <SelectItem value={EventType.HOLIDAY}>Holiday</SelectItem>
+                          <SelectItem value={EventType.EXAM_PERIOD}>Exam Period</SelectItem>
+                          <SelectItem value={EventType.REGISTRATION_PERIOD}>Registration</SelectItem>
+                          <SelectItem value={EventType.PAYMENT_DEADLINE}>Payment Deadline</SelectItem>
+                          <SelectItem value={EventType.OTHER}>Other</SelectItem>
+                        </SelectContent>
+                      </Select>
 
-            <div className="w-full md:w-auto">
               <Select
                 value={filters.isActive !== undefined ? filters.isActive.toString() : ''}
                 onValueChange={(value) => handleFilterChange('isActive', value)}
@@ -270,51 +273,14 @@ const AcademicCalendarPage: React.FC = () => {
                   <SelectItem value="false">Inactive</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-          </div>
 
-          <div className="flex items-center gap-2">
-                      <Select value={filterYear} onValueChange={setFilterYear}>
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Filter by Year" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Years</SelectItem>
-                          <SelectItem value="2022-2023">2022-2023</SelectItem>
-                          <SelectItem value="2023-2024">2023-2024</SelectItem>
-                          <SelectItem value="2024-2025">2024-2025</SelectItem>
-                        </SelectContent>
-                      </Select>
-          
-                      <Select value={filterSemester} onValueChange={setFilterSemester}>
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Filter by Semester" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Semesters</SelectItem>
-                          <SelectItem value="semester one">Semester One</SelectItem>
-                          <SelectItem value="semester two">Semester Two</SelectItem>
-                        </SelectContent>
-                      </Select>
-          
-                      <Select value={filterType} onValueChange={setFilterType}>
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Filter by Type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Types</SelectItem>
-                          <SelectItem value="academic">Academic</SelectItem>
-                          <SelectItem value="exam">Exam</SelectItem>
-                          <SelectItem value="holiday">Holiday</SelectItem>
-                          <SelectItem value="registration">Registration</SelectItem>
-                        </SelectContent>
-                      </Select>
-          
-                      <Button variant="outline" className="flex items-center gap-2">
-                        <Download className="h-4 w-4" />
-                        Export
-                      </Button>
-                    </div>
+              <Button variant="secondary" 
+              onClick={handleRefresh}
+              >
+                <RefreshCcw className="h-4 w-4" />
+                 
+                </Button>
+            </div>
 
           <TabsContent value="list" className="space-y-4">
             <Card>

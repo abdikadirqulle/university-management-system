@@ -330,12 +330,13 @@ const CalendarEventForm: React.FC<CalendarEventFormProps> = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {semesterOptions.map((semester) => (
-                      <SelectItem key={semester} value={semester}>
-                        Semester {semester}
+                    <SelectItem value="semester 1">
+                      Semester 1
+                    </SelectItem>
+                    <SelectItem value="semester 2">
+                      Semester 2
                       </SelectItem>
-                    ))}
-                  </SelectContent>
+                    </SelectContent>
                 </Select>
                 <FormMessage />
               </FormItem>
