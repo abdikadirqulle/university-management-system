@@ -22,7 +22,7 @@ import {
   Pie,
 } from "recharts";
 import {
-  FileText,
+  FileSpreadsheet,
   Download,
   BarChart as BarChartIcon,
   PieChart as PieChartIcon,
@@ -271,6 +271,65 @@ const ReportsPage = () => {
                 </SelectContent>
               </Select>
             </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Export Reports</CardTitle>
+            <CardDescription>
+              Download reports in different formats
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-3">
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+              // onClick={() => handleDownloadReport("Enrollment")}
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              Enrollment Report
+            </Button>
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+              // onClick={() => handleDownloadReport("Student")}
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              Student Report
+            </Button>
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+              // onClick={() => handleDownloadReport("Faculty")}
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              Faculty Report
+            </Button>
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+              // onClick={() => handleDownloadReport("Course")}
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              Course Report
+            </Button>
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+              // onClick={() => handleDownloadReport("Financial")}
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              Financial Report
+            </Button>
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+              // onClick={() => handleDownloadReport("Academic")}
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              Academic Report
+            </Button>
+            
           </CardContent>
         </Card>
       </div>
