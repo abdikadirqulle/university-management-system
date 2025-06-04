@@ -6,7 +6,7 @@ import { prisma } from "../config/db.js"
  * @access  Private/Admin
  */
 const createCourse = async (req, res) => {
-  const { code, title, departmentId, credits, semester, instructor } = req.body
+  const { academicYear, code, title, departmentId, credits, semester, instructor } = req.body
 
   try {
     // Check if course with the same code already exists
@@ -36,6 +36,7 @@ const createCourse = async (req, res) => {
     // Create the course
     const newCourse = await prisma.course.create({
       data: {
+        academicYear,
         code,
         title,
         departmentId,
@@ -82,9 +83,11 @@ const getAllCourses = async (req, res) => {
       },
     })
 
+    console.log(courses)
     res.status(200).json({
       success: true,
       count: courses.length,
+      
       data: courses,
     })
   } catch (error) {
@@ -147,7 +150,7 @@ const getCourseById = async (req, res) => {
  * @access  Private/Admin
  */
 const updateCourse = async (req, res) => {
-  const { code, title, departmentId, credits, semester, instructor } = req.body
+  const { academicYear, code, title, departmentId, credits, semester, instructor } = req.body
 
   try {
     // Check if course exists
@@ -194,6 +197,7 @@ const updateCourse = async (req, res) => {
     const updatedCourse = await prisma.course.update({
       where: { id: req.params.id },
       data: {
+        academicYear: academicYear || course.academicYear,
         code: code || course.code,
         title: title || course.title,
         departmentId: departmentId || course.departmentId,

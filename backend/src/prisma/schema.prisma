@@ -92,6 +92,7 @@ model Course {
   code         String     @unique
   title        String
   departmentId String     @db.ObjectId
+  academicYear String?
   credits      Int
   semester     String
   instructor   String

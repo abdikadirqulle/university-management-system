@@ -48,6 +48,7 @@ const courseFormSchema = z.object({
     .number()
     .min(1, { message: "Credits must be at least 1" })
     .max(6),
+  academicYear: z.string().min(1, { message: "Academic year is required" }),
   semester: z.string().min(1, { message: "Semester is required" }),
   instructor: z.string().optional(),
 });
@@ -79,6 +80,7 @@ const CoursesPage = () => {
       title: "",
       departmentId: "",
       credits: 3,
+      academicYear: "",
       semester: "",
       instructor: "",
     },
@@ -128,6 +130,7 @@ const CoursesPage = () => {
         await updateCourse(editingCourse.id, {
           ...data,
           department: departmentName,
+          instructor: data.instructor || "Not assigned",
         });
         toast.success("Course updated successfully");
       } else {
@@ -154,6 +157,7 @@ const CoursesPage = () => {
       title: course.title,
       departmentId: course.departmentId,
       credits: course.credits,
+      academicYear: course.academicYear,
       semester: course.semester,
       instructor: course.instructor || "",
     });
@@ -195,6 +199,10 @@ const CoursesPage = () => {
     {
       accessorKey: "credits",
       header: "Credits",
+    },
+    {
+      accessorKey: "academicYear",
+      header: "Academic Year",
     },
     {
       accessorKey: "semester",
@@ -399,6 +407,24 @@ const CoursesPage = () => {
                           ))}
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="academicYear"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Academic Year</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g. 2024-2025"
+                          value={field.value}
+                          onChange={(e) => field.onChange(e.target.value)}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

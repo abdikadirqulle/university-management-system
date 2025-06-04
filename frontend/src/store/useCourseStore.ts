@@ -12,6 +12,7 @@ export interface Course {
   department: string; // Department name for display
   faculty?: string; // Faculty name for display
   credits: number;
+  academicYear: string;
   semester: string;
   instructor: string;
 }
@@ -72,6 +73,7 @@ export const useCourseStore = create<CourseState>((set) => ({
             department: departmentName,
             faculty: facultyName,
             credits: course.credits,
+            academicYear: course.academicYear,
             semester: course.semester,
             instructor: course.instructor || "Not assigned",
           };
@@ -96,6 +98,7 @@ export const useCourseStore = create<CourseState>((set) => ({
         title: course.title,
         departmentId: course.departmentId,
         credits: course.credits,
+        academicYear: course.academicYear,
         semester: course.semester,
         instructor: course.instructor || "",
       };
@@ -113,6 +116,7 @@ export const useCourseStore = create<CourseState>((set) => ({
           department: course.department, // Use the name we already have
           faculty: course.faculty,
           credits: newCourse.credits,
+          academicYear: newCourse.academicYear,
           semester: newCourse.semester,
           instructor: newCourse.instructor || "Not assigned",
         }],
@@ -136,6 +140,7 @@ export const useCourseStore = create<CourseState>((set) => ({
       if (courseData.title) updateDto.title = courseData.title;
       if (courseData.departmentId) updateDto.departmentId = courseData.departmentId;
       if (courseData.credits) updateDto.credits = courseData.credits;
+      if (courseData.academicYear) updateDto.academicYear = courseData.academicYear;
       if (courseData.semester) updateDto.semester = courseData.semester;
       if (courseData.instructor) updateDto.instructor = courseData.instructor;
 
@@ -153,6 +158,7 @@ export const useCourseStore = create<CourseState>((set) => ({
             title: updatedCourse.title,
             departmentId: updatedCourse.departmentId,
             credits: updatedCourse.credits,
+            academicYear: updatedCourse.academicYear,
             semester: updatedCourse.semester,
             instructor: updatedCourse.instructor || "Not assigned",
           } : course

@@ -5,6 +5,7 @@ export interface Course {
   departmentId: string;
   credits: number;
   semester: string;
+  academicYear: string;
   instructor: string;
   createdAt?: string;
   updatedAt?: string;
@@ -22,6 +23,7 @@ export interface CreateCourseDto {
   departmentId: string;
   credits: number;
   semester: string;
+  academicYear: string;
   instructor: string;
 }
 
@@ -31,5 +33,6 @@ export interface UpdateCourseDto {
   departmentId?: string;
   credits?: number;
   semester?: string;
+  academicYear?: string;
   instructor?: string;
 }
