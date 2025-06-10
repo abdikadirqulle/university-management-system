@@ -14,7 +14,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
-import { Search, Plus, Edit, Trash2, RefreshCw, UserPlus, Eye } from "lucide-react";
+import {
+  Search,
+  Plus,
+  Edit,
+  Trash2,
+  RefreshCw,
+  UserPlus,
+  Eye,
+} from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 
@@ -43,13 +51,12 @@ import { Student } from "@/types/student";
 import StudentDetailDialog from "@/components/admission/StudentDetailDialog";
 import StudentRegistrationDialog from "@/components/admission/student-registration-dialog";
 
-
-
 const StudentEnrollment = () => {
-  useAuthGuard(["admission"]);
+  useAuthGuard(["admin", "admission"]);
   const navigate = useNavigate();
-  const { students, isLoading, fetchStudents, updateStudent, deleteStudent } = useStudentStore();
-  
+  const { students, isLoading, fetchStudents, updateStudent, deleteStudent } =
+    useStudentStore();
+
   // State for student management
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
@@ -160,11 +167,19 @@ const StudentEnrollment = () => {
                 <TableRow>
                   <TableHead>Student ID</TableHead>
                   <TableHead>Name</TableHead>
-                  <TableHead className="hidden md:table-cell">Faculty</TableHead>
-                  <TableHead className="hidden md:table-cell">Department</TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Faculty
+                  </TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Department
+                  </TableHead>
                   <TableHead className="hidden md:table-cell">Batch</TableHead>
-                  <TableHead className="hidden md:table-cell">Semester</TableHead>
-                  <TableHead className="hidden md:table-cell">Session</TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Semester
+                  </TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Session
+                  </TableHead>
                   <TableHead className="hidden md:table-cell">Tel</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -185,8 +200,8 @@ const StudentEnrollment = () => {
                   </TableRow>
                 ) : (
                   filteredStudents.map((student) => (
-                    <TableRow 
-                      key={student.id} 
+                    <TableRow
+                      key={student.id}
                       className="cursor-pointer hover:bg-muted/50"
                       onClick={() => handleViewStudent(student)}
                     >
@@ -197,22 +212,22 @@ const StudentEnrollment = () => {
                         </div>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {student.faculty?.name || 'N/A'}
+                        {student.faculty?.name || "N/A"}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {student.department?.name || 'N/A'}
+                        {student.department?.name || "N/A"}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {student.registerYear || 'N/A'}
+                        {student.registerYear || "N/A"}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {student.semester || 'N/A'}
+                        {student.semester || "N/A"}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {student.session || 'N/A'}
+                        {student.session || "N/A"}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {student.phoneNumber || 'N/A'}
+                        {student.phoneNumber || "N/A"}
                       </TableCell>
                       <TableCell>
                         <Badge
@@ -223,7 +238,6 @@ const StudentEnrollment = () => {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end space-x-2">
-                       
                           <Button
                             variant="ghost"
                             size="sm"
@@ -241,16 +255,22 @@ const StudentEnrollment = () => {
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogTitle>
+                                  Are you sure?
+                                </AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  This action cannot be undone. This will permanently delete the student
-                                  record for {student.fullName} and remove their data from the system.
+                                  This action cannot be undone. This will
+                                  permanently delete the student record for{" "}
+                                  {student.fullName} and remove their data from
+                                  the system.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                                 <AlertDialogAction
-                                  onClick={() => handleDeleteStudent(student.id)}
+                                  onClick={() =>
+                                    handleDeleteStudent(student.id)
+                                  }
                                   className="bg-destructive hover:bg-destructive/90"
                                 >
                                   Delete

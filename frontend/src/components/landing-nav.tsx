@@ -25,7 +25,7 @@ export function LandingNav() {
         <Link to="/" className="flex items-center gap-2 text-white">
           <School className="h-8 w-8 text-primary" />
           <span className="text-xl font-semibold">
-            <span className="text-primary">Scholar</span> Nexus
+            <span className="text-primary">Aqoon</span>Maamul
           </span>
         </Link>
 

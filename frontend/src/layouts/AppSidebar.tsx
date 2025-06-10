@@ -44,7 +44,8 @@ const AppSidebar = () => {
 
   // Role-specific menu items
   const roleMenuItems = {
-    admin: [ // Add admin role with same menu items as academic
+    admin: [
+      // Add admin role with same menu items as academic
       {
         title: "Dashboard",
         icon: Home,
@@ -63,7 +64,7 @@ const AppSidebar = () => {
       {
         title: "Registration",
         icon: UserPlus,
-        path: "/admission/student-enrollment",
+        path: "/admin/student-enrollment",
       },
       {
         title: "All Students",
@@ -102,7 +103,7 @@ const AppSidebar = () => {
         path: `/admin/settings`,
       },
     ],
- 
+
     financial: [
       {
         title: "Dashboard",
@@ -142,11 +143,6 @@ const AppSidebar = () => {
         icon: UsersRound,
         path: "/admission/students",
       },
-      {
-        title: "Student Admission",
-        icon: GraduationCap,
-        path: "/admission/student-admission",
-      },
     ],
     student: [
       {
@@ -178,9 +174,8 @@ const AppSidebar = () => {
   };
 
   // Get menu items based on user role with fallback to prevent errors
-  const menuItems = user?.role && roleMenuItems[user.role] 
-    ? [...roleMenuItems[user.role]] 
-    : [];
+  const menuItems =
+    user?.role && roleMenuItems[user.role] ? [...roleMenuItems[user.role]] : [];
 
   // Map user role to display label with fallback
   const roleLabelMap = {
@@ -189,10 +184,9 @@ const AppSidebar = () => {
     student: "Student",
     financial: "Financial Officer",
   };
-  
-  const roleLabel = user?.role && roleLabelMap[user.role] 
-    ? roleLabelMap[user.role] 
-    : "User";
+
+  const roleLabel =
+    user?.role && roleLabelMap[user.role] ? roleLabelMap[user.role] : "User";
 
   const roleBadgeClass = user?.role
     ? {

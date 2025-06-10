@@ -27,7 +27,6 @@ import AcademicCalendarPage from "./pages/admin/academic-calendar";
 // admission Pages
 import AdmissionDashboard from "./pages/admission/admission-dashboard";
 import StudentEnrollment from "./pages/admission/Student-enrollment";
-import StudentAdmission from "./pages/admission/Student-admission";
 import StudentList from "./pages/admission/Students-list";
 
 // Student Pages
@@ -65,7 +64,10 @@ const App = () => (
             {/* Auth routes */}
             <Route element={<AuthLayout />}>
               <Route path="/login" element={<LoginPage />} />
-              <Route path="/auth/student-login" element={<StudentLoginPage />} />
+              <Route
+                path="/auth/student-login"
+                element={<StudentLoginPage />}
+              />
               {/* Root redirect to login */}
               <Route path="/" element={<LoginPage />} />
             </Route>
@@ -75,13 +77,20 @@ const App = () => (
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<UsersPage />} />
               <Route path="students" element={<StudentList />} />
+              <Route
+                path="student-enrollment"
+                element={<StudentEnrollment />}
+              />
 
               <Route path="faculties" element={<FacultiesPage />} />
               <Route path="courses" element={<CoursesPage />} />
               <Route path="departments" element={<DepartmentsPage />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="settings" element={<SettingsPage />} />
-              <Route path="academic-calendar" element={<AcademicCalendarPage />} />
+              <Route
+                path="academic-calendar"
+                element={<AcademicCalendarPage />}
+              />
 
               {/* 404 Page */}
               <Route path="*" element={<NotFound />} />
@@ -94,7 +103,6 @@ const App = () => (
                 path="student-enrollment"
                 element={<StudentEnrollment />}
               />
-              <Route path="student-admission" element={<StudentAdmission />} />
               <Route path="students" element={<StudentList />} />
 
               {/* 404 Page */}

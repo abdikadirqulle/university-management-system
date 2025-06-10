@@ -25,21 +25,17 @@ const Header = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon">
-            <Bell className="h-5 w-5" />
-          </Button>
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="relative h-10 w-10 rounded-full"
-              >
+              <Button variant="ghost" className=" rounded-md py-2">
                 <Avatar className="h-9 w-9">
                   <AvatarFallback className="bg-primary uppercase text-primary-foreground">
                     {user?.name?.charAt(0) || "U"}
                   </AvatarFallback>
                 </Avatar>
+                <span className="text-sm font-medium uppercase">
+                  {user?.name}
+                </span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
