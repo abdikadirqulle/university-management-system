@@ -25,9 +25,7 @@ export interface Student {
   batch?: string;
   createdAt: string;
   updatedAt: string;
-  is_active?: boolean;
-  
-  
+
   // Relations
   user?: User;
   faculty?: {
@@ -50,11 +48,12 @@ export interface Student {
     tuitionFee: number;
     otherCharges: number;
     discount: number;
+    is_active?: boolean;
     totalDue: number;
     status: "pending" | "paid" | "overdue" | "partial";
     createdAt: string;
     updatedAt: string;
-  }
+  };
 }
 
 export interface StudentAccount {

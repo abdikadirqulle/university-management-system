@@ -1,6 +1,5 @@
 import { prisma } from "../config/db.js"
 
-
 /**
  * Get all students
  * @route GET /api/students
@@ -10,7 +9,6 @@ const getAllStudents = async (req, res) => {
   try {
     const students = await prisma.student.findMany({
       include: {
-      
         faculty: {
           select: {
             name: true,
@@ -23,24 +21,18 @@ const getAllStudents = async (req, res) => {
           },
         },
         payments: true,
-        studentAccount: {
-          select: {
-            tuitionFee: true,
-            discount: true,
-            totalDue: true,
-            paidAmount: true,
-            status: true,
-          },
-        }
+        studentAccount: true,
       },
-    });
+    })
 
-    res.status(200).json({ success: true, count: students.length, data: students });
+    res
+      .status(200)
+      .json({ success: true, count: students.length, data: students })
   } catch (error) {
-    console.error('Error fetching students:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error("Error fetching students:", error)
+    res.status(500).json({ success: false, message: "Server error" })
   }
-};
+}
 
 /**
  * Get student by ID
@@ -49,20 +41,11 @@ const getAllStudents = async (req, res) => {
  */
 const getStudentById = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    // Check if the user is a student and only allow access to their own record
-    if (req.user.role === 'student' && req.user.id !== id) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied. Students can only view their own records',
-      });
-    }
+    const { id } = req.params
 
     const student = await prisma.student.findUnique({
       where: { id },
       include: {
-       
         faculty: {
           select: {
             name: true,
@@ -75,28 +58,22 @@ const getStudentById = async (req, res) => {
           },
         },
         payments: true,
-        studentAccount: {
-          select: {
-            tuitionFee: true,
-            discount: true,
-            totalDue: true,
-            paidAmount: true,
-            status: true,
-          },
-        }
+        studentAccount: true,
       },
-    });
+    })
 
     if (!student) {
-      return res.status(404).json({ success: false, message: 'Student not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Student not found" })
     }
 
-    res.status(200).json({ success: true, data: student });
+    res.status(200).json({ success: true, data: student })
   } catch (error) {
-    console.error('Error fetching student:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error("Error fetching student:", error)
+    res.status(500).json({ success: false, message: "Server error" })
   }
-};
+}
 
 /**
  * Create new student
@@ -124,44 +101,43 @@ const createStudent = async (req, res) => {
       academicYear,
       registerYear,
       semester,
-    } = req.body;
+    } = req.body
 
     // Check if student ID already exists
     const existingStudentId = await prisma.student.findUnique({
       where: { studentId },
-    });
+    })
 
     if (existingStudentId) {
       return res.status(400).json({
         success: false,
-        message: 'Student ID already exists',
-      });
+        message: "Student ID already exists",
+      })
     }
 
     // Check if faculty exists
     const faculty = await prisma.faculty.findUnique({
       where: { id: facultyId },
-    });
+    })
 
     if (!faculty) {
       return res.status(404).json({
         success: false,
-        message: 'Faculty not found',
-      });
+        message: "Faculty not found",
+      })
     }
 
     // Check if department exists
     const department = await prisma.department.findUnique({
       where: { id: departmentId },
-    });
+    })
 
     if (!department) {
       return res.status(404).json({
         success: false,
-        message: 'Department not found',
-      });
+        message: "Department not found",
+      })
     }
-
 
     const student = await prisma.student.create({
       data: {
@@ -183,8 +159,9 @@ const createStudent = async (req, res) => {
         academicYear,
         registerYear: parseInt(registerYear),
         semester,
+        is_active: true,
       },
-    });
+    })
 
     const account = await prisma.studentAccount.create({
       data: {
@@ -195,23 +172,23 @@ const createStudent = async (req, res) => {
         discount: 0,
         paidAmount: 0,
         totalDue: department.price,
-        status: 'pending',
+        status: "pending",
       },
-    });
-    
+    })
+
     res.status(201).json({
       success: true,
-      message: 'Student created successfully',
+      message: "Student created successfully",
       data: {
         ...student,
-        studentAccount: account
+        studentAccount: account,
       },
-    });
+    })
   } catch (error) {
-    console.error('Error creating student:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error("Error creating student:", error)
+    res.status(500).json({ success: false, message: "Server error" })
   }
-};
+}
 
 /**
  * Update student
@@ -220,7 +197,7 @@ const createStudent = async (req, res) => {
  */
 const updateStudent = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params
     const {
       fullName,
       gender,
@@ -238,31 +215,31 @@ const updateStudent = async (req, res) => {
       academicYear,
       registerYear,
       semester,
-    } = req.body;
+    } = req.body
 
     // Check if student exists
     const existingStudent = await prisma.student.findUnique({
       where: { id },
-    });
+    })
 
     if (!existingStudent) {
       return res.status(404).json({
         success: false,
-        message: 'Student not found',
-      });
+        message: "Student not found",
+      })
     }
 
     // Check if email already exists (excluding current student)
     if (email !== existingStudent.email) {
       const existingEmail = await prisma.student.findUnique({
         where: { email },
-      });
+      })
 
       if (existingEmail) {
         return res.status(400).json({
           success: false,
-          message: 'Email already exists',
-        });
+          message: "Email already exists",
+        })
       }
     }
 
@@ -270,50 +247,59 @@ const updateStudent = async (req, res) => {
     if (facultyId) {
       const faculty = await prisma.faculty.findUnique({
         where: { id: facultyId },
-      });
+      })
 
       if (!faculty) {
         return res.status(404).json({
           success: false,
-          message: 'Faculty not found',
-        });
+          message: "Faculty not found",
+        })
       }
     }
 
     // Check if department exists
-   
-      const department = await prisma.department.findUnique({
-        where: { id: departmentId },
-      });
-   
-      if (!department) {
-        return res.status(404).json({
-          success: false,
-          message: 'Department not found',
-        });
-      }
+
+    const department = await prisma.department.findUnique({
+      where: { id: departmentId },
+    })
+
+    if (!department) {
+      return res.status(404).json({
+        success: false,
+        message: "Department not found",
+      })
+    }
 
     const updatedStudent = await prisma.student.update({
       where: { id },
       data: {
         fullName: fullName || existingStudent.fullName,
         gender: gender || existingStudent.gender,
-        dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : existingStudent.dateOfBirth,
+        dateOfBirth: dateOfBirth
+          ? new Date(dateOfBirth)
+          : existingStudent.dateOfBirth,
         placeOfBirth: placeOfBirth || existingStudent.placeOfBirth,
         email: email || existingStudent.email,
         phoneNumber: phoneNumber || existingStudent.phoneNumber,
         highSchoolName: highSchoolName || existingStudent.highSchoolName,
         highSchoolCity: highSchoolCity || existingStudent.highSchoolCity,
-        graduationYear: graduationYear ? parseInt(graduationYear) : existingStudent.graduationYear,
-        averagePass: averagePass ? parseFloat(averagePass) : existingStudent.averagePass,
+        graduationYear: graduationYear
+          ? parseInt(graduationYear)
+          : existingStudent.graduationYear,
+        averagePass: averagePass
+          ? parseFloat(averagePass)
+          : existingStudent.averagePass,
         facultyId: facultyId || existingStudent.facultyId,
         departmentId: departmentId || existingStudent.departmentId,
         session: session || existingStudent.session,
         academicYear: academicYear || existingStudent.academicYear,
-        registerYear: registerYear ? parseInt(registerYear) : existingStudent.registerYear,
+        registerYear: registerYear
+          ? parseInt(registerYear)
+          : existingStudent.registerYear,
         semester: semester || existingStudent.semester,
+        is_active: true,
       },
-    });
+    })
 
     // Update the student account with the payment amount
     await prisma.studentAccount.create({
@@ -325,20 +311,20 @@ const updateStudent = async (req, res) => {
         discount: 0,
         paidAmount: 0,
         totalDue: department.price,
-        status: 'pending',
+        status: "pending",
       },
-    });
-    
+    })
+
     res.status(200).json({
       success: true,
-      message: 'Student updated successfully',
+      message: "Student updated successfully",
       data: updatedStudent,
-    });
+    })
   } catch (error) {
-    console.error('Error updating student:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error("Error updating student:", error)
+    res.status(500).json({ success: false, message: "Server error" })
   }
-};
+}
 
 /**
  * Delete student
@@ -347,40 +333,40 @@ const updateStudent = async (req, res) => {
  */
 const deleteStudent = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params
 
     // Check if student exists
     const student = await prisma.student.findUnique({
       where: { id },
-    });
+    })
 
     if (!student) {
       return res.status(404).json({
         success: false,
-        message: 'Student not found',
-      });
+        message: "Student not found",
+      })
     }
 
     // Delete student
     // First delete related payments
     await prisma.payment.deleteMany({
       where: { studentId: student.studentId },
-    });
-    
+    })
+
     // Then delete the student
     await prisma.student.delete({
       where: { id },
-    });
+    })
 
     res.status(200).json({
       success: true,
-      message: 'Student deleted successfully',
-    });
+      message: "Student deleted successfully",
+    })
   } catch (error) {
-    console.error('Error deleting student:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error("Error deleting student:", error)
+    res.status(500).json({ success: false, message: "Server error" })
   }
-};
+}
 
 /**
  * Get students by department
@@ -389,18 +375,18 @@ const deleteStudent = async (req, res) => {
  */
 const getStudentsByDepartment = async (req, res) => {
   try {
-    const { departmentId } = req.params;
+    const { departmentId } = req.params
 
     // Check if department exists
     const department = await prisma.department.findUnique({
       where: { id: departmentId },
-    });
+    })
 
     if (!department) {
       return res.status(404).json({
         success: false,
-        message: 'Department not found',
-      });
+        message: "Department not found",
+      })
     }
 
     const students = await prisma.student.findMany({
@@ -424,14 +410,16 @@ const getStudentsByDepartment = async (req, res) => {
           },
         },
       },
-    });
+    })
 
-    res.status(200).json({ success: true, count: students.length, data: students });
+    res
+      .status(200)
+      .json({ success: true, count: students.length, data: students })
   } catch (error) {
-    console.error('Error fetching students by department:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error("Error fetching students by department:", error)
+    res.status(500).json({ success: false, message: "Server error" })
   }
-};
+}
 
 /**
  * Get students by faculty
@@ -440,18 +428,18 @@ const getStudentsByDepartment = async (req, res) => {
  */
 const getStudentsByFaculty = async (req, res) => {
   try {
-    const { facultyId } = req.params;
+    const { facultyId } = req.params
 
     // Check if faculty exists
     const faculty = await prisma.faculty.findUnique({
       where: { id: facultyId },
-    });
+    })
 
     if (!faculty) {
       return res.status(404).json({
         success: false,
-        message: 'Faculty not found',
-      });
+        message: "Faculty not found",
+      })
     }
 
     const students = await prisma.student.findMany({
@@ -475,14 +463,16 @@ const getStudentsByFaculty = async (req, res) => {
           },
         },
       },
-    });
+    })
 
-    res.status(200).json({ success: true, count: students.length, data: students });
+    res
+      .status(200)
+      .json({ success: true, count: students.length, data: students })
   } catch (error) {
-    console.error('Error fetching students by faculty:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error("Error fetching students by faculty:", error)
+    res.status(500).json({ success: false, message: "Server error" })
   }
-};
+}
 
 export {
   getAllStudents,
@@ -492,4 +482,4 @@ export {
   deleteStudent,
   getStudentsByDepartment,
   getStudentsByFaculty,
-};
+}
