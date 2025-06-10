@@ -48,7 +48,8 @@ enum PaymentType {
 model User {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String
-  email     String   @unique
+  username  String   @unique
+  email     String
   password  String
   role      Role
   createdAt DateTime @default(now())

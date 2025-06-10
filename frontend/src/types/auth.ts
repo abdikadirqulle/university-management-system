@@ -1,8 +1,9 @@
-export type UserRole = "admin" | "admission" | "financial" | "student";
+export type UserRole = "admin" | "admission" | "financial";
 
 export interface User {
   id: string;
   name: string;
+  username: string;
   email: string;
   role: UserRole;
   password?: string;
@@ -11,7 +12,7 @@ export interface User {
 }
 
 export interface LoginCredentials {
-  email: string;
+  username: string;
   password: string;
 }
 
@@ -32,4 +33,11 @@ export interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => void;
   clearError: () => void;
+}
+
+export interface LoginResponse {
+  success: boolean;
+  message?: string;
+  user: User;
+  token: string;
 }

@@ -34,6 +34,10 @@ import { Loader2 } from "lucide-react";
 // Form schema for user form
 const userFormSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
+  username: z
+    .string()
+    .min(3, "Username must be at least 3 characters")
+    .refine((value) => !value.includes(" "), "Username cannot contain spaces"),
   email: z.string().email("Please enter a valid email"),
   password: z.string().min(6, "Please enter a password"),
   role: z.enum(["admin", "admission", "financial"] as const),
@@ -42,72 +46,59 @@ const userFormSchema = z.object({
 export type UserFormValues = z.infer<typeof userFormSchema>;
 
 interface UserFormDialogProps {
-  isOpen: boolean;
+  open: boolean;
   onOpenChange: (open: boolean) => void;
-  dialogMode: "add" | "edit";
-  currentUser: User | null;
   onSubmit: (data: UserFormValues) => Promise<void>;
+  initialData?: Partial<User>;
+  isSubmitting?: boolean;
 }
 
-
-
-const UserFormDialog: React.FC<UserFormDialogProps> = ({
-  isOpen,
+export function UserFormDialog({
+  open,
   onOpenChange,
-  dialogMode,
-  currentUser,
   onSubmit,
-}) => {
+  initialData,
+  isSubmitting = false,
+}: UserFormDialogProps) {
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema),
     defaultValues: {
-      name: "",
-      email: "",
+      name: initialData?.name || "",
+      username: initialData?.username || "",
+      email: initialData?.email || "",
       password: "",
+      role: initialData?.role || "admission",
     },
   });
 
-  // Reset form when dialog opens/closes or when currentUser changes
   useEffect(() => {
-    if (isOpen && dialogMode === "add") {
+    if (initialData) {
       form.reset({
-        name: "",
-        email: "",
+        name: initialData.name || "",
+        username: initialData.username || "",
+        email: initialData.email || "",
         password: "",
-      });
-    } else if (isOpen && dialogMode === "edit" && currentUser) {
-      form.reset({
-        name: currentUser.name,
-        email: currentUser.email,
-        password: currentUser.password,
-        role: currentUser.role,
+        role: initialData.role || "admission",
       });
     }
-  }, [isOpen, dialogMode, currentUser, form]);
-
-  const handleSubmit = async (data: UserFormValues) => {
-    await onSubmit(data);
-  };
+  }, [initialData, form]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[525px]">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {dialogMode === "add" ? "Add New User" : "Edit User"}
+            {initialData ? "Edit User" : "Create New User"}
           </DialogTitle>
           <DialogDescription>
-            {dialogMode === "add"
-              ? "Fill in the details to add a new user to the system."
-              : "Update the user details below."}
+            {initialData
+              ? "Update the user's information below."
+              : "Fill in the user's information below."}
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-4"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="name"
@@ -115,7 +106,21 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter full name" {...field} />
+                    <Input placeholder="Enter name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter username" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -129,20 +134,29 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="email@university.edu" {...field} />
+                    <Input placeholder="Enter email" type="email" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>password</FormLabel>
+                  <FormLabel>
+                    {initialData ? "New Password (optional)" : "Password"}
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="password" {...field} />
+                    <Input
+                      placeholder={
+                        initialData ? "Enter new password" : "Enter password"
+                      }
+                      type="password"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -158,7 +172,6 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
-                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -177,26 +190,11 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
             />
 
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={form.formState.isSubmitting}>
-                {dialogMode === "add" ? (
-                  form.formState.isSubmitting ? (
-                    <div className="flex items-center space-x-2">
-                      <Loader2 className="h-4 w-4 animate-spin text-primary-foreground" />
-                      <span className="text-primary-foreground">Adding...</span>
-                    </div>
-                  ) : (
-                    "Add User"
-                  )
-                ) : (
-                  "Save Changes"
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
+                {initialData ? "Update User" : "Create User"}
               </Button>
             </DialogFooter>
           </form>
@@ -204,6 +202,4 @@ const UserFormDialog: React.FC<UserFormDialogProps> = ({
       </DialogContent>
     </Dialog>
   );
-};
-
-export default UserFormDialog;
+}

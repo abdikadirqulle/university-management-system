@@ -8,7 +8,8 @@ import { toast } from "sonner";
 
 // Import our new components
 import UserTable from "@/components/admin/UserTable";
-import UserFormDialog, {
+import {
+  UserFormDialog,
   UserFormValues,
 } from "@/components/admin/UserFormDialog";
 
@@ -85,10 +86,10 @@ const UsersPage = () => {
       />
 
       <UserFormDialog
-        isOpen={isDialogOpen}
+        open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        dialogMode={dialogMode}
-        currentUser={currentUser}
+        initialData={currentUser}
+        isSubmitting={false}
         onSubmit={handleFormSubmit}
       />
     </div>

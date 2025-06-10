@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { LoginCredentials, StudentLoginCredentials, User } from "../types/auth";
+import { StudentLoginCredentials, User } from "../types/auth";
 
 interface LoginResponse {
   success: boolean;
@@ -14,28 +14,27 @@ interface UserResponse {
 }
 
 export const authService = {
-  login: async (
-    credentials: LoginCredentials,
-  ): Promise<{ user: User; token: string }> => {
-    try {
-      const response = await api.post<LoginResponse>("/users/login", credentials);
-      if (!response.data.success) {
-        throw new Error(response.data.message || "Invalid credentials");
-      }
-      return {
-        user: response.data.user,
-        token: response.data.token,
-      };
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || "Login failed";
-      throw new Error(errorMessage);
+  login: async (credentials: {
+    username: string;
+    password: string;
+  }): Promise<{ user: User; token: string }> => {
+    const response = await api.post<LoginResponse>("/users/login", credentials);
+    if (!response.data.success) {
+      throw new Error(response.data.message || "Login failed");
     }
+    return {
+      user: response.data.user,
+      token: response.data.token,
+    };
   },
-  
+
   loginStudent: async (
     credentials: StudentLoginCredentials,
   ): Promise<{ user: User; token: string }> => {
-    const response = await api.post<LoginResponse>("/student-auth/login", credentials);
+    const response = await api.post<LoginResponse>(
+      "/student-auth/login",
+      credentials,
+    );
     if (!response.data.success) {
       throw new Error(response.data.message || "Student login failed");
     }
@@ -64,7 +63,13 @@ export const authService = {
     return response.data.user;
   },
 
-  register: async (userData: any): Promise<{ user: User; token: string }> => {
+  register: async (userData: {
+    name: string;
+    username: string;
+    email: string;
+    password: string;
+    role: string;
+  }): Promise<{ user: User; token: string }> => {
     const response = await api.post<LoginResponse>("/users/register", userData);
     if (!response.data.success) {
       throw new Error(response.data.message || "Registration failed");

@@ -4,18 +4,18 @@ import { prisma } from "../config/db.js"
 
 // Register user
 const registerUser = async (req, res) => {
-  const { name, email, password, role } = req.body
+  const { name, username, email, password, role } = req.body
 
   try {
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: { username },
     })
 
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: "User already exists with this email",
+        message: "User already exists with this username",
       })
     }
 
@@ -27,6 +27,7 @@ const registerUser = async (req, res) => {
     const newUser = await prisma.user.create({
       data: {
         name,
+        username,
         email,
         password: hashedPassword,
         role,
@@ -34,7 +35,6 @@ const registerUser = async (req, res) => {
     })
 
     // Create profile based on role
- 
 
     // Generate JWT token
     const token = generateToken(newUser.id)
@@ -46,6 +46,7 @@ const registerUser = async (req, res) => {
       user: {
         id: newUser.id,
         name: newUser.name,
+        username: newUser.username,
         email: newUser.email,
         role: newUser.role,
       },
@@ -62,28 +63,28 @@ const registerUser = async (req, res) => {
 
 // Login user
 const loginUser = async (req, res) => {
-  const { email, password } = req.body
+  const { username, password } = req.body
 
   try {
-    // Find user by email
+    // Find user by username
     const user = await prisma.user.findUnique({
-      where: { email }
+      where: { username },
     })
 
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: "Invalid credentials"
+        message: "Invalid credentials",
       })
     }
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password)
-    
+
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
-        message: "Invalid credentials"
+        message: "Invalid credentials",
       })
     }
 
@@ -97,16 +98,17 @@ const loginUser = async (req, res) => {
       user: {
         id: user.id,
         name: user.name,
+        username: user.username,
         email: user.email,
-        role: user.role
-      }
+        role: user.role,
+      },
     })
   } catch (error) {
     console.error("Login error:", error)
     res.status(500).json({
       success: false,
       message: "Server error during login",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     })
   }
 }
@@ -119,6 +121,7 @@ const getCurrentUser = async (req, res) => {
       select: {
         id: true,
         name: true,
+        username: true,
         email: true,
         role: true,
         createdAt: true,
@@ -376,10 +379,10 @@ const logoutUser = async (req, res) => {
     // In a stateless JWT authentication system, we don't need to invalidate tokens on the server
     // since tokens are validated by signature and expiration time
     // However, we can implement a token blacklist or revocation mechanism if needed
-    
+
     // For now, we'll just send a success response
     // The client will remove the token from local storage
-    
+
     res.status(200).json({
       success: true,
       message: "Logged out successfully",

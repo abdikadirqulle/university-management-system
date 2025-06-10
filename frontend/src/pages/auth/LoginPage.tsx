@@ -2,7 +2,15 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, School, LockKeyhole, Mail, ArrowRight, Eye, EyeOff } from "lucide-react";
+import {
+  Loader2,
+  School,
+  LockKeyhole,
+  User,
+  ArrowRight,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,7 +28,7 @@ import {
 import { useForm } from "react-hook-form";
 
 const staffSchema = z.object({
-  email: z.string().email(" email address is required"),
+  username: z.string().min(3, "Username must be at least 3 characters"),
   password: z.string().min(4, "Password must be at least 4 characters"),
 });
 
@@ -34,7 +42,7 @@ const LoginPage = () => {
   const form = useForm<StaffFormData>({
     resolver: zodResolver(staffSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
@@ -43,12 +51,12 @@ const LoginPage = () => {
   const onSubmit = async (data: StaffFormData) => {
     try {
       const credentials: LoginCredentials = {
-        email: data.email,
-        password: data.password
+        username: data.username,
+        password: data.password,
       };
       await login(credentials);
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error("Login failed:", error);
     }
   };
 
@@ -58,7 +66,9 @@ const LoginPage = () => {
         <div className="flex items-center justify-center mb-2">
           <School className="h-10 w-10 text-primary" />
         </div>
-        <h1 className="text-3xl font-bold text-center text-gray-900 dark:text-white">Sign in</h1>
+        <h1 className="text-3xl font-bold text-center text-gray-900 dark:text-white">
+          Sign in
+        </h1>
       </div>
 
       {error && (
@@ -69,21 +79,20 @@ const LoginPage = () => {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* Email Field */}
+          {/* Username Field */}
           <FormField
             control={form.control}
-            name="email"
+            name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Username</FormLabel>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
+                    <User className="h-5 w-5 text-gray-400" />
                   </div>
                   <FormControl>
                     <Input
-                      placeholder="Enter your email"
-                      type="email"
+                      placeholder="Enter your username"
                       className="pl-10 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700"
                       {...field}
                       onChange={(e) => {
@@ -134,8 +143,8 @@ const LoginPage = () => {
             )}
           />
 
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             className="w-full bg-primary hover:bg-primary/90 text-white py-3 flex items-center justify-center gap-2"
             disabled={isLoading}
           >
@@ -153,7 +162,13 @@ const LoginPage = () => {
 
       <div className="mt-8 text-center">
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Are you a student? <Link to="/auth/student-login" className="text-primary hover:text-primary/90 font-medium">Login here</Link>
+          Are you a student?{" "}
+          <Link
+            to="/auth/student-login"
+            className="text-primary hover:text-primary/90 font-medium"
+          >
+            Login here
+          </Link>
         </p>
       </div>
     </div>
