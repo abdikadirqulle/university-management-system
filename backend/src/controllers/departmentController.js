@@ -11,7 +11,7 @@ const createDepartment = async (req, res) => {
   try {
     // Check if department with the same name already exists
     const existingDepartment = await prisma.department.findUnique({
-      where: { name },
+      where: { name: body.name },
     })
 
     if (existingDepartment) {

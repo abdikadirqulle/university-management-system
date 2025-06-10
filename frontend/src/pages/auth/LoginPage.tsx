@@ -20,7 +20,7 @@ import {
 import { useForm } from "react-hook-form";
 
 const staffSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  email: z.string().email(" email address is required"),
   password: z.string().min(4, "Password must be at least 4 characters"),
 });
 

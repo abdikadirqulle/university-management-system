@@ -117,7 +117,6 @@ model Student {
   highSchoolCity    String?
   graduationYear    Int
   averagePass       Float
-  is_active         Boolean?    @default(true)
   facultyId         String     @db.ObjectId
   departmentId      String     @db.ObjectId
   session           String
@@ -138,14 +137,19 @@ model StudentAccount {
   id              String      @id @default(auto()) @map("_id") @db.ObjectId
   studentId       String
   academicYear    String
-  TuitionFeeType  String?
   semester        String
+  is_active        Boolean?    @default(true)
+
+// payments
+  TuitionFeeType  String?
   tuitionFee      Float
   otherCharges    Float?
   discount        Float?
+  forwarded       Float?
   totalDue        Float
   paidAmount      Float?
   status          PaymentStatus // e.g. UNPAID, PARTIAL, PAID
+  
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
@@ -163,8 +167,6 @@ model Payment {
   status        PaymentStatus?
   type          PaymentType
   paymentMethod String?
-  forwarded     Float?
-  extraFee      Float?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 

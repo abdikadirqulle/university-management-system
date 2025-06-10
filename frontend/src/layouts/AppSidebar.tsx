@@ -56,6 +56,16 @@ const AppSidebar = () => {
         path: "/admin/users",
       },
       {
+        title: "Student Payments",
+        icon: CreditCard,
+        path: "/financial/payments",
+      },
+      {
+        title: "Registration",
+        icon: UserPlus,
+        path: "/admission/student-enrollment",
+      },
+      {
         title: "All Students",
         icon: UsersRound,
         path: "/admin/students",
