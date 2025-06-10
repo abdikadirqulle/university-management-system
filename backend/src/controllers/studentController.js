@@ -159,7 +159,6 @@ const createStudent = async (req, res) => {
         academicYear,
         registerYear: parseInt(registerYear),
         semester,
-        is_active: true,
       },
     })
 
@@ -173,6 +172,7 @@ const createStudent = async (req, res) => {
         paidAmount: 0,
         totalDue: department.price,
         status: "pending",
+        is_active: true,
       },
     })
 
@@ -297,7 +297,6 @@ const updateStudent = async (req, res) => {
           ? parseInt(registerYear)
           : existingStudent.registerYear,
         semester: semester || existingStudent.semester,
-        is_active: true,
       },
     })
 
@@ -312,6 +311,7 @@ const updateStudent = async (req, res) => {
         paidAmount: 0,
         totalDue: department.price,
         status: "pending",
+        is_active: true,
       },
     })
 
