@@ -1,36 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { Download, PlusCircle, RefreshCcw } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Download, PlusCircle, RefreshCcw } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar } from '@/components/ui/calendar';
+} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar } from "@/components/ui/calendar";
 
-import CalendarEventForm from '@/components/academic-calendar/CalendarEventForm';
-import CalendarEventsList from '@/components/academic-calendar/CalendarEventsList';
-import CalendarEventDetail from '@/components/academic-calendar/CalendarEventDetail';
+import CalendarEventForm from "@/components/academic-calendar/CalendarEventForm";
+import CalendarEventsList from "@/components/academic-calendar/CalendarEventsList";
+import CalendarEventDetail from "@/components/academic-calendar/CalendarEventDetail";
 
-import useAcademicCalendarStore from '@/store/useAcademicCalendarStore';
-import { useDepartmentStore } from '@/store/useDepartmentStore';
-import { useAuth } from '@/context/AuthContext';
-import { AcademicCalendarEvent, EventType } from '@/types/academicCalendar';
+import useAcademicCalendarStore from "@/store/useAcademicCalendarStore";
+import { useDepartmentStore } from "@/store/useDepartmentStore";
+import { useAuth } from "@/context/AuthContext";
+import { AcademicCalendarEvent, EventType } from "@/types/academicCalendar";
 
-import { toast } from 'sonner';
+import { toast } from "sonner";
 
 const AcademicCalendarPage: React.FC = () => {
   const navigate = useNavigate();
@@ -55,21 +55,23 @@ const AcademicCalendarPage: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [filterYear, setFilterYear] = useState('all');
-  const [filterSemester, setFilterSemester] = useState('all');
-  const [filterType, setFilterType] = useState('all');
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const [activeTab, setActiveTab] = useState('list');
+  const [filterYear, setFilterYear] = useState("all");
+  const [filterSemester, setFilterSemester] = useState("all");
+  const [filterType, setFilterType] = useState("all");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    new Date(),
+  );
+  const [activeTab, setActiveTab] = useState("list");
 
   console.log(events);
   // Fetch data on component mount
   useEffect(() => {
     if (!user) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       fetchEvents(token);
       // fetchDepartments(token);
@@ -87,52 +89,50 @@ const AcademicCalendarPage: React.FC = () => {
 
   // Handle form submission for creating/editing events
   const handleFormSubmit = async (data: any) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      toast.error('Authentication required');
+      toast.error("Authentication required");
       return;
     }
 
     try {
       if (isEditMode && selectedEvent) {
         await editEvent(selectedEvent.id, data, token);
-        toast.success('Calendar event updated successfully');
+        toast.success("Calendar event updated successfully");
       } else {
         // Add createdBy field with current user's ID
-        await addEvent({ ...data, createdBy: user?.id || '' }, token);
-        toast.success('Calendar event created successfully');
+        await addEvent({ ...data, createdBy: user?.id || "" }, token);
+        toast.success("Calendar event created successfully");
       }
       setIsFormOpen(false);
       setIsEditMode(false);
     } catch (error) {
-      toast.error('Failed to save calendar event');
+      toast.error("Failed to save calendar event");
     }
   };
 
-    // Filter events
-    const filteredEvents = events.filter((event) => {
-      return (
-        (filterYear === "all" || event.academicYear === filterYear) &&
-        (filterSemester === "all" || event.semester === filterSemester) &&
-        (filterType === "all" || event.eventType === filterType)
-      );
-    });
-
-    
+  // Filter events
+  const filteredEvents = events.filter((event) => {
+    return (
+      (filterYear === "all" || event.academicYear === filterYear) &&
+      (filterSemester === "all" || event.semester === filterSemester) &&
+      (filterType === "all" || event.eventType === filterType)
+    );
+  });
 
   // Handle event deletion
   const handleDeleteEvent = async (eventId: string) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      toast.error('Authentication required');
+      toast.error("Authentication required");
       return;
     }
 
     try {
       await removeEvent(eventId, token);
-      toast.success('Calendar event deleted successfully');
+      toast.success("Calendar event deleted successfully");
     } catch (error) {
-      toast.error('Failed to delete calendar event');
+      toast.error("Failed to delete calendar event");
     }
   };
 
@@ -157,7 +157,7 @@ const AcademicCalendarPage: React.FC = () => {
   };
 
   const handleRefresh = () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       fetchEvents(token);
     }
@@ -165,13 +165,12 @@ const AcademicCalendarPage: React.FC = () => {
     // filters.semester = "all";
     // // filters.eventType = ;
     // filters.isActive = true;
-
   };
   // Handle filter changes
   const handleFilterChange = (key: string, value: string | boolean) => {
-    setFilters({ [key]: key === 'isActive' ? value === 'true' : value });
-    
-    const token = localStorage.getItem('token');
+    setFilters({ [key]: key === "isActive" ? value === "true" : value });
+
+    const token = localStorage.getItem("token");
     if (token) {
       fetchEvents(token);
     }
@@ -196,91 +195,100 @@ const AcademicCalendarPage: React.FC = () => {
           </Button>
         </div>
 
-     
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-4"
+        >
+          <div className="flex justify-between ">
+            <TabsList>
+              <TabsTrigger value="list">List View</TabsTrigger>
+              <TabsTrigger value="calendar">Calendar View</TabsTrigger>
+            </TabsList>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-         <div className='flex justify-between '>
-
-          <TabsList>
-            <TabsTrigger value="list">List View</TabsTrigger>
-            <TabsTrigger value="calendar">Calendar View</TabsTrigger>
-          </TabsList>
-
-          <Button variant="outline" className="flex items-center gap-2">
-            <Download className="h-4 w-4" />
-             Export
-            </Button>
-         </div>
-
+            {/* <Button variant="outline" className="flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              Export
+            </Button> */}
+          </div>
 
           <div className="flex items-center gap-2">
-                      <Select value={filters.academicYear} onValueChange={setFilterYear}>
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Filter by Year" />
-                        </SelectTrigger>
-                        <SelectContent>
-                      <SelectItem value="all">All Years</SelectItem>
-                      {academicYearOptions.map((year) => (
-                        <SelectItem key={year} value={year}>
-                          {year}
-                        </SelectItem>
-                      ))}
-                                              
-                        </SelectContent>
-                      </Select>
-          
-                      <Select value={filters.semester} onValueChange={setFilterSemester}>
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Filter by Semester" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Semesters</SelectItem>
-                          {Array.from({ length: 2 }, (_, i) => (
-                            <SelectItem key={i + 1} value={(i + 1).toString()}>
-                              Semester {i + 1}
-                            </SelectItem>
-                          ))}
-                          
-                        </SelectContent>
-                      </Select>
-          
-                      <Select value={filters.eventType} onValueChange={setFilterType}>
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Filter by Type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Types</SelectItem>
-                          <SelectItem value={EventType.SEMESTER_START}>Semester Start</SelectItem>
-                          <SelectItem value={EventType.SEMESTER_END}>Semester End</SelectItem>
-                          <SelectItem value={EventType.HOLIDAY}>Holiday</SelectItem>
-                          <SelectItem value={EventType.EXAM_PERIOD}>Exam Period</SelectItem>
-                          <SelectItem value={EventType.REGISTRATION_PERIOD}>Registration</SelectItem>
-                          <SelectItem value={EventType.PAYMENT_DEADLINE}>Payment Deadline</SelectItem>
-                          <SelectItem value={EventType.OTHER}>Other</SelectItem>
-                        </SelectContent>
-                      </Select>
+            <Select value={filters.academicYear} onValueChange={setFilterYear}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by Year" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Years</SelectItem>
+                {academicYearOptions.map((year) => (
+                  <SelectItem key={year} value={year}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-              <Select
-                value={filters.isActive !== undefined ? filters.isActive.toString() : ''}
-                onValueChange={(value) => handleFilterChange('isActive', value)}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="true">Active</SelectItem>
-                  <SelectItem value="false">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
+            <Select value={filters.semester} onValueChange={setFilterSemester}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by Semester" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Semesters</SelectItem>
+                {Array.from({ length: 2 }, (_, i) => (
+                  <SelectItem key={i + 1} value={(i + 1).toString()}>
+                    Semester {i + 1}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-              <Button variant="secondary" 
-              onClick={handleRefresh}
-              >
-                <RefreshCcw className="h-4 w-4" />
-                 
-                </Button>
-            </div>
+            <Select value={filters.eventType} onValueChange={setFilterType}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value={EventType.SEMESTER_START}>
+                  Semester Start
+                </SelectItem>
+                <SelectItem value={EventType.SEMESTER_END}>
+                  Semester End
+                </SelectItem>
+                <SelectItem value={EventType.HOLIDAY}>Holiday</SelectItem>
+                <SelectItem value={EventType.EXAM_PERIOD}>
+                  Exam Period
+                </SelectItem>
+                <SelectItem value={EventType.REGISTRATION_PERIOD}>
+                  Registration
+                </SelectItem>
+                <SelectItem value={EventType.PAYMENT_DEADLINE}>
+                  Payment Deadline
+                </SelectItem>
+                <SelectItem value={EventType.OTHER}>Other</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={
+                filters.isActive !== undefined
+                  ? filters.isActive.toString()
+                  : ""
+              }
+              onValueChange={(value) => handleFilterChange("isActive", value)}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="true">Active</SelectItem>
+                <SelectItem value="false">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Button variant="secondary" onClick={handleRefresh}>
+              <RefreshCcw className="h-4 w-4" />
+            </Button>
+          </div>
 
           <TabsContent value="list" className="space-y-4">
             <Card>
@@ -316,12 +324,17 @@ const AcademicCalendarPage: React.FC = () => {
                   </div>
                   <div className="md:col-span-2">
                     <h3 className="text-lg font-medium mb-4">
-                      Events for {selectedDate ? selectedDate.toDateString() : 'Selected Date'}
+                      Events for{" "}
+                      {selectedDate
+                        ? selectedDate.toDateString()
+                        : "Selected Date"}
                     </h3>
                     {selectedDate && (
                       <div className="space-y-4">
                         {getEventsForDate(selectedDate).length === 0 ? (
-                          <p className="text-muted-foreground">No events scheduled for this date</p>
+                          <p className="text-muted-foreground">
+                            No events scheduled for this date
+                          </p>
                         ) : (
                           getEventsForDate(selectedDate).map((event) => (
                             <div
@@ -333,7 +346,8 @@ const AcademicCalendarPage: React.FC = () => {
                                 <div>
                                   <h4 className="font-medium">{event.title}</h4>
                                   <p className="text-sm text-muted-foreground">
-                                    Semester {event.semester} | {event.academicYear}
+                                    Semester {event.semester} |{" "}
+                                    {event.academicYear}
                                   </p>
                                 </div>
                                 {event.eventType === EventType.SEMESTER_END && (
@@ -341,7 +355,8 @@ const AcademicCalendarPage: React.FC = () => {
                                     Semester End
                                   </div>
                                 )}
-                                {event.eventType === EventType.SEMESTER_START && (
+                                {event.eventType ===
+                                  EventType.SEMESTER_START && (
                                   <div className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
                                     Semester Start
                                   </div>
@@ -361,13 +376,15 @@ const AcademicCalendarPage: React.FC = () => {
 
         {/* Create/Edit Event Dialog */}
         <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{isEditMode ? 'Edit Event' : 'Create New Event'}</DialogTitle>
+              <DialogTitle>
+                {isEditMode ? "Edit Event" : "Create New Event"}
+              </DialogTitle>
               <DialogDescription>
                 {isEditMode
-                  ? 'Update the details of this academic calendar event.'
-                  : 'Add a new event to the academic calendar.'}
+                  ? "Update the details of this academic calendar event."
+                  : "Add a new event to the academic calendar."}
               </DialogDescription>
             </DialogHeader>
             <CalendarEventForm
@@ -392,10 +409,7 @@ const AcademicCalendarPage: React.FC = () => {
               />
             )}
             <div className="flex justify-end space-x-2 mt-4">
-              <Button
-                variant="outline"
-                onClick={() => setIsViewOpen(false)}
-              >
+              <Button variant="outline" onClick={() => setIsViewOpen(false)}>
                 Close
               </Button>
               <Button

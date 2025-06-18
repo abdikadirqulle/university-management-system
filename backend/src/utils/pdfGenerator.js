@@ -1,4 +1,4 @@
-import PDFDocument from 'pdfkit';
+import PDFDocument from "pdfkit"
 
 /**
  * Generate a PDF document with the provided data
@@ -9,106 +9,104 @@ import PDFDocument from 'pdfkit';
  */
 export const generatePDF = (data, title, columns) => {
   // Create a new PDF document
-  const doc = new PDFDocument({ margin: 50 });
-  
+  const doc = new PDFDocument({ margin: 50 })
+
   // Add the title
-  doc.fontSize(20).text(title, { align: 'center' });
-  doc.moveDown();
-  
+  doc.fontSize(20).text(title, { align: "center" })
+  doc.moveDown()
+
   // Add the current date
-  doc.fontSize(10).text(`Generated on: ${new Date().toLocaleDateString()}`, { align: 'right' });
-  doc.moveDown();
+  doc.fontSize(10).text(`Generated on: ${new Date().toLocaleDateString()}`, {
+    align: "right",
+  })
+  doc.moveDown()
 
   // Define table dimensions
-  const tableTop = 150;
-  const tableLeft = 50;
-  const rowHeight = 30;
-  const colWidth = (doc.page.width - 100) / columns.length;
-  
+  const tableTop = 150
+  const tableLeft = 50
+  const rowHeight = 50
+  const colWidth = (doc.page.width - 100) / columns.length
+
   // Draw table headers
-  doc.fontSize(12);
-  doc.font('Helvetica-Bold');
-  
+  doc.fontSize(12)
+  doc.font("Helvetica-Bold")
+
   // Draw header background
-  doc.fillColor('#f0f0f0')
-     .rect(tableLeft, tableTop, doc.page.width - 100, rowHeight)
-     .fill();
-  
+  doc
+    .fillColor("#f0f0f0")
+    .rect(tableLeft, tableTop, doc.page.width - 100, rowHeight)
+    .fill()
+
   // Draw header text
-  doc.fillColor('#000');
+  doc.fillColor("#000")
   columns.forEach((column, i) => {
-    doc.text(
-      column.header,
-      tableLeft + i * colWidth + 5,
-      tableTop + 10,
-      { width: colWidth - 10 }
-    );
-  });
-  
+    doc.text(column.header, tableLeft + i * colWidth + 5, tableTop + 10, {
+      width: colWidth - 10,
+    })
+  })
+
   // Draw table rows
-  let rowTop = tableTop + rowHeight;
-  
+  let rowTop = tableTop + rowHeight
+
   // Handle data as array or convert if it's not
-  const dataArray = Array.isArray(data) ? data : Object.values(data);
-  
+  const dataArray = Array.isArray(data) ? data : Object.values(data)
+
   dataArray.forEach((row, rowIndex) => {
     // Check if we need a new page
     if (rowTop > doc.page.height - 50) {
-      doc.addPage();
-      rowTop = 50;
-      
+      doc.addPage()
+      rowTop = 50
+
       // Redraw headers on new page
-      doc.fillColor('#f0f0f0')
-         .rect(tableLeft, rowTop, doc.page.width - 100, rowHeight)
-         .fill();
-      
-      doc.fillColor('#000');
-      doc.font('Helvetica-Bold');
+      doc
+        .fillColor("#f0f0f0")
+        .rect(tableLeft, rowTop, doc.page.width - 100, rowHeight)
+        .fill()
+
+      doc.fillColor("#000")
+      doc.font("Helvetica-Bold")
       columns.forEach((column, i) => {
-        doc.text(
-          column.header,
-          tableLeft + i * colWidth + 5,
-          rowTop + 10,
-          { width: colWidth - 10 }
-        );
-      });
-      
-      rowTop += rowHeight;
+        doc.text(column.header, tableLeft + i * colWidth + 5, rowTop + 10, {
+          width: colWidth - 10,
+        })
+      })
+
+      rowTop += rowHeight
     }
-    
+
     // Draw row background (alternating colors)
-    doc.fillColor(rowIndex % 2 === 0 ? '#ffffff' : '#f9f9f9')
-       .rect(tableLeft, rowTop, doc.page.width - 100, rowHeight)
-       .fill();
-    
+    doc
+      .fillColor(rowIndex % 2 === 0 ? "#ffffff" : "#f9f9f9")
+      .rect(tableLeft, rowTop, doc.page.width - 100, rowHeight)
+      .fill()
+
     // Draw cell borders
-    doc.strokeColor('#e0e0e0')
-       .lineWidth(0.5)
-       .rect(tableLeft, rowTop, doc.page.width - 100, rowHeight)
-       .stroke();
-    
+    doc
+      .strokeColor("#e0e0e0")
+      .lineWidth(0.5)
+      .rect(tableLeft, rowTop, doc.page.width - 100, rowHeight)
+      .stroke()
+
     // Draw cell content
-    doc.fillColor('#000');
-    doc.font('Helvetica');
+    doc.fillColor("#000")
+    doc.font("Helvetica")
     columns.forEach((column, i) => {
-      const value = row[column.key] || '';
-      doc.text(
-        value.toString(),
-        tableLeft + i * colWidth + 5,
-        rowTop + 10,
-        { width: colWidth - 10 }
-      );
-    });
-    
-    rowTop += rowHeight;
-  });
-  
+      const value = row[column.key] || ""
+      doc.text(value.toString(), tableLeft + i * colWidth + 5, rowTop + 10, {
+        width: colWidth - 10,
+      })
+    })
+
+    rowTop += rowHeight
+  })
+
   // Add footer
-  doc.fontSize(10)
-     .text('AqoonMaamul', 50, doc.page.height - 50, { align: 'center' });
-  
-  return doc;
-};
+  doc
+    .fontSize(10)
+    .text("AqoonMaamul", 50, doc.page.height - 50, { align: "center" })
+
+  return doc
+}
 
 /**
  * Generate a PDF for student records
@@ -117,15 +115,15 @@ export const generatePDF = (data, title, columns) => {
  */
 export const generateStudentsPDF = (students) => {
   const columns = [
-    { header: 'ID', key: 'id' },
-    { header: 'Name', key: 'name' },
-    { header: 'Email', key: 'email' },
-    { header: 'Department', key: 'department' },
-    { header: 'Registration Date', key: 'registrationDate' }
-  ];
-  
-  return generatePDF(students, 'Student Records', columns);
-};
+    { header: "ID", key: "id" },
+    { header: "Name", key: "name" },
+    { header: "Email", key: "email" },
+    { header: "Department", key: "department" },
+    { header: "Registration Date", key: "registrationDate" },
+  ]
+
+  return generatePDF(students, "Student Records", columns)
+}
 
 /**
  * Generate a PDF for course records
@@ -134,15 +132,18 @@ export const generateStudentsPDF = (students) => {
  */
 export const generateCoursesPDF = (courses) => {
   const columns = [
-    { header: 'Code', key: 'code' },
-    { header: 'Title', key: 'title' },
-    { header: 'Credits', key: 'credits' },
-    { header: 'Department', key: 'department' },
-    { header: 'Instructor', key: 'instructor' }
-  ];
-  
-  return generatePDF(courses, 'Course Catalog', columns);
-};
+    { header: "Code", key: "code" },
+    { header: "Title", key: "title" },
+    { header: "Credits", key: "credits" },
+    { header: "Faculty", key: "faculty" },
+    { header: "Department", key: "department" },
+    { header: "Academic Year", key: "academicYear" },
+    { header: "Semester", key: "semester" },
+    { header: "Instructor", key: "instructor" },
+  ]
+
+  return generatePDF(courses, "Course Catalog", columns)
+}
 
 /**
  * Generate a PDF for payment records
@@ -151,16 +152,16 @@ export const generateCoursesPDF = (courses) => {
  */
 export const generatePaymentsPDF = (payments) => {
   const columns = [
-    { header: 'ID', key: 'id' },
-    { header: 'Student', key: 'student' },
-    { header: 'Amount', key: 'amount' },
-    { header: 'Type', key: 'type' },
-    { header: 'Date', key: 'date' },
-    { header: 'Status', key: 'status' }
-  ];
-  
-  return generatePDF(payments, 'Payment Records', columns);
-};
+    { header: "ID", key: "id" },
+    { header: "Student", key: "student" },
+    { header: "Amount", key: "amount" },
+    { header: "Type", key: "type" },
+    { header: "Date", key: "date" },
+    { header: "Status", key: "status" },
+  ]
+
+  return generatePDF(payments, "Payment Records", columns)
+}
 
 /**
  * Generate a PDF for enrollment trends report
@@ -169,15 +170,15 @@ export const generatePaymentsPDF = (payments) => {
  * @returns {PDFDocument} - The generated PDF document
  */
 export const generateEnrollmentTrendsPDF = (data, filters) => {
-  const { academicYear, semester } = filters;
+  const { academicYear, semester } = filters
   const columns = [
-    { header: 'Month', key: 'name' },
-    { header: 'Enrollment Count', key: 'value' }
-  ];
-  
-  const title = `Enrollment Trends - ${academicYear} ${semester}`;
-  return generatePDF(data, title, columns);
-};
+    { header: "Month", key: "name" },
+    { header: "Enrollment Count", key: "value" },
+  ]
+
+  const title = `Enrollment Trends - ${academicYear} ${semester}`
+  return generatePDF(data, title, columns)
+}
 
 /**
  * Generate a PDF for faculty distribution report
@@ -186,15 +187,15 @@ export const generateEnrollmentTrendsPDF = (data, filters) => {
  * @returns {PDFDocument} - The generated PDF document
  */
 export const generateFacultyDistributionPDF = (data, filters) => {
-  const { academicYear, semester } = filters;
+  const { academicYear, semester } = filters
   const columns = [
-    { header: 'Faculty', key: 'name' },
-    { header: 'Student Count', key: 'value' }
-  ];
-  
-  const title = `Faculty Distribution - ${academicYear} ${semester}`;
-  return generatePDF(data, title, columns);
-};
+    { header: "Faculty", key: "name" },
+    { header: "Student Count", key: "value" },
+  ]
+
+  const title = `Faculty Distribution - ${academicYear} ${semester}`
+  return generatePDF(data, title, columns)
+}
 
 /**
  * Generate a PDF for course enrollment report
@@ -203,20 +204,19 @@ export const generateFacultyDistributionPDF = (data, filters) => {
  * @returns {PDFDocument} - The generated PDF document
  */
 export const generateCourseEnrollmentPDF = (data, filters) => {
-  const { academicYear, semester } = filters;
+  const { academicYear, semester } = filters
   const columns = [
-    { header: 'Course', key: 'title' },
-    { header: 'Code', key: 'code' },
-    { header: 'Students Enrolled', key: 'students' },
-    { header: 'Department', key: 'department' },
-    { header: 'Credits', key: 'credits' },
-    { header: 'Instructor', key: 'instructor' }
+    { header: "Course", key: "title" },
+    { header: "Code", key: "code" },
+    { header: "Students Enrolled", key: "students" },
+    { header: "Department", key: "department" },
+    { header: "Credits", key: "credits" },
+    { header: "Instructor", key: "instructor" },
+  ]
 
-  ];
-  
-  const title = `Course Enrollment - ${academicYear} Semester - ${semester}`;
-  return generatePDF(data, title, columns);
-};
+  const title = `Course Enrollment - ${academicYear} Semester - ${semester}`
+  return generatePDF(data, title, columns)
+}
 
 /**
  * Generate a PDF for enrollment by department report
@@ -225,16 +225,16 @@ export const generateCourseEnrollmentPDF = (data, filters) => {
  * @returns {PDFDocument} - The generated PDF document
  */
 export const generateEnrollmentByDepartmentPDF = (data, filters) => {
-  const { academicYear, semester } = filters;
+  const { academicYear, semester } = filters
   const columns = [
-    { header: 'Department', key: 'department' },
-    { header: 'Total Students', key: 'totalStudents' },
-    { header: 'Male Students', key: 'maleStudents' },
-    { header: 'Female Students', key: 'femaleStudents' },
-    { header: 'Full Time', key: 'fullTime' },
-    { header: 'Part Time', key: 'partTime' }
-  ];
-  
-  const title = `Enrollment by Department - ${academicYear} ${semester}`;
-  return generatePDF(data, title, columns);
-};
+    { header: "Department", key: "department" },
+    { header: "Total Students", key: "totalStudents" },
+    { header: "Male Students", key: "maleStudents" },
+    { header: "Female Students", key: "femaleStudents" },
+    { header: "Full Time", key: "fullTime" },
+    { header: "Part Time", key: "partTime" },
+  ]
+
+  const title = `Enrollment by Department - ${academicYear} ${semester}`
+  return generatePDF(data, title, columns)
+}

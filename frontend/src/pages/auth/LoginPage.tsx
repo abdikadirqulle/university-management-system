@@ -159,18 +159,6 @@ const LoginPage = () => {
           </Button>
         </form>
       </Form>
-
-      <div className="mt-8 text-center">
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Are you a student?{" "}
-          <Link
-            to="/auth/student-login"
-            className="text-primary hover:text-primary/90 font-medium"
-          >
-            Login here
-          </Link>
-        </p>
-      </div>
     </div>
   );
 };
