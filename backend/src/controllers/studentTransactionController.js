@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client';
-import { generateStudentTransactionPDF } from '../utils/studentTransactionPdf.js';
+import { PrismaClient } from "@prisma/client"
+import { generateStudentTransactionPDF } from "../utils/studentTransactionPdf.js"
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
 
 /**
  * Export a single student's transaction history as PDF
@@ -10,54 +10,57 @@ const prisma = new PrismaClient();
  */
 export const exportStudentTransactionPDF = async (req, res) => {
   try {
-    const { studentId } = req.params;
-    
+    const { studentId } = req.params
+
     if (!studentId) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Student ID is required' 
-      });
+        message: "Student ID is required",
+      })
     }
-    
+
     // Fetch student data
     const student = await prisma.student.findUnique({
       where: { studentId },
       include: {
         department: true,
-      }
-    });
-    
+      },
+    })
+    console.log("student", student)
     if (!student) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: 'Student not found' 
-      });
+        message: "Student not found",
+      })
     }
-    
+
     // Fetch all transactions for this student
     const transactions = await prisma.payment.findMany({
       where: { studentId },
-      orderBy: { paymentDate: 'desc' }
-    });
-    
+      orderBy: { paymentDate: "desc" },
+    })
+    console.log(transactions)
     // Generate PDF
-    const doc = generateStudentTransactionPDF(student, transactions);
-    
+    const doc = generateStudentTransactionPDF(student, transactions)
+
     // Set response headers for inline viewing instead of download
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `inline; filename=student_${studentId}_transactions.pdf`);
-    res.setHeader('Cache-Control', 'public, max-age=0');
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    
+    res.setHeader("Content-Type", "application/pdf")
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename=student_${studentId}_transactions.pdf`
+    )
+    res.setHeader("Cache-Control", "public, max-age=0")
+    res.setHeader("X-Content-Type-Options", "nosniff")
+
     // Pipe the PDF to the response
-    doc.pipe(res);
-    doc.end();
+    doc.pipe(res)
+    doc.end()
   } catch (error) {
-    console.error('Error exporting student transaction PDF:', error);
-    res.status(500).json({ 
+    console.error("Error exporting student transaction PDF:", error)
+    res.status(500).json({
       success: false,
-      message: 'Failed to export student transaction data', 
-      error: error.message 
-    });
+      message: "Failed to export student transaction data",
+      error: error.message,
+    })
   }
-};
+}

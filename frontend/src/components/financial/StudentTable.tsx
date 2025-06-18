@@ -36,7 +36,9 @@ const StudentTable: React.FC<StudentTableProps> = ({
       student.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.studentId.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (student.department?.name || "").toLowerCase().includes(searchTerm.toLowerCase())
+      (student.department?.name || "")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()),
   );
 
   // Format currency
@@ -49,17 +51,21 @@ const StudentTable: React.FC<StudentTableProps> = ({
 
   // Get payment type for a student
   const getPaymentType = (student: Student) => {
-    const studentPayments = payments.filter(p => p.studentId === student.studentId);
+    const studentPayments = payments.filter(
+      (p) => p.studentId === student.studentId,
+    );
     if (studentPayments.length === 0) return "Not set";
-    
-    // Get the most recent payment type
-    const latestPayment = studentPayments.sort((a, b) => 
-      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    )[0];
-    
-    return latestPayment.type.charAt(0).toUpperCase() + latestPayment.type.slice(1);
-  };
 
+    // Get the most recent payment type
+    const latestPayment = studentPayments.sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    )[0];
+
+    return (
+      latestPayment.type.charAt(0).toUpperCase() + latestPayment.type.slice(1)
+    );
+  };
 
   // Get net amount for a student
   const getNetAmount = (student: Student) => {
@@ -71,7 +77,6 @@ const StudentTable: React.FC<StudentTableProps> = ({
       return tuition - paid - discount;
     }
     return 0;
-       
   };
 
   if (isLoading) {
@@ -97,14 +102,30 @@ const StudentTable: React.FC<StudentTableProps> = ({
             <TableBody>
               {Array.from({ length: 5 }).map((_, index) => (
                 <TableRow key={index}>
-                  <TableCell><Skeleton className="h-6 w-[100px]" /></TableCell>
-                  <TableCell><Skeleton className="h-6 w-[150px]" /></TableCell>
-                  <TableCell><Skeleton className="h-6 w-[80px]" /></TableCell>
-                  <TableCell><Skeleton className="h-6 w-[80px]" /></TableCell>
-                  <TableCell><Skeleton className="h-6 w-[80px]" /></TableCell>
-                  <TableCell><Skeleton className="h-6 w-[80px]" /></TableCell>
-                  <TableCell><Skeleton className="h-6 w-[80px]" /></TableCell>
-                  <TableCell><Skeleton className="h-6 w-[100px]" /></TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-[100px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-[150px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-[80px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-[80px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-[80px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-[80px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-[80px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-[100px]" />
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -126,7 +147,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Button 
+        {/* <Button 
           variant="secondary" 
           size="sm" 
           className="flex items-center gap-2"
@@ -134,7 +155,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
           >
           <FileTextIcon className="h-4 w-4" />
           View PDF
-        </Button>
+        </Button> */}
       </div>
 
       <div className="rounded-md border">
@@ -156,14 +177,17 @@ const StudentTable: React.FC<StudentTableProps> = ({
           <TableBody>
             {filteredStudents.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-6 text-muted-foreground">
+                <TableCell
+                  colSpan={8}
+                  className="text-center py-6 text-muted-foreground"
+                >
                   No students found
                 </TableCell>
               </TableRow>
             ) : (
               filteredStudents.map((student) => (
-                <TableRow 
-                  key={student.id} 
+                <TableRow
+                  key={student.id}
                   className="cursor-pointer hover:bg-muted/50"
                   onClick={() => onSelectStudent(student)}
                 >
@@ -172,18 +196,26 @@ const StudentTable: React.FC<StudentTableProps> = ({
                     <div className="font-medium">{student.fullName}</div>
                   </TableCell>
                   <TableCell>
-                    <div className="uppercase text-nowrap font-medium">{student.faculty?.name || 'N/A'}</div>
-                  </TableCell>
-                  <TableCell> 
-                    <div className="uppercase text-nowrap font-medium" >{student.department?.name || 'N/A'}</div>
+                    <div className="uppercase text-nowrap font-medium">
+                      {student.faculty?.name || "N/A"}
+                    </div>
                   </TableCell>
                   <TableCell>
-                    <div className="uppercase">{student.department?.batch || 'N/A'}</div>
+                    <div className="uppercase text-nowrap font-medium">
+                      {student.department?.name || "N/A"}
+                    </div>
                   </TableCell>
-                  <TableCell>{student.semester || 'N/A'}</TableCell>
-                  <TableCell className="uppercase">{student.session || 'N/A'}</TableCell>
+                  <TableCell>
+                    <div className="uppercase">
+                      {student.department?.batch || "N/A"}
+                    </div>
+                  </TableCell>
+                  <TableCell>{student.semester || "N/A"}</TableCell>
+                  <TableCell className="uppercase">
+                    {student.session || "N/A"}
+                  </TableCell>
                   <TableCell className="font-medium">
-                    {formatCurrency((student.studentAccount[0]?.paidAmount || 0))}
+                    {formatCurrency(student.studentAccount[0]?.paidAmount || 0)}
                   </TableCell>
                   <TableCell className="font-medium">
                     {formatCurrency(getNetAmount(student))}
