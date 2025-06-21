@@ -120,11 +120,11 @@ const AppSidebar = () => {
         icon: UsersRound,
         path: "/financial/students",
       },
-      {
-        title: "Reports",
-        icon: BarChart,
-        path: "/financial/reports",
-      },
+      //   {
+      //     title: "Reports",
+      //     icon: BarChart,
+      //     path: "/financial/reports",
+      //   },
     ],
     admission: [
       {
@@ -142,33 +142,6 @@ const AppSidebar = () => {
         title: "All Students",
         icon: UsersRound,
         path: "/admission/students",
-      },
-    ],
-    student: [
-      {
-        title: "Dashboard",
-        icon: Home,
-        path: "/student/dashboard",
-      },
-      {
-        title: "My Courses",
-        icon: BookCopy,
-        path: "/student/courses",
-      },
-      {
-        title: "Grades",
-        icon: FileText,
-        path: "/student/grades",
-      },
-      {
-        title: "Schedule",
-        icon: BookLock,
-        path: "/student/schedule",
-      },
-      {
-        title: "Payments",
-        icon: CreditCard,
-        path: "/student/payments",
       },
     ],
   };
