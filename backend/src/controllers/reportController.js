@@ -94,33 +94,64 @@ const getFacultyDistributionData = async (academicYear, departmentId) => {
 
 const getCourseEnrollmentData = async (academicYear, departmentId) => {
   try {
+    console.log("getCourseEnrollmentData called with:", {
+      academicYear,
+      departmentId,
+    })
+
     const whereClause = {}
     if (academicYear) whereClause.academicYear = academicYear
     if (departmentId) whereClause.departmentId = departmentId
 
-    // Get courses with student count
+    console.log("Course where clause:", whereClause)
+
+    // Get courses with their department info
     const courses = await prisma.course.findMany({
       where: whereClause,
       select: {
         id: true,
         title: true,
+        code: true,
+        credits: true,
+        instructor: true,
+        academicYear: true,
+        departmentId: true,
         department: {
-          select: { name: true },
-        },
-        students: {
-          select: { id: true },
+          select: {
+            name: true,
+            students: {
+              where: whereClause,
+              select: { id: true },
+            },
+          },
         },
       },
     })
 
-    return courses
-      .map((course) => ({
-        name: course.title,
-        students: course.students.length,
-        department: course.department?.name || "Unknown",
-      }))
+    console.log("Found courses:", courses.length)
+    console.log("Sample course:", courses[0])
+
+    // Calculate course enrollment based on department students
+    // For now, we'll show courses with their department's student count
+    // In a real system, you might want to add a CourseEnrollment model
+    const result = courses
+      .map((course) => {
+        const studentCount = course.department?.students?.length || 0
+        console.log(`Course ${course.title}: ${studentCount} students`)
+        return {
+          name: course.title,
+          students: studentCount,
+          department: course.department?.name || "Unknown",
+          code: course.code,
+          credits: course.credits,
+          instructor: course.instructor,
+        }
+      })
       .sort((a, b) => b.students - a.students)
       .slice(0, 10) // Top 10 courses
+
+    console.log("Final result:", result)
+    return result
   } catch (error) {
     console.error("Error fetching course enrollment data:", error)
     return []
@@ -218,7 +249,13 @@ export const getFacultyDistributionDataAPI = async (req, res) => {
 export const getCourseEnrollmentDataAPI = async (req, res) => {
   try {
     const { academicYear, departmentId } = req.query
+    console.log("Course enrollment API called with:", {
+      academicYear,
+      departmentId,
+    })
+
     const data = await getCourseEnrollmentData(academicYear, departmentId)
+    console.log("Course enrollment data result:", data)
 
     res.status(200).json({
       success: true,
@@ -286,12 +323,10 @@ export const exportEnrollmentTrendsPDF = async (req, res) => {
     doc.end()
   } catch (error) {
     console.error("Error exporting enrollment trends PDF:", error)
-    res
-      .status(500)
-      .json({
-        message: "Failed to export enrollment trends data",
-        error: error.message,
-      })
+    res.status(500).json({
+      message: "Failed to export enrollment trends data",
+      error: error.message,
+    })
   }
 }
 
@@ -334,12 +369,10 @@ export const exportEnrollmentTrendsExcel = async (req, res) => {
     res.end()
   } catch (error) {
     console.error("Error exporting enrollment trends Excel:", error)
-    res
-      .status(500)
-      .json({
-        message: "Failed to export enrollment trends data",
-        error: error.message,
-      })
+    res.status(500).json({
+      message: "Failed to export enrollment trends data",
+      error: error.message,
+    })
   }
 }
 
@@ -376,12 +409,10 @@ export const exportFacultyDistributionPDF = async (req, res) => {
     doc.end()
   } catch (error) {
     console.error("Error exporting faculty distribution PDF:", error)
-    res
-      .status(500)
-      .json({
-        message: "Failed to export faculty distribution data",
-        error: error.message,
-      })
+    res.status(500).json({
+      message: "Failed to export faculty distribution data",
+      error: error.message,
+    })
   }
 }
 
@@ -424,12 +455,10 @@ export const exportFacultyDistributionExcel = async (req, res) => {
     res.end()
   } catch (error) {
     console.error("Error exporting faculty distribution Excel:", error)
-    res
-      .status(500)
-      .json({
-        message: "Failed to export faculty distribution data",
-        error: error.message,
-      })
+    res.status(500).json({
+      message: "Failed to export faculty distribution data",
+      error: error.message,
+    })
   }
 }
 
@@ -466,12 +495,10 @@ export const exportCourseEnrollmentPDF = async (req, res) => {
     doc.end()
   } catch (error) {
     console.error("Error exporting course enrollment PDF:", error)
-    res
-      .status(500)
-      .json({
-        message: "Failed to export course enrollment data",
-        error: error.message,
-      })
+    res.status(500).json({
+      message: "Failed to export course enrollment data",
+      error: error.message,
+    })
   }
 }
 
@@ -514,12 +541,10 @@ export const exportCourseEnrollmentExcel = async (req, res) => {
     res.end()
   } catch (error) {
     console.error("Error exporting course enrollment Excel:", error)
-    res
-      .status(500)
-      .json({
-        message: "Failed to export course enrollment data",
-        error: error.message,
-      })
+    res.status(500).json({
+      message: "Failed to export course enrollment data",
+      error: error.message,
+    })
   }
 }
 
@@ -559,12 +584,10 @@ export const exportEnrollmentByDepartmentPDF = async (req, res) => {
     doc.end()
   } catch (error) {
     console.error("Error exporting enrollment by department PDF:", error)
-    res
-      .status(500)
-      .json({
-        message: "Failed to export enrollment by department data",
-        error: error.message,
-      })
+    res.status(500).json({
+      message: "Failed to export enrollment by department data",
+      error: error.message,
+    })
   }
 }
 
@@ -607,11 +630,41 @@ export const exportEnrollmentByDepartmentExcel = async (req, res) => {
     res.end()
   } catch (error) {
     console.error("Error exporting enrollment by department Excel:", error)
-    res
-      .status(500)
-      .json({
-        message: "Failed to export enrollment by department data",
-        error: error.message,
-      })
+    res.status(500).json({
+      message: "Failed to export enrollment by department data",
+      error: error.message,
+    })
+  }
+}
+
+// Test endpoint to check courses
+export const testCoursesAPI = async (req, res) => {
+  try {
+    const courses = await prisma.course.findMany({
+      select: {
+        id: true,
+        title: true,
+        code: true,
+        academicYear: true,
+        departmentId: true,
+        department: {
+          select: { name: true },
+        },
+      },
+    })
+
+    console.log("All courses in database:", courses)
+
+    res.status(200).json({
+      success: true,
+      data: courses,
+    })
+  } catch (error) {
+    console.error("Error fetching test courses:", error)
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch test courses",
+      error: error.message,
+    })
   }
 }

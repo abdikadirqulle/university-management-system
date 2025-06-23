@@ -13,6 +13,7 @@ import {
   getFacultyDistributionDataAPI,
   getCourseEnrollmentDataAPI,
   getEnrollmentByDepartmentDataAPI,
+  testCoursesAPI,
 } from "../controllers/reportController.js"
 
 const router = express.Router()
@@ -25,6 +26,9 @@ router.get("/enrollment-trends", getEnrollmentTrendsDataAPI)
 router.get("/faculty-distribution", getFacultyDistributionDataAPI)
 router.get("/course-enrollment", getCourseEnrollmentDataAPI)
 router.get("/enrollment-by-department", getEnrollmentByDepartmentDataAPI)
+
+// Test endpoint
+router.get("/test-courses", testCoursesAPI)
 
 // Export endpoints
 router.get("/enrollment-trends/pdf", exportEnrollmentTrendsPDF)

@@ -20,6 +20,9 @@ export interface CourseEnrollment {
   name: string;
   students: number;
   department: string;
+  code: string;
+  credits: number;
+  instructor: string;
 }
 
 export interface EnrollmentByDepartment {

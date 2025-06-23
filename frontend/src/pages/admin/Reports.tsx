@@ -52,6 +52,7 @@ import { exportService } from "@/services/exportService";
 import reportsService, {
   EnrollmentByDepartment,
   ReportFilters,
+  CourseEnrollment,
 } from "@/services/reportsService";
 import { departmentService } from "@/services/departmentService";
 import { Department } from "@/types/department";
@@ -129,6 +130,56 @@ const COLORS = [
   "#FF8042",
   "#8884D8",
   "#82CA9D",
+];
+
+// Define columns for the course enrollment data table
+const courseColumns: ColumnDef<CourseEnrollment>[] = [
+  {
+    accessorKey: "code",
+    header: "Course Code",
+    cell: ({ row }) => (
+      <div className="font-mono text-sm font-medium text-blue-600">
+        {row.getValue("code")}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "name",
+    header: "Course Name",
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue("name")}</div>
+    ),
+  },
+  {
+    accessorKey: "department",
+    header: "Department",
+    cell: ({ row }) => (
+      <Badge variant="outline">{row.getValue("department")}</Badge>
+    ),
+  },
+  {
+    accessorKey: "semester",
+    header: "Semester",
+    cell: ({ row }) => (
+      <div className="text-center font-semibold text-green-600">
+        {row.getValue("semester")}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "credits",
+    header: "Credits",
+    cell: ({ row }) => (
+      <div className="text-center text-gray-600">{row.getValue("credits")}</div>
+    ),
+  },
+  {
+    accessorKey: "instructor",
+    header: "Instructor",
+    cell: ({ row }) => (
+      <div className="text-sm text-gray-700">{row.getValue("instructor")}</div>
+    ),
+  },
 ];
 
 const ReportsPage = () => {
@@ -627,62 +678,214 @@ const ReportsPage = () => {
           ) : error ? (
             <ErrorComponent />
           ) : (
-            <Card className="shadow-lg border-0">
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <BookOpen className="h-5 w-5 text-orange-600" />
-                      Course Enrollment
-                    </CardTitle>
-                    <CardDescription>
-                      Top courses by enrollment for {academicYear}
-                    </CardDescription>
+            <>
+              {/* Course Enrollment by Department Chart */}
+              {/* <Card className="shadow-lg border-0">
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <BarChartIcon className="h-5 w-5 text-blue-600" />
+                        Course Enrollment by Department
+                      </CardTitle>
+                      <CardDescription>
+                        Top courses grouped by department for {academicYear}
+                        {selectedDepartment &&
+                          ` - ${departments.find((d) => d.id === selectedDepartment)?.name}`}
+                      </CardDescription>
+                    </div>
+                    <ExportButtons
+                      onExportPDF={() =>
+                        handleDownloadReport(
+                          "courseEnrollment",
+                          "Course Enrollment",
+                          "pdf",
+                        )
+                      }
+                      onExportExcel={() =>
+                        handleDownloadReport(
+                          "courseEnrollment",
+                          "Course Enrollment",
+                          "excel",
+                        )
+                      }
+                    />
                   </div>
-                  <ExportButtons
-                    onExportPDF={() =>
-                      handleDownloadReport(
-                        "courseEnrollment",
-                        "Course Enrollment",
-                        "pdf",
-                      )
-                    }
-                    onExportExcel={() =>
-                      handleDownloadReport(
-                        "courseEnrollment",
-                        "Course Enrollment",
-                        "excel",
-                      )
-                    }
-                  />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={400}>
-                  <LineChart data={reportsData?.courseEnrollment || []}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="name" stroke="#666" />
-                    <YAxis stroke="#666" />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "white",
-                        border: "1px solid #e0e0e0",
-                        borderRadius: "8px",
-                      }}
-                    />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="students"
-                      stroke="#f97316"
-                      strokeWidth={3}
-                      activeDot={{ r: 8, fill: "#f97316" }}
-                      name="Students"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
+                </CardHeader>
+                <CardContent>
+                  {reportsData?.courseEnrollment &&
+                  reportsData.courseEnrollment.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={400}>
+                      <BarChart data={reportsData.courseEnrollment}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                        <XAxis
+                          dataKey="name"
+                          stroke="#666"
+                          angle={-45}
+                          textAnchor="end"
+                          height={120}
+                          interval={0}
+                          tick={{ fontSize: 12 }}
+                        />
+                        <YAxis stroke="#666" />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "white",
+                            border: "1px solid #e0e0e0",
+                            borderRadius: "8px",
+                          }}
+                          formatter={(value, name, props) => [
+                            `${value} students`,
+                            "Enrollment",
+                          ]}
+                          labelFormatter={(label) => `Course: ${label}`}
+                        />
+                        <Legend />
+                        <Bar
+                          dataKey="students"
+                          fill="#3b82f6"
+                          name="Students"
+                          radius={[4, 4, 0, 0]}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12">
+                      <div className="text-center">
+                        <div className="text-gray-400 text-6xl mb-4">📚</div>
+                        <h3 className="text-lg font-semibold mb-2">
+                          No Course Data Available
+                        </h3>
+                        <p className="text-muted-foreground">
+                          No courses found for the selected filters. Try
+                          adjusting your search criteria.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card> */}
+
+              {/* Course Enrollment Detailed Table */}
+              <Card className="shadow-lg border-0">
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <BookOpen className="h-5 w-5 text-orange-600" />
+                        Course Enrollment Details
+                      </CardTitle>
+                      <CardDescription>
+                        Comprehensive course enrollment data organized by
+                        department
+                      </CardDescription>
+                    </div>
+                    <div className="flex flex-col md:flex-row items-center gap-2">
+                      <Badge variant="secondary" className="text-sm">
+                        {reportsData?.courseEnrollment?.length || 0} Courses
+                      </Badge>
+                      <Badge variant="outline" className="text-sm">
+                        {
+                          new Set(
+                            reportsData?.courseEnrollment?.map(
+                              (c) => c.department,
+                            ) || [],
+                          ).size
+                        }{" "}
+                        Departments
+                      </Badge>
+                      <ExportButtons
+                        onExportPDF={() =>
+                          handleDownloadReport(
+                            "courseEnrollment",
+                            "Course Enrollment",
+                            "pdf",
+                          )
+                        }
+                        onExportExcel={() =>
+                          handleDownloadReport(
+                            "courseEnrollment",
+                            "Course Enrollment",
+                            "excel",
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {reportsData?.courseEnrollment &&
+                  reportsData.courseEnrollment.length > 0 ? (
+                    <div className="space-y-6">
+                      {/* Department Summary Cards */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {Array.from(
+                          new Set(
+                            reportsData.courseEnrollment.map(
+                              (c) => c.department,
+                            ),
+                          ),
+                        ).map((department) => {
+                          const deptCourses =
+                            reportsData.courseEnrollment.filter(
+                              (c) => c.department === department,
+                            );
+                          const totalStudents = deptCourses.reduce(
+                            (sum, course) => sum + course.students,
+                            0,
+                          );
+                          const totalCourses = deptCourses.length;
+
+                          return (
+                            <Card
+                              key={department}
+                              className="border-l-4 border-l-green-500"
+                            >
+                              <CardContent className="p-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="p-2 bg-green-100 rounded-lg">
+                                    <Building2 className="h-4 w-4 text-green-600" />
+                                  </div>
+                                  <div className="flex-1">
+                                    <p className="text-sm font-medium text-gray-900 truncate">
+                                      {department}
+                                    </p>
+                                    <div className="flex justify-between text-xs text-gray-600 mt-1">
+                                      <span>{totalCourses} courses</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </div>
+
+                      {/* Detailed Data Table */}
+                      <div className="border rounded-lg">
+                        <DataTable
+                          columns={courseColumns}
+                          data={reportsData.courseEnrollment}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12">
+                      <div className="text-center">
+                        <div className="text-gray-400 text-6xl mb-4">📚</div>
+                        <h3 className="text-lg font-semibold mb-2">
+                          No Course Data Available
+                        </h3>
+                        <p className="text-muted-foreground">
+                          No courses found for the selected filters. Try
+                          adjusting your search criteria.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </>
           )}
         </TabsContent>
       </Tabs>
