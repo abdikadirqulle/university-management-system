@@ -192,6 +192,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         studentId: selectedStudent?.studentId,
         // dueDate: format(values.dueDate, "yyyy-MM-dd"),
         // status: values.status as PaymentStatus,
+
         tuitionFee: selectedStudent?.studentAccount[0]?.tuitionFee || 0,
         discount: selectedStudent?.studentAccount[0]?.discount || 0,
         paid: selectedStudent?.studentAccount[0]?.paidAmount || 0,
@@ -243,7 +244,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     }
   };
 
-  console.log("paidType", paidType);
   // Handle paid type change
   const handlePaidTypeChange = async () => {
     if (!selectedStudent) return;

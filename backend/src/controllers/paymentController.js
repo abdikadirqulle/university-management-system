@@ -148,21 +148,20 @@ const createPayment = async (req, res) => {
         // kuwan ka saar
         // dueDate: new Date(dueDate),
         status: body.status,
-        forwarded: body.forwarded ? parseFloat(body.forwarded) : null,
-        extraFee: body.extraFee ? parseFloat(body.extraFee) : null,
+        // forwarded: body.forwarded ? parseFloat(body.forwarded) : 0,
+        // extraFee: body.extraFee ? parseFloat(body.extraFee) : null,
       },
     })
 
-// Update the student account with the payment amount
-  await prisma.studentAccount.updateMany({
-    where: { studentId: body.studentId },
-    data: {
-      paidAmount: {
-        increment:  parseFloat(body.amount)
-      }
-    }
-  });
-    
+    // Update the student account with the payment amount
+    await prisma.studentAccount.updateMany({
+      where: { studentId: body.studentId },
+      data: {
+        paidAmount: {
+          increment: parseFloat(body.amount),
+        },
+      },
+    })
 
     res.status(201).json({
       success: true,
@@ -183,15 +182,8 @@ const createPayment = async (req, res) => {
 const updatePayment = async (req, res) => {
   try {
     const { id } = req.params
-    const {
-      amount,
-      paymentDate,
-      dueDate,
-      status,
-      type,
-      forwarded,
-      extraFee,
-    } = req.body
+    const { amount, paymentDate, dueDate, status, type, forwarded, extraFee } =
+      req.body
 
     // Check if payment exists
     const existingPayment = await prisma.payment.findUnique({
@@ -214,23 +206,22 @@ const updatePayment = async (req, res) => {
         dueDate: dueDate ? new Date(dueDate) : undefined,
         status: status || undefined,
         type: type || undefined,
-        forwarded: forwarded ? parseFloat(forwarded) : undefined,
-        extraFee: extraFee ? parseFloat(extraFee) : undefined,
+        // forwarded: forwarded ? parseFloat(forwarded) : 0,
+        // extraFee: extraFee ? parseFloat(extraFee) : undefined,
       },
     })
 
     // Update the student account with the payment amount
-  
-      await prisma.studentAccount.updateMany({
-        where: { studentId: existingPayment.studentId },
-        data: {
-          paidAmount: {
-            increment: parseFloat(amount)
-          }
-        }
-      });
-    
-    
+
+    await prisma.studentAccount.updateMany({
+      where: { studentId: existingPayment.studentId },
+      data: {
+        paidAmount: {
+          increment: parseFloat(amount),
+        },
+      },
+    })
+
     res.status(200).json({
       success: true,
       message: "Payment updated successfully",
@@ -273,12 +264,11 @@ const deletePayment = async (req, res) => {
       where: { studentId: payment.studentId },
       data: {
         paidAmount: {
-          decrement: parseFloat(payment.amount)
-          }
-        }
-      });
-  
-    
+          decrement: parseFloat(payment.amount),
+        },
+      },
+    })
+
     res.status(200).json({
       success: true,
       message: "Payment deleted successfully",

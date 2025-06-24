@@ -50,7 +50,7 @@ const PaymentsPage = () => {
   const handleSubmitPayment = async (data: PaymentFormData) => {
     try {
       await createPayment(data);
-      toast.success("Payment created successfully");
+      //   toast.success("Payment created successfully");
       setIsFormOpen(false);
       setSelectedPayment(null);
       setSelectedStudent(null);
