@@ -32,7 +32,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Loader2, PrinterIcon, Trash2 } from "lucide-react";
+import { Loader2, Pencil, PrinterIcon, Trash2 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -157,7 +157,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
   // Handle form submission
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log("Form values:", values);
     try {
       // Ensure all required fields are included
       const paymentData: PaymentFormData = {
@@ -515,7 +514,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                           <TableHead>Academic Year</TableHead>
                           <TableHead>Paid Amount</TableHead>
                           <TableHead>Type</TableHead>
-                          <TableHead>Date</TableHead>
+                          <TableHead>Created At</TableHead>
                           <TableHead>Action</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -533,22 +532,23 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                                 {transaction.type}
                               </Badge>
                             </TableCell>
+
                             <TableCell>
                               {format(
-                                new Date(transaction.paymentDate),
-                                "MMM dd, yyyy",
+                                new Date(transaction.createdAt),
+                                "MMM dd, yyyy hh:mm a",
                               )}
                             </TableCell>
                             <TableCell>
                               <div className="flex space-x-2">
-                                {/* <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEditPayment(transaction)}
-                            title="Edit transaction"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button> */}
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  //   onClick={() => handleEditPayment(transaction)}
+                                  title="Edit transaction"
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
                                 <Button
                                   variant="ghost"
                                   size="icon"

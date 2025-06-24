@@ -107,7 +107,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
                 <TableHead>Student ID</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Batch</TableHead>
-                <TableHead>Semester</TableHead>
+                <TableHead>Sem</TableHead>
                 <TableHead>Session</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Paid</TableHead>
@@ -179,7 +179,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
             onClick={() => exportService.exportStudentsExcel()}
           >
             <FileTextIcon className="h-4 w-4 mr-2" />
-            Export
+            Excel Export
           </Button>
         </div>
       </div>
@@ -190,11 +190,11 @@ const StudentTable: React.FC<StudentTableProps> = ({
             <TableRow>
               <TableHead>Student ID</TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Faculty</TableHead>
-              <TableHead>Department</TableHead>
               <TableHead>Batch</TableHead>
-              <TableHead>Semester</TableHead>
+              <TableHead>Sem</TableHead>
               <TableHead>Session</TableHead>
+              <TableHead>Forwarded</TableHead>
+              <TableHead>Discount</TableHead>
               <TableHead>Paid</TableHead>
               <TableHead>Net</TableHead>
               <TableHead>TF Type</TableHead>
@@ -223,26 +223,25 @@ const StudentTable: React.FC<StudentTableProps> = ({
                       {student.fullName}
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <div className="uppercase text-nowrap font-medium">
-                      {student.faculty?.name || "N/A"}
-                    </div>
-                  </TableCell>
+
                   <TableCell>
                     <div className="uppercase  font-medium">
-                      {student.department?.name || "N/A"}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="uppercase">
                       {student.department?.batch || "N/A"}
                     </div>
                   </TableCell>
+
                   <TableCell>{student.semester || "N/A"}</TableCell>
                   <TableCell className="uppercase">
                     {student.session || "N/A"}
                   </TableCell>
-
+                  <TableCell className="font-medium">
+                    {formatCurrency(
+                      student.studentAccount?.[0]?.forwarded || 0,
+                    )}
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {formatCurrency(student.studentAccount?.[0]?.discount || 0)}
+                  </TableCell>
                   <TableCell className="font-medium">
                     {formatCurrency(
                       student.studentAccount?.[0]?.paidAmount || 0,

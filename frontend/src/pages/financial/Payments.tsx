@@ -96,7 +96,6 @@ const PaymentsPage = () => {
       }
     }
   };
-
   return (
     <div className="container mx-auto py-6 space-y-6">
       <PageHeader
@@ -131,7 +130,9 @@ const PaymentsPage = () => {
             </DialogTitle>
           </DialogHeader>
           <PaymentForm
-            student={selectedStudent}
+            selectedStudent={selectedStudent}
+            students={students}
+            isLoading={isLoading}
             payment={selectedPayment}
             onSubmit={handleSubmitPayment}
             onCancel={() => {
