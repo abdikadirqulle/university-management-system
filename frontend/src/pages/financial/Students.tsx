@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Search } from "lucide-react";
 import { useStudentStore } from "@/store/useStudentStore";
+import { Badge } from "@/components/ui/badge";
 
 const FinancialStudentsPage = () => {
   // Use auth guard to protect this page
@@ -23,7 +24,11 @@ const FinancialStudentsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   // Get data from stores
-  const { students, isLoading: isStudentsLoading, fetchStudents } = useStudentStore();
+  const {
+    students,
+    isLoading: isStudentsLoading,
+    fetchStudents,
+  } = useStudentStore();
 
   // Fetch students on component mount
   useEffect(() => {
@@ -36,15 +41,15 @@ const FinancialStudentsPage = () => {
       student.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.studentId.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (student.department?.name && 
-        student.department.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      (student.department?.name &&
+        student.department.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())),
   );
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Student Information"
-      />
+      <PageHeader title="Student Information" />
 
       {/* Search */}
       <div className="flex items-center">
@@ -117,23 +122,39 @@ const FinancialStudentsPage = () => {
                     ))
                 ) : filteredStudents.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
+                    <TableCell
+                      colSpan={5}
+                      className="text-center py-6 text-muted-foreground"
+                    >
                       No students found
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredStudents.map((student) => (
                     <TableRow key={student.id}>
-                      <TableCell className="font-medium">{student.studentId}</TableCell>
+                      <TableCell className="font-medium">
+                        {student.studentId}
+                      </TableCell>
                       <TableCell>
                         <div className="font-medium">{student.fullName}</div>
                       </TableCell>
                       <TableCell>{student.faculty?.name || "N/A"}</TableCell>
                       <TableCell>{student.department?.name || "N/A"}</TableCell>
-                      <TableCell className="uppercase">{student.department?.batch || "N/A"}</TableCell>
+                      <TableCell className="uppercase">
+                        {student.department?.batch || "N/A"}
+                      </TableCell>
                       <TableCell>{student.semester || "N/A"}</TableCell>
-                      <TableCell className="uppercase">{student.session || "N/A"}</TableCell>
+                      <TableCell className="uppercase">
+                        {student.session || "N/A"}
+                      </TableCell>
                       <TableCell>{student.phoneNumber || "N/A"}</TableCell>
+                      <TableCell>
+                        <Badge
+                          className={`px-2 py-1 ${student.isActive ? "bg-green-500" : "bg-red-500"}`}
+                        >
+                          {student.isActive ? "Active" : "Inactive"}
+                        </Badge>
+                      </TableCell>
                     </TableRow>
                   ))
                 )}

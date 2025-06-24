@@ -125,8 +125,7 @@ const FinancialDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                  {students.filter((s) => s.studentAccount?.is_active === true)
-                    .length || 0}
+                  {students.filter((s) => s.isActive === true).length || 0}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Currently active students

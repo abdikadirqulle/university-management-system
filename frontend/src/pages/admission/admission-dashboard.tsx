@@ -35,70 +35,6 @@ import {
 } from "recharts";
 
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-
-// Define admission requirements data - keeping this for reference though not displayed anymore
-const admissionRequirements = [
-  {
-    title: "Academic Requirements",
-    items: [
-      {
-        id: "req-1",
-        text: "High school diploma or equivalent with minimum GPA of 3.0",
-      },
-      {
-        id: "req-2",
-        text: "Completion of required prerequisite courses for specific programs",
-      },
-      {
-        id: "req-3",
-        text: "Standardized test scores (SAT/ACT) for undergraduate applicants",
-      },
-      {
-        id: "req-4",
-        text: "GRE/GMAT scores for graduate program applicants",
-      },
-    ],
-  },
-  {
-    title: "Documentation Requirements",
-    items: [
-      {
-        id: "doc-1",
-        text: "Official transcripts from all previous academic institutions",
-      },
-      {
-        id: "doc-2",
-        text: "Letters of recommendation (2-3 depending on program)",
-      },
-      {
-        id: "doc-3",
-        text: "Personal statement or statement of purpose",
-      },
-      {
-        id: "doc-4",
-        text: "Valid identification documents",
-      },
-    ],
-  },
-  {
-    title: "Additional Requirements",
-    items: [
-      {
-        id: "add-1",
-        text: "International students: TOEFL/IELTS scores and visa documentation",
-      },
-      {
-        id: "add-2",
-        text: "Portfolio for arts, architecture, and design programs",
-      },
-      {
-        id: "add-3",
-        text: "Interview for specific programs (medicine, MBA, etc.)",
-      },
-    ],
-  },
-];
 
 // Create stats cards with real data
 const createAdmissionStats = (
@@ -128,6 +64,13 @@ const createAdmissionStats = (
     iconColor: "text-pink-600",
     bgColor: "bg-pink-600",
   },
+  //   {
+  //     title: "Total active students",
+  //     value: enrolledStudents.filter((s) => s.isActive === true).length.toString(),
+  //     icon: Users,
+  //     iconColor: "text-green-600",
+  //     bgColor: "bg-green-600",
+  //   }
 ];
 
 // Sample student data for the table
