@@ -31,13 +31,31 @@ import { Faculty, useFacultyStore } from "@/store/useFacultyStore";
 
 // Form schema
 const facultyFormSchema = z.object({
-  name: z.string().min(2, { message: "Faculty name is required" }),
+  name: z
+    .string()
+    .min(2, { message: "Faculty name is required" })
+    .regex(
+      /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z\s]*$/,
+      { message: "Faculty name should only contain letters and spaces" },
+    ),
   description: z
     .string()
     .min(10, { message: "Description must be at least 10 characters" })
     .optional(),
-  dean: z.string().min(2, { message: "Dean name is required" }),
-  location: z.string().min(2, { message: "Location is required" })
+  dean: z
+    .string()
+    .min(2, { message: "Dean name is required" })
+    .regex(
+      /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z\s]*$/,
+      { message: "Dean name should only contain letters and spaces" },
+    ),
+  location: z
+    .string()
+    .min(2, { message: "Location is required" })
+    .regex(
+      /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z\s]*$/,
+      { message: "Location should only contain letters and spaces" },
+    )
     .optional(),
   establish: z.coerce
     .number()
@@ -119,7 +137,11 @@ const FacultiesPage = () => {
 
   // Handle delete faculty
   const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this faculty? This action cannot be undone.")) {
+    if (
+      confirm(
+        "Are you sure you want to delete this faculty? This action cannot be undone.",
+      )
+    ) {
       try {
         await deleteFaculty(id);
         toast.success("Faculty deleted successfully");
@@ -314,8 +336,10 @@ const FacultiesPage = () => {
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       {editingFaculty ? "Updating..." : "Adding..."}
                     </>
+                  ) : editingFaculty ? (
+                    "Update Faculty"
                   ) : (
-                    editingFaculty ? "Update Faculty" : "Add Faculty"
+                    "Add Faculty"
                   )}
                 </Button>
               </DialogFooter>

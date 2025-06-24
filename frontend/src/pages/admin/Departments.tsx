@@ -35,15 +35,41 @@ import {
 } from "@/components/ui/select";
 import { Department, useDepartmentStore } from "@/store/useDepartmentStore";
 import { Faculty, useFacultyStore } from "@/store/useFacultyStore";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 // Form schema
 const departmentFormSchema = z.object({
-  name: z.string().min(2, { message: "Department name is required" }),
+  name: z
+    .string()
+    .min(2, { message: "Department name is required" })
+    .regex(
+      /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z\s]*$/,
+      { message: "Department name should only contain letters and spaces" },
+    ),
   facultyId: z.string().min(1, { message: "Faculty is required" }),
-  head: z.string().min(2, { message: "Department head name is required" }),
+  head: z
+    .string()
+    .min(2, { message: "Department head name is required" })
+    .regex(
+      /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z\s]*$/,
+      {
+        message: "Department head name should only contain letters and spaces",
+      },
+    ),
   phone: z.string().min(6, { message: "Phone number is required" }),
-  price: z.coerce.number().min(0, { message: "Price must be a positive number" }),
+  price: z.coerce
+    .number()
+    .min(0, { message: "Price must be a positive number" }),
   semester: z.string().optional(),
   batch: z.string().optional(),
 });
@@ -59,7 +85,11 @@ const DepartmentsPage = () => {
     deleteDepartment,
     isLoading,
   } = useDepartmentStore();
-  const { faculties, fetchFaculties, isLoading: facultiesLoading } = useFacultyStore();
+  const {
+    faculties,
+    fetchFaculties,
+    isLoading: facultiesLoading,
+  } = useFacultyStore();
   const [isOpen, setIsOpen] = useState(false);
   const [editingDepartment, setEditingDepartment] = useState<Department | null>(
     null,
@@ -150,7 +180,11 @@ const DepartmentsPage = () => {
 
   // Handle delete department
   const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this department? This action cannot be undone.")) {
+    if (
+      confirm(
+        "Are you sure you want to delete this department? This action cannot be undone.",
+      )
+    ) {
       try {
         await deleteDepartment(id);
         toast.success("Department deleted successfully");
@@ -216,11 +250,7 @@ const DepartmentsPage = () => {
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  disabled={isLoading}
-                >
+                <Button variant="ghost" size="icon" disabled={isLoading}>
                   <Trash2 className="h-4 w-4 text-destructive" />
                   <span className="sr-only">Delete</span>
                 </Button>
@@ -229,8 +259,9 @@ const DepartmentsPage = () => {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete the department
-                    record for {department.name} and remove its data from the system.
+                    This action cannot be undone. This will permanently delete
+                    the department record for {department.name} and remove its
+                    data from the system.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -370,7 +401,9 @@ const DepartmentsPage = () => {
                           type="number"
                           placeholder="0.00"
                           {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                          onChange={(e) =>
+                            field.onChange(parseFloat(e.target.value) || 0)
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -393,9 +426,8 @@ const DepartmentsPage = () => {
                     </FormItem>
                   )}
                 />
-           
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -429,15 +461,16 @@ const DepartmentsPage = () => {
                     <FormItem>
                       <FormLabel>Batch</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter batch (e.g. BI02)" {...field} />
+                        <Input
+                          placeholder="Enter batch (e.g. BI02)"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-
-
 
               <DialogFooter>
                 <Button
@@ -457,8 +490,10 @@ const DepartmentsPage = () => {
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       {editingDepartment ? "Updating..." : "Adding..."}
                     </>
+                  ) : editingDepartment ? (
+                    "Update Department"
                   ) : (
-                    editingDepartment ? "Update Department" : "Add Department"
+                    "Add Department"
                   )}
                 </Button>
               </DialogFooter>

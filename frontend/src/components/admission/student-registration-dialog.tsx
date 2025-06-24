@@ -55,7 +55,10 @@ const studentSchema = z.object({
   fullName: z
     .string()
     .min(3, "Full name is required and must be at least 3 characters")
-    .regex(/^[a-zA-Z\s]*$/, "Full name should only contain letters and spaces")
+    .regex(
+      /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z\s]*$/,
+      "Full name should only contain letters and spaces",
+    )
     .transform((val) => val.trim()),
   gender: z.enum(["male", "female"], { required_error: "Gender is required" }),
   dateOfBirth: z
@@ -79,7 +82,7 @@ const studentSchema = z.object({
     .string()
     .min(1, "Place of birth is required")
     .regex(
-      /^[a-zA-Z\s,]*$/,
+      /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z\s,]*$/,
       "Place of birth should only contain letters, spaces, and commas",
     ),
   email: z
