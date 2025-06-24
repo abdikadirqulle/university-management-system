@@ -151,9 +151,7 @@ model StudentAccount {
   discount        Float?
   forwarded       Float?
   totalDue        Float
-  paidAmount      Float?
-  status          PaymentStatus // e.g. UNPAID, PARTIAL, PAID
-  
+  paidAmount      Float?  
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 

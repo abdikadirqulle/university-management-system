@@ -171,7 +171,6 @@ const createStudent = async (req, res) => {
         discount: 0,
         paidAmount: 0,
         totalDue: department.price,
-        status: "pending",
         is_active: true,
       },
     })
@@ -310,7 +309,6 @@ const updateStudent = async (req, res) => {
         discount: 0,
         paidAmount: 0,
         totalDue: department.price,
-        status: "pending",
         is_active: true,
       },
     })
