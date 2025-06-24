@@ -27,8 +27,8 @@ export const AuthLayout = () => {
         case "admission":
           navigate("/admission/dashboard");
           break;
-        case "student":
-          navigate("/student/dashboard");
+        case "financial":
+          navigate("/financial/dashboard");
           break;
         default:
           break;
@@ -46,19 +46,19 @@ export const AuthLayout = () => {
           <School className="h-20 w-20 text-white mb-6 mx-auto" />
           <h1 className="text-4xl font-bold text-white mb-4">AqoonMaamul</h1>
           <p className="text-white/80 text-lg max-w-md">
-            Welcome to the AqoonMaamul. Access your academic resources, courses, and more.
+            Welcome to the AqoonMaamul. Access your academic resources, courses,
+            and more.
           </p>
         </div>
       </div>
-      
+
       <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-white dark:bg-gray-950">
         <div className="w-full max-w-md">
           <Outlet />
         </div>
       </div>
-      
+
       {/* Right side - Image background */}
-     
     </div>
   );
 };

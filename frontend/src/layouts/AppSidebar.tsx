@@ -13,26 +13,18 @@ import { Button } from "@/components/ui/button";
 import {
   BookOpen,
   Calendar,
-  FileText,
-  GraduationCap,
   Home,
   LogOut,
   Settings,
   Users,
   School,
-  BookCopy,
   BarChart,
   CreditCard,
-  UserCog,
   Building,
-  BookLock,
-  DollarSign,
   UserPlus,
   UsersRound,
-  Wallet2Icon,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { Close } from "@radix-ui/react-toast";
 
 const AppSidebar = () => {
   const { user, logout } = useAuth();
