@@ -8,47 +8,75 @@ import {
   deleteStudent,
   getStudentsByDepartment,
   getStudentsByFaculty,
-}  from '../controllers/studentController.js';
+  toggleStudentActivation,
+} from "../controllers/studentController.js"
 
-import { authenticateUser, authorize } from '../middleware/authMiddleware.js';
+import { authenticateUser, authorize } from "../middleware/authMiddleware.js"
 
-const router = express.Router();
+const router = express.Router()
 
 // Get all students - Admin and Admission access
-router.get('/', 
+router.get(
+  "/",
   // authenticateUser,
   // authorize(['admin', 'admission', 'financial']),
-   getAllStudents);
+  getAllStudents
+)
 
 // Get student by ID - Admin, Admission, and Student (own record) access
-router.get('/:id', authenticateUser,
+router.get(
+  "/:id",
+  authenticateUser,
   //  authorize(['admin', 'admission', 'student']),
-    getStudentById);
+  getStudentById
+)
 
 // Create new student - Admin and Admission access
-router.post('/',
+router.post(
+  "/",
   //  authenticateUser,
   // authorize(['admin', 'admission']),
-   createStudent);
+  createStudent
+)
 
 // Update student - Admin and Admission access
-router.put('/:id', authenticateUser,
+router.put(
+  "/:id",
+  authenticateUser,
   // authorize(['admin', 'admission']),
-   updateStudent);
+  updateStudent
+)
 
 // Delete student - Admin only access
-router.delete('/:id', authenticateUser,
+router.delete(
+  "/:id",
+  authenticateUser,
   // authorize(['admin', 'admission']),
-   deleteStudent);
+  deleteStudent
+)
+
+// Toggle student activation - Admin, Financial, Admission access
+router.patch(
+  "/:id/toggle-activation",
+  authenticateUser,
+  // authorize(['admin', 'financial', 'admission']),
+  toggleStudentActivation
+)
 
 // Get students by department - Admin and Admission access
-router.get('/department/:departmentId', authenticateUser,
+router.get(
+  "/department/:departmentId",
+  authenticateUser,
   // authorize(['admin', 'admission']),
-   getStudentsByDepartment);
+  getStudentsByDepartment
+)
 
 // Get students by faculty - Admin and Admission access
-router.get('/faculty/:facultyId', authenticateUser,
+router.get(
+  "/faculty/:facultyId",
+  authenticateUser,
   // authorize(['admin', 'admission']),
-   getStudentsByFaculty);
+  getStudentsByFaculty
+)
 
 export default router

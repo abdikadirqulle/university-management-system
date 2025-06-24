@@ -10,7 +10,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Student } from "@/types/student";
-import { PrinterIcon, Search, FileTextIcon } from "lucide-react";
+import {
+  PrinterIcon,
+  Search,
+  FileTextIcon,
+  Power,
+  PowerOff,
+} from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Payment } from "@/types/payment";
 import { Button } from "../ui/button";
@@ -21,6 +27,7 @@ interface StudentTableProps {
   payments: Payment[];
   isLoading: boolean;
   onSelectStudent: (student: Student) => void;
+  onToggleActivation?: (student: Student) => void;
 }
 
 const StudentTable: React.FC<StudentTableProps> = ({
@@ -28,6 +35,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
   payments,
   isLoading,
   onSelectStudent,
+  onToggleActivation,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   // Filter students based on search term
@@ -79,6 +87,13 @@ const StudentTable: React.FC<StudentTableProps> = ({
     return 0;
   };
 
+  const handleToggleActivation = (e: React.MouseEvent, student: Student) => {
+    e.stopPropagation();
+    if (onToggleActivation) {
+      onToggleActivation(student);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -94,9 +109,11 @@ const StudentTable: React.FC<StudentTableProps> = ({
                 <TableHead>Batch</TableHead>
                 <TableHead>Semester</TableHead>
                 <TableHead>Session</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>Paid</TableHead>
                 <TableHead>Net</TableHead>
                 <TableHead>TF Type</TableHead>
+                {onToggleActivation && <TableHead>Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -124,8 +141,16 @@ const StudentTable: React.FC<StudentTableProps> = ({
                     <Skeleton className="h-6 w-[80px]" />
                   </TableCell>
                   <TableCell>
+                    <Skeleton className="h-6 w-[80px]" />
+                  </TableCell>
+                  <TableCell>
                     <Skeleton className="h-6 w-[100px]" />
                   </TableCell>
+                  {onToggleActivation && (
+                    <TableCell>
+                      <Skeleton className="h-6 w-[80px]" />
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
@@ -138,24 +163,25 @@ const StudentTable: React.FC<StudentTableProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="relative w-full max-w-sm">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by name, ID, email, or department..."
-            className="pl-8"
+            placeholder="Search students..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-8 w-[300px]"
           />
         </div>
-        {/* <Button 
-          variant="secondary" 
-          size="sm" 
-          className="flex items-center gap-2"
-          onClick={() => exportService.exportStudentTransactionPDF(filteredStudents.map((student) => student.studentId)[0])}
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportService.exportStudentsExcel()}
           >
-          <FileTextIcon className="h-4 w-4" />
-          View PDF
-        </Button> */}
+            <FileTextIcon className="h-4 w-4 mr-2" />
+            Export
+          </Button>
+        </div>
       </div>
 
       <div className="rounded-md border">
@@ -178,7 +204,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
             {filteredStudents.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={8}
+                  colSpan={onToggleActivation ? 12 : 11}
                   className="text-center py-6 text-muted-foreground"
                 >
                   No students found
@@ -193,7 +219,9 @@ const StudentTable: React.FC<StudentTableProps> = ({
                 >
                   <TableCell>{student.studentId}</TableCell>
                   <TableCell>
-                    <div className="font-medium">{student.fullName}</div>
+                    <div className="font-medium text-nowrap">
+                      {student.fullName}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="uppercase text-nowrap font-medium">
@@ -201,7 +229,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="uppercase text-nowrap font-medium">
+                    <div className="uppercase  font-medium">
                       {student.department?.name || "N/A"}
                     </div>
                   </TableCell>
@@ -214,8 +242,11 @@ const StudentTable: React.FC<StudentTableProps> = ({
                   <TableCell className="uppercase">
                     {student.session || "N/A"}
                   </TableCell>
+
                   <TableCell className="font-medium">
-                    {formatCurrency(student.studentAccount[0]?.paidAmount || 0)}
+                    {formatCurrency(
+                      student.studentAccount?.[0]?.paidAmount || 0,
+                    )}
                   </TableCell>
                   <TableCell className="font-medium">
                     {formatCurrency(getNetAmount(student))}

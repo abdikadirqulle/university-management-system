@@ -127,6 +127,7 @@ model Student {
   academicYear      String
   registerYear      Int
   semester          String
+  isActive          Boolean    @default(true)
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
 

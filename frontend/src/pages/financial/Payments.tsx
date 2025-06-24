@@ -18,35 +18,34 @@ import {
 } from "@/components/ui/dialog";
 import { RefreshCw } from "lucide-react";
 
-
 const PaymentsPage = () => {
   useAuthGuard(["financial", "admin"]);
-  
+
   // State for dialogs
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
-  
   // Get data from stores
-  const { 
-    payments, 
-    isLoading, 
+  const {
+    payments,
+    isLoading,
     selectedPayment,
-    fetchPayments, 
-    createPayment, 
+    fetchPayments,
+    createPayment,
     setSelectedPayment,
-    fetchPaymentStatistics
+    fetchPaymentStatistics,
   } = usePaymentStore();
-  
-  const { students, fetchStudents } = useStudentStore();
-  
+
+  const { students, fetchStudents, toggleStudentActivation } =
+    useStudentStore();
+
   // Fetch data on component mount
   useEffect(() => {
     fetchPayments();
     fetchStudents();
     fetchPaymentStatistics();
   }, [fetchPayments, fetchStudents, fetchPaymentStatistics]);
-  
+
   // Handle form submission
   const handleSubmitPayment = async (data: PaymentFormData) => {
     try {
@@ -60,27 +59,43 @@ const PaymentsPage = () => {
       toast.error("Failed to save payment");
     }
   };
-  
+
   // Handle student selection
   const handleSelectStudent = (student: Student) => {
     setSelectedStudent(student);
-    
+
     // Find the most recent payment for this student
-    const studentPayments = payments.filter(p => p.studentId === student.studentId);
+    const studentPayments = payments.filter(
+      (p) => p.studentId === student.studentId,
+    );
     if (studentPayments.length > 0) {
       // Sort by date descending and get the most recent
-      const latestPayment = studentPayments.sort((a, b) => 
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      const latestPayment = studentPayments.sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
       )[0];
       setSelectedPayment(latestPayment);
     } else {
       // No existing payment, create a new one
       setSelectedPayment(null);
     }
-    
+
     setIsFormOpen(true);
   };
-  
+
+  // Handle student activation toggle
+  const handleToggleActivation = async (student: Student) => {
+    const action = student.isActive ? "deactivate" : "activate";
+    if (
+      window.confirm(`Are you sure you want to ${action} ${student.fullName}?`)
+    ) {
+      try {
+        await toggleStudentActivation(student.id);
+      } catch (error) {
+        toast.error(`Failed to ${action} student`);
+      }
+    }
+  };
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -90,36 +105,35 @@ const PaymentsPage = () => {
         action={{
           label: "Refresh",
           icon: RefreshCw,
-          onClick: (() => {
+          onClick: () => {
             fetchPayments();
             fetchStudents();
             fetchPaymentStatistics();
-          }),
+          },
         }}
       />
-      
-      
 
       {/* Students Table with Payment Information */}
-      <StudentTable 
+      <StudentTable
         students={students}
         payments={payments}
         isLoading={isLoading}
         onSelectStudent={handleSelectStudent}
+        onToggleActivation={handleToggleActivation}
       />
 
       {/* Payment Form Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="sm:max-w-[800px] max-h-[95vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Manage Payment</DialogTitle>
+            <DialogTitle>
+              {selectedPayment ? "Edit Payment" : "Create New Payment"}
+            </DialogTitle>
           </DialogHeader>
           <PaymentForm
-            payment={selectedPayment || undefined}
-            selectedStudent={selectedStudent}
-            students={students}
+            student={selectedStudent}
+            payment={selectedPayment}
             onSubmit={handleSubmitPayment}
-            isLoading={isLoading}
             onCancel={() => {
               setIsFormOpen(false);
               setSelectedPayment(null);
@@ -128,8 +142,6 @@ const PaymentsPage = () => {
           />
         </DialogContent>
       </Dialog>
-
-  
     </div>
   );
 };

@@ -32,16 +32,22 @@ import {
 import { Student } from "@/types/student";
 import { toast } from "sonner";
 import StudentDetailDialog from "@/components/admission/StudentDetailDialog";
-import {
-  Search,
-  Filter,
-  RefreshCw,
-
-} from "lucide-react";
+import { Search, Filter, RefreshCw, Power, PowerOff } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 import { exportService } from "@/services/exportService";
 import ExportButtons from "@/components/ui/ExportButtons";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 // Define available semesters for filtering
 const semesters = Array.from({ length: 12 }, (_, i) => `${i + 1}`);
@@ -49,8 +55,14 @@ const semesters = Array.from({ length: 12 }, (_, i) => `${i + 1}`);
 const StudentList = () => {
   useAuthGuard(["admin", "admission"]);
 
-  const { students, isLoading, fetchStudents, updateStudent, deleteStudent } =
-    useStudentStore();
+  const {
+    students,
+    isLoading,
+    fetchStudents,
+    updateStudent,
+    deleteStudent,
+    toggleStudentActivation,
+  } = useStudentStore();
 
   // State for search and filters
   const [searchTerm, setSearchTerm] = useState("");
@@ -103,18 +115,22 @@ const StudentList = () => {
     const matchesSearch =
       student.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (student.department?.name?.toLowerCase() || '').includes(searchTerm.toLowerCase());
+      (student.department?.name?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase(),
+      );
 
     const matchesId = idFilter ? student.studentId.includes(idFilter) : true;
 
-    const matchesSemester = semesterFilter && semesterFilter !== 'all'
-      ? student.semester === semesterFilter
-      : true;
+    const matchesSemester =
+      semesterFilter && semesterFilter !== "all"
+        ? student.semester === semesterFilter
+        : true;
 
     // We'll implement status filtering when the status field is added to the API
-    const matchesStatus = statusFilter && statusFilter !== 'all'
-      ? true // Replace with actual status check when implemented
-      : true;
+    const matchesStatus =
+      statusFilter && statusFilter !== "all"
+        ? student.isActive === (statusFilter === "active")
+        : true;
 
     return matchesSearch && matchesId && matchesSemester && matchesStatus;
   });
@@ -125,6 +141,16 @@ const StudentList = () => {
     setIdFilter("");
     setSemesterFilter("");
     setStatusFilter("");
+  };
+
+  const handleToggleActivation = async (student: Student) => {
+    const action = student.isActive ? "deactivate" : "activate";
+
+    try {
+      await toggleStudentActivation(student.id);
+    } catch (error) {
+      toast.error(`Failed to ${action} student`);
+    }
   };
 
   return (
@@ -150,10 +176,9 @@ const StudentList = () => {
                 <RefreshCw className="h-4 w-4 mr-1" /> Refresh
               </Button>
               <ExportButtons
-              onExportPDF={() => exportService.exportStudentsPDF()}
-              onExportExcel={() => exportService.exportStudentsExcel()}
+                onExportPDF={() => exportService.exportStudentsPDF()}
+                onExportExcel={() => exportService.exportStudentsExcel()}
               />
-           
             </div>
           </div>
         </CardHeader>
@@ -247,19 +272,16 @@ const StudentList = () => {
                   <TableHead className="hidden md:table-cell">
                     Department
                   </TableHead>
-                  <TableHead className="hidden md:table-cell">
-                    Batch
-                  </TableHead>
+                  <TableHead className="hidden md:table-cell">Batch</TableHead>
                   <TableHead className="hidden md:table-cell">
                     Semester
                   </TableHead>
                   <TableHead className="hidden md:table-cell">
                     Session
                   </TableHead>
-                  <TableHead className="hidden md:table-cell">
-                    Tel
-                  </TableHead>
+                  <TableHead className="hidden md:table-cell">Tel</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Activation</TableHead>
                   {/* <TableHead className="text-right">Actions</TableHead> */}
                 </TableRow>
               </TableHeader>
@@ -278,98 +300,87 @@ const StudentList = () => {
                   </TableRow>
                 ) : (
                   filteredStudents.map((student) => (
-                    <TableRow 
-                      key={student.id} 
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleViewStudent(student)}
+                    <TableRow
+                      key={student.id}
+                      className=" hover:bg-muted/50"
+                      //   onClick={() => handleViewStudent(student)}
                     >
                       <TableCell>{student.studentId}</TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{student.fullName}</div>
-                          <div className="text-sm text-muted-foreground">
+                          <div className="font-medium text-nowrap">
+                            {student.fullName}
                           </div>
+                          <div className="text-sm text-muted-foreground"></div>
                         </div>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {student.faculty?.name || 'N/A'}
+                        {student.faculty?.name || "N/A"}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {student.department?.name || 'N/A'}
+                        {student.department?.name || "N/A"}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell uppercase">
+                        {student.department.batch || "N/A"}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {student.registerYear || 'N/A'}
+                        {student.semester || "N/A"}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {student.semester || 'N/A'}
+                        {student.session || "N/A"}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
-                        {student.session || 'N/A'}
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        {student.phoneNumber || 'N/A'}
+                        {student.phoneNumber || "N/A"}
                       </TableCell>
                       <TableCell>
                         <Badge
-                          className={`px-2 py-1 ${student.academicYear ? "bg-green-500" : "bg-gray-500"}`}
+                          className={`px-2 py-1 ${student.isActive ? "bg-green-500" : "bg-red-500"}`}
                         >
-                          {student.academicYear ? "Active" : "Pending"}
+                          {student.isActive ? "Active" : "Inactive"}
                         </Badge>
                       </TableCell>
-
-                      {/* <TableCell className="text-right">
-                      <div
-                      className="flex justify-center item-center cursor-pointer"
-                              onClick={() => handleViewStudent(student)}
+                      <TableCell>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => e.stopPropagation()}
+                              className="h-8 w-8 p-0"
                             >
-                              <Eye className="h-4 w-4 mr-2" /> 
-                            </div>  
-
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
+                              {student.isActive ? (
+                                <PowerOff className="h-4 w-4 text-red-500" />
+                              ) : (
+                                <Power className="h-4 w-4 text-green-500" />
+                              )}
                             </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              onClick={() => handleViewStudent(student)}
-                            >
-                              <Eye className="h-4 w-4 mr-2" /> View Details
-                            </DropdownMenuItem>       
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <DropdownMenuItem
-                                  onSelect={(e) => e.preventDefault()}
-                                  className="text-destructive focus:text-destructive"
-                                >
-                                  <Trash2 className="h-4 w-4 mr-2" /> Delete
-                                </DropdownMenuItem>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    This action cannot be undone. This will permanently delete the student
-                                    record for {student.fullName} and remove their data from the system.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => handleDeleteStudent(student.id)}
-                                    className="bg-destructive hover:bg-destructive/90"
-                                  >
-                                    Delete
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell> */}
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                You are about to{" "}
+                                {student.isActive ? "deactivate" : "activate"}{" "}
+                                {student.fullName}. This action cannot be
+                                undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleToggleActivation(student)}
+                                className={
+                                  student.isActive
+                                    ? "bg-red-500 hover:bg-red-500/90"
+                                    : "bg-green-500 hover:bg-green-500/90"
+                                }
+                              >
+                                {student.isActive ? "Deactivate" : "Activate"}
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </TableCell>
                     </TableRow>
                   ))
                 )}

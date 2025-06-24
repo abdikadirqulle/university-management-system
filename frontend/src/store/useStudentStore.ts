@@ -17,10 +17,9 @@ interface StudentState {
   deleteStudent: (id: string) => Promise<void>;
   getStudentsByDepartment: (departmentId: string) => Promise<void>;
   getStudentsByFaculty: (facultyId: string) => Promise<void>;
+  toggleStudentActivation: (id: string) => Promise<void>;
   resetSelectedStudent: () => void;
 }
-
-
 
 export const useStudentStore = create<StudentState>((set) => ({
   students: [],
@@ -34,7 +33,8 @@ export const useStudentStore = create<StudentState>((set) => ({
       const students = await studentService.getAllStudents();
       set({ students, isLoading: false });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to fetch students";
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch students";
       toast.error(errorMessage);
       set({
         error: errorMessage,
@@ -49,7 +49,8 @@ export const useStudentStore = create<StudentState>((set) => ({
       const student = await studentService.getStudentById(id);
       set({ selectedStudent: student, isLoading: false });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to fetch student";
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch student";
       toast.error(errorMessage);
       set({
         error: errorMessage,
@@ -68,7 +69,8 @@ export const useStudentStore = create<StudentState>((set) => ({
       }));
       toast.success("Student added successfully");
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to add student";
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to add student";
       toast.error(errorMessage);
       set({
         error: errorMessage,
@@ -80,19 +82,24 @@ export const useStudentStore = create<StudentState>((set) => ({
   updateStudent: async (id: string, studentData: Partial<Student>) => {
     set({ isLoading: true, error: null });
     try {
-      const updatedStudent = await studentService.updateStudent(id, studentData);
+      const updatedStudent = await studentService.updateStudent(
+        id,
+        studentData,
+      );
       set((state) => ({
         students: state.students.map((student) =>
-          student.id === id ? { ...student, ...updatedStudent } : student
+          student.id === id ? { ...student, ...updatedStudent } : student,
         ),
-        selectedStudent: state.selectedStudent?.id === id 
-          ? { ...state.selectedStudent, ...updatedStudent } 
-          : state.selectedStudent,
+        selectedStudent:
+          state.selectedStudent?.id === id
+            ? { ...state.selectedStudent, ...updatedStudent }
+            : state.selectedStudent,
         isLoading: false,
       }));
       toast.success("Student updated successfully");
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to update student";
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update student";
       toast.error(errorMessage);
       set({
         error: errorMessage,
@@ -107,12 +114,14 @@ export const useStudentStore = create<StudentState>((set) => ({
       await studentService.deleteStudent(id);
       set((state) => ({
         students: state.students.filter((student) => student.id !== id),
-        selectedStudent: state.selectedStudent?.id === id ? null : state.selectedStudent,
+        selectedStudent:
+          state.selectedStudent?.id === id ? null : state.selectedStudent,
         isLoading: false,
       }));
       toast.success("Student deleted successfully");
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to delete student";
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to delete student";
       toast.error(errorMessage);
       set({
         error: errorMessage,
@@ -124,10 +133,14 @@ export const useStudentStore = create<StudentState>((set) => ({
   getStudentsByDepartment: async (departmentId: string) => {
     set({ isLoading: true, error: null });
     try {
-      const students = await studentService.getStudentsByDepartment(departmentId);
+      const students =
+        await studentService.getStudentsByDepartment(departmentId);
       set({ students, isLoading: false });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to fetch students by department";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch students by department";
       toast.error(errorMessage);
       set({
         error: errorMessage,
@@ -142,7 +155,41 @@ export const useStudentStore = create<StudentState>((set) => ({
       const students = await studentService.getStudentsByFaculty(facultyId);
       set({ students, isLoading: false });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to fetch students by faculty";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch students by faculty";
+      toast.error(errorMessage);
+      set({
+        error: errorMessage,
+        isLoading: false,
+      });
+    }
+  },
+
+  toggleStudentActivation: async (id: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const updatedStudent = await studentService.toggleStudentActivation(id);
+      set((state) => ({
+        students: state.students.map((student) =>
+          student.id === id
+            ? { ...student, isActive: updatedStudent.isActive }
+            : student,
+        ),
+        selectedStudent:
+          state.selectedStudent?.id === id
+            ? { ...state.selectedStudent, isActive: updatedStudent.isActive }
+            : state.selectedStudent,
+        isLoading: false,
+      }));
+      const status = updatedStudent.isActive ? "activated" : "deactivated";
+      toast.success(`Student ${status} successfully`);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to toggle student activation";
       toast.error(errorMessage);
       set({
         error: errorMessage,

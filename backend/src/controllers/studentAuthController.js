@@ -13,15 +13,15 @@ const loginStudent = async (req, res) => {
       include: {
         department: {
           select: {
-            name: true
-          }
+            name: true,
+          },
         },
         faculty: {
           select: {
-            name: true
-          }
-        }
-      }
+            name: true,
+          },
+        },
+      },
     })
 
     if (!student) {
@@ -31,11 +31,20 @@ const loginStudent = async (req, res) => {
       })
     }
 
+    // Check if student is active
+    if (!student.isActive) {
+      return res.status(403).json({
+        success: false,
+        message:
+          "This student account is deactivated. Please contact the administrator.",
+      })
+    }
+
     // For simplicity in this implementation, we'll use a basic password check
     // In a real-world scenario, you would use bcrypt to compare hashed passwords
     // This assumes the password is stored in plaintext or has a default value
     // In production, always use proper password hashing
-    
+
     // Check if password matches (simple check for demo)
     // The default password is the student ID
     if (password !== studentId) {
@@ -47,10 +56,10 @@ const loginStudent = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { 
+      {
         id: student.id,
         studentId: student.studentId,
-        role: "student" 
+        role: "student",
       },
       process.env.JWT_SECRET || "your_jwt_secret",
       { expiresIn: "30d" }
@@ -66,14 +75,15 @@ const loginStudent = async (req, res) => {
       department: student.department?.name,
       faculty: student.faculty?.name,
       semester: student.semester,
-      academicYear: student.academicYear
+      academicYear: student.academicYear,
+      isActive: student.isActive,
     }
 
     res.status(200).json({
       success: true,
       message: "Login successful",
       token,
-      user: userObject
+      user: userObject,
     })
   } catch (error) {
     console.error("Student login error:", error)
@@ -93,15 +103,15 @@ const getCurrentStudent = async (req, res) => {
       include: {
         department: {
           select: {
-            name: true
-          }
+            name: true,
+          },
         },
         faculty: {
           select: {
-            name: true
-          }
-        }
-      }
+            name: true,
+          },
+        },
+      },
     })
 
     if (!student) {
@@ -120,12 +130,12 @@ const getCurrentStudent = async (req, res) => {
       department: student.department?.name,
       faculty: student.faculty?.name,
       semester: student.semester,
-      academicYear: student.academicYear
+      academicYear: student.academicYear,
     }
 
     res.status(200).json({
       success: true,
-      user: userObject
+      user: userObject,
     })
   } catch (error) {
     console.error("Get current student error:", error)
@@ -136,7 +146,4 @@ const getCurrentStudent = async (req, res) => {
   }
 }
 
-export {
-  loginStudent,
-  getCurrentStudent
-}
+export { loginStudent, getCurrentStudent }

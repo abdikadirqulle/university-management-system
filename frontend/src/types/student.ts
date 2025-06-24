@@ -23,6 +23,7 @@ export interface Student {
   registerYear: number;
   semester: string;
   batch?: string;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 

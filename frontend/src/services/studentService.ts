@@ -30,8 +30,14 @@ const studentService = {
   },
 
   // Update student
-  updateStudent: async (id: string, studentData: Partial<Student>): Promise<Student> => {
-    const response = await api.put<StudentResponse>(`/students/${id}`, studentData);
+  updateStudent: async (
+    id: string,
+    studentData: Partial<Student>,
+  ): Promise<Student> => {
+    const response = await api.put<StudentResponse>(
+      `/students/${id}`,
+      studentData,
+    );
     if (!response.data.success) {
       throw new Error("Failed to update student");
     }
@@ -40,15 +46,30 @@ const studentService = {
 
   // Delete student
   deleteStudent: async (id: string): Promise<void> => {
-    const response = await api.delete<{ success: boolean; message: string }>(`/students/${id}`);
+    const response = await api.delete<{ success: boolean; message: string }>(
+      `/students/${id}`,
+    );
     if (!response.data.success) {
       throw new Error("Failed to delete student");
     }
   },
 
+  // Toggle student activation status
+  toggleStudentActivation: async (id: string): Promise<Student> => {
+    const response = await api.patch<StudentResponse>(
+      `/students/${id}/toggle-activation`,
+    );
+    if (!response.data.success) {
+      throw new Error("Failed to toggle student activation");
+    }
+    return response.data.data;
+  },
+
   // Get students by department
   getStudentsByDepartment: async (departmentId: string): Promise<Student[]> => {
-    const response = await api.get<StudentsResponse>(`/students/department/${departmentId}`);
+    const response = await api.get<StudentsResponse>(
+      `/students/department/${departmentId}`,
+    );
     if (!response.data.success) {
       throw new Error("Failed to fetch students by department");
     }
@@ -57,7 +78,9 @@ const studentService = {
 
   // Get students by faculty
   getStudentsByFaculty: async (facultyId: string): Promise<Student[]> => {
-    const response = await api.get<StudentsResponse>(`/students/faculty/${facultyId}`);
+    const response = await api.get<StudentsResponse>(
+      `/students/faculty/${facultyId}`,
+    );
     if (!response.data.success) {
       throw new Error("Failed to fetch students by faculty");
     }

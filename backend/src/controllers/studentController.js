@@ -472,6 +472,74 @@ const getStudentsByFaculty = async (req, res) => {
   }
 }
 
+/**
+ * Toggle student activation status
+ * @route PATCH /api/students/:id/toggle-activation
+ * @access Private (Admin, Financial, Admission)
+ */
+const toggleStudentActivation = async (req, res) => {
+  try {
+    const { id } = req.params
+
+    // Find student by ID
+    const student = await prisma.student.findUnique({
+      where: { id },
+      include: {
+        faculty: {
+          select: {
+            name: true,
+          },
+        },
+        department: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    })
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      })
+    }
+
+    // Toggle activation status
+    const updatedStudent = await prisma.student.update({
+      where: { id },
+      data: { isActive: !student.isActive },
+      include: {
+        faculty: {
+          select: {
+            name: true,
+          },
+        },
+        department: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    })
+
+    const status = updatedStudent.isActive ? "activated" : "deactivated"
+
+    res.status(200).json({
+      success: true,
+      message: `Student ${status} successfully`,
+      data: updatedStudent,
+    })
+  } catch (error) {
+    console.error("Toggle student activation error:", error)
+    res.status(500).json({
+      success: false,
+      message: "Server error toggling student activation",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    })
+  }
+}
+
 export {
   getAllStudents,
   getStudentById,
@@ -480,4 +548,5 @@ export {
   deleteStudent,
   getStudentsByDepartment,
   getStudentsByFaculty,
+  toggleStudentActivation,
 }

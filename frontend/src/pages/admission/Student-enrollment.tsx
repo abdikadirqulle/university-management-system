@@ -22,6 +22,8 @@ import {
   RefreshCw,
   UserPlus,
   Eye,
+  PowerOff,
+  Power,
 } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
@@ -54,8 +56,14 @@ import StudentRegistrationDialog from "@/components/admission/student-registrati
 const StudentEnrollment = () => {
   useAuthGuard(["admin", "admission"]);
   const navigate = useNavigate();
-  const { students, isLoading, fetchStudents, updateStudent, deleteStudent } =
-    useStudentStore();
+  const {
+    students,
+    isLoading,
+    fetchStudents,
+    updateStudent,
+    deleteStudent,
+    toggleStudentActivation,
+  } = useStudentStore();
 
   // State for student management
   const [searchTerm, setSearchTerm] = useState("");
@@ -95,6 +103,19 @@ const StudentEnrollment = () => {
     } catch (error) {
       toast.error("Failed to delete student");
       console.error("Error deleting student:", error);
+    }
+  };
+
+  const handleToggleActivation = async (student: Student) => {
+    const action = student.isActive ? "deactivate" : "activate";
+    if (
+      window.confirm(`Are you sure you want to ${action} ${student.fullName}?`)
+    ) {
+      try {
+        await toggleStudentActivation(student.id);
+      } catch (error) {
+        toast.error(`Failed to ${action} student`);
+      }
     }
   };
 
@@ -202,23 +223,25 @@ const StudentEnrollment = () => {
                   filteredStudents.map((student) => (
                     <TableRow
                       key={student.id}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => handleViewStudent(student)}
+                      className=" hover:bg-muted/50"
+                      //   onClick={() => handleViewStudent(student)}
                     >
                       <TableCell>{student.studentId}</TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{student.fullName}</div>
+                          <div className="font-medium text-nowrap">
+                            {student.fullName}
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         {student.faculty?.name || "N/A"}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
+                      <TableCell className="hidden md:table-cell text-nowrap">
                         {student.department?.name || "N/A"}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        {student.registerYear || "N/A"}
+                      <TableCell className="hidden md:table-cell uppercase">
+                        {student.department.batch || "N/A"}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         {student.semester || "N/A"}
@@ -231,11 +254,12 @@ const StudentEnrollment = () => {
                       </TableCell>
                       <TableCell>
                         <Badge
-                          className={`px-2 py-1 ${student.academicYear ? "bg-green-500" : "bg-gray-500"}`}
+                          className={`px-2 py-1 ${student.isActive ? "bg-green-500" : "bg-red-500"}`}
                         >
-                          {student.academicYear ? "Active" : "Pending"}
+                          {student.isActive ? "Active" : "Inactive"}
                         </Badge>
                       </TableCell>
+
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end space-x-2">
                           <Button
