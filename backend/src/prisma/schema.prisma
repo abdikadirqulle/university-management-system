@@ -120,7 +120,7 @@ model Student {
   highSchoolName    String
   highSchoolCity    String?
   graduationYear    Int
-  averagePass       Float
+  averagePass       String    // Changed from Float to String to support both percentage and letter grades
   facultyId         String     @db.ObjectId
   departmentId      String     @db.ObjectId
   session           String

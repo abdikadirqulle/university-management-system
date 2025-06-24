@@ -125,9 +125,39 @@ const studentSchema = z.object({
     }, "Graduation year must be between current year and 10 years ago"),
   averagePass: z
     .string()
-    .min(1, "GPA is required")
-    .transform((val) => parseFloat(val))
-    .refine((val) => val >= 0 && val <= 4, "GPA must be between 0 and 4"),
+    .min(1, "Average pass is required")
+    .refine((val) => {
+      const trimmedVal = val.trim().toUpperCase();
+
+      // Check if it's a percentage (0-100)
+      const percentage = parseFloat(trimmedVal);
+      if (!isNaN(percentage) && percentage >= 0 && percentage <= 100) {
+        return true;
+      }
+
+      // Check if it's a letter grade (A, A+, A-, B, B+, B-, C, C+, C-, D, D+, D-, F)
+      const letterGrades = [
+        "A+",
+        "A",
+        "A-",
+        "B+",
+        "B",
+        "B-",
+        "C+",
+        "C",
+        "C-",
+        "D+",
+        "D",
+        "D-",
+        "F",
+      ];
+      if (letterGrades.includes(trimmedVal)) {
+        return true;
+      }
+
+      return false;
+    }, "Average pass must be either a percentage (0-100) or a letter grade (A+, A, A-, B+, B, B-, C+, C, C-, D+, D, D-, F)")
+    .transform((val) => val.trim().toUpperCase()),
 
   // Program Information
   facultyId: z.string().min(1, "Faculty is required"),
@@ -169,7 +199,6 @@ interface StudentRegistrationDialogProps {
 interface Department {
   id: string;
   name: string;
-  code: string;
   facultyId: string;
 }
 
@@ -230,7 +259,7 @@ const StudentRegistrationDialog = ({
         highSchoolName: student.highSchoolName || "",
         highSchoolCity: student.highSchoolCity || "",
         graduationYear: parseInt(graduationYearStr),
-        averagePass: parseFloat(averagePassStr),
+        averagePass: averagePassStr,
 
         // Program Information
         facultyId: student.facultyId || "",
@@ -267,7 +296,7 @@ const StudentRegistrationDialog = ({
       highSchoolName: "",
       highSchoolCity: "",
       graduationYear: new Date().getFullYear(),
-      averagePass: 0,
+      averagePass: "",
 
       // Program Information
       facultyId: "",
@@ -331,11 +360,15 @@ const StudentRegistrationDialog = ({
       } else {
         // Generate a student ID for new students (this would normally be done by the backend)
         const year = new Date().getFullYear().toString().slice(-2);
-        const facultyCode =
+        const facultyName =
           faculties.find((f) => f.id === data.facultyId)?.code || "XX";
-        const deptCode =
+        const deptName =
           departments.find((d) => d.id === data.departmentId)?.code || "XX";
         const randomNum = Math.floor(1000 + Math.random() * 9000); // 4-digit random number
+
+        // Use first 2 letters of faculty and department names
+        const facultyCode = facultyName.substring(0, 2).toUpperCase();
+        const deptCode = deptName.substring(0, 2).toUpperCase();
 
         const studentId = `${year}${facultyCode}${deptCode}${randomNum}`;
 
@@ -348,6 +381,7 @@ const StudentRegistrationDialog = ({
           ...studentData,
           studentId,
           userId: userId,
+          isActive: true,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
@@ -565,10 +599,23 @@ const StudentRegistrationDialog = ({
                   name="averagePass"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>GPA / Average Pass</FormLabel>
+                      <FormLabel>Average Pass / GPA</FormLabel>
                       <FormControl>
-                        <Input placeholder="3.5" {...field} />
+                        <Input
+                          placeholder="e.g., 89 or A+"
+                          {...field}
+                          onChange={(e) => {
+                            let value = e.target.value;
+                            // Convert to uppercase for letter grades
+                            value = value.toUpperCase();
+                            field.onChange(value);
+                          }}
+                        />
                       </FormControl>
+                      <FormDescription>
+                        Enter percentage (0-100) or letter grade (A+, A, A-, B+,
+                        B, B-, C+, C, C-, D+, D, D-, F)
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}

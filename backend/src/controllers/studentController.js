@@ -152,7 +152,7 @@ const createStudent = async (req, res) => {
         highSchoolName,
         highSchoolCity,
         graduationYear: parseInt(graduationYear),
-        averagePass: parseFloat(averagePass),
+        averagePass: averagePass,
         facultyId,
         departmentId,
         session,
@@ -285,9 +285,7 @@ const updateStudent = async (req, res) => {
         graduationYear: graduationYear
           ? parseInt(graduationYear)
           : existingStudent.graduationYear,
-        averagePass: averagePass
-          ? parseFloat(averagePass)
-          : existingStudent.averagePass,
+        averagePass: averagePass ? averagePass : existingStudent.averagePass,
         facultyId: facultyId || existingStudent.facultyId,
         departmentId: departmentId || existingStudent.departmentId,
         session: session || existingStudent.session,

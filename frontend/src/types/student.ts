@@ -15,7 +15,7 @@ export interface Student {
   highSchoolName: string;
   highSchoolCity: string;
   graduationYear: number;
-  averagePass: number;
+  averagePass: string;
   facultyId: string;
   departmentId: string;
   session: string;
