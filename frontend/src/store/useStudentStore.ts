@@ -18,7 +18,11 @@ interface StudentState {
   getStudentsByDepartment: (departmentId: string) => Promise<void>;
   getStudentsByFaculty: (facultyId: string) => Promise<void>;
   toggleStudentActivation: (id: string) => Promise<void>;
-  updateStudentAccount: (id: string, paidType: string) => Promise<void>;
+  updateStudentAccount: (
+    id: string,
+    paidType: string,
+    discount?: number,
+  ) => Promise<void>;
   resetSelectedStudent: () => void;
 }
 
@@ -199,10 +203,14 @@ export const useStudentStore = create<StudentState>((set) => ({
     }
   },
 
-  updateStudentAccount: async (id: string, paidType: string) => {
+  updateStudentAccount: async (
+    id: string,
+    paidType: string,
+    discount?: number,
+  ) => {
     set({ isLoading: true, error: null });
     try {
-      await studentService.updateStudentAccount(id, { paidType });
+      await studentService.updateStudentAccount(id, { paidType, discount });
 
       // Update the student in the store
       set((state) => {
@@ -213,6 +221,7 @@ export const useStudentStore = create<StudentState>((set) => ({
               studentAccount: {
                 ...student.studentAccount,
                 paidType,
+                ...(discount !== undefined && { discount }),
               },
             };
           }
@@ -229,6 +238,7 @@ export const useStudentStore = create<StudentState>((set) => ({
             studentAccount: {
               ...state.selectedStudent.studentAccount,
               paidType,
+              ...(discount !== undefined && { discount }),
             },
           };
         }
@@ -241,12 +251,12 @@ export const useStudentStore = create<StudentState>((set) => ({
         };
       });
 
-      toast.success("Student payment type updated successfully");
+      toast.success("Student account updated successfully");
     } catch (error) {
       const errorMessage =
         error instanceof Error
           ? error.message
-          : "Failed to update student payment type";
+          : "Failed to update student account";
       toast.error(errorMessage);
       set({
         error: errorMessage,

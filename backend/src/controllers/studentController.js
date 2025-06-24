@@ -546,7 +546,7 @@ const toggleStudentActivation = async (req, res) => {
 const updateStudentAccount = async (req, res) => {
   try {
     const { id } = req.params
-    const { paidType } = req.body
+    const { paidType, discount } = req.body
 
     // Check if student exists
     const student = await prisma.student.findUnique({
@@ -578,6 +578,10 @@ const updateStudentAccount = async (req, res) => {
       where: { id: studentAccount.id },
       data: {
         paidType: paidType || studentAccount.paidType,
+        discount:
+          discount !== undefined
+            ? parseFloat(discount)
+            : studentAccount.discount,
       },
     })
 

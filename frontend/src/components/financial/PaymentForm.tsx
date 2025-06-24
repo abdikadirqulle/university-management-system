@@ -79,6 +79,21 @@ const PAID_TYPES = [
   { value: "One Time", label: "One Time" },
 ];
 
+// Discount percentages
+const DISCOUNT_PERCENTAGES = [
+  { value: "0", label: "0%" },
+  { value: "5", label: "5%" },
+  { value: "10", label: "10%" },
+  { value: "15", label: "15%" },
+  { value: "20", label: "20%" },
+  { value: "25", label: "25%" },
+  { value: "30", label: "30%" },
+  { value: "40", label: "40%" },
+  { value: "50", label: "50%" },
+  { value: "75", label: "75%" },
+  { value: "100", label: "100%" },
+];
+
 interface PaymentFormProps {
   payment?: Payment;
   selectedStudent: Student | null;
@@ -118,6 +133,19 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   );
   const [paidTypeLoading, setPaidTypeLoading] = useState(false);
   const [paidTypeSuccess, setPaidTypeSuccess] = useState(false);
+
+  // New state for discount
+  const [discountPercentage, setDiscountPercentage] = useState(
+    selectedStudent?.studentAccount?.[0]?.discount
+      ? Math.round(
+          (selectedStudent?.studentAccount[0].discount /
+            (selectedStudent?.studentAccount[0].tuitionFee || 1)) *
+            100,
+        ).toString()
+      : "0",
+  );
+  const [discountLoading, setDiscountLoading] = useState(false);
+  const [discountSuccess, setDiscountSuccess] = useState(false);
 
   const { deletePayment, fetchPayments } = usePaymentStore();
   const { toggleStudentActivation, updateStudentAccount } = useStudentStore();
@@ -159,8 +187,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   }, [fetchPayments]);
 
   // Handle payment delete
-  const handleDeletePayment = (payment: Payment) => {
-    setSelectedPayment(payment);
+  const handleDeletePayment = (transaction: any) => {
+    setSelectedPayment(transaction);
     setIsDeleteDialogOpen(true);
   };
 
@@ -263,6 +291,30 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     }
   };
 
+  // Handle discount change
+  const handleDiscountChange = async () => {
+    if (!selectedStudent) return;
+
+    setDiscountLoading(true);
+    setDiscountSuccess(false);
+
+    try {
+      // Calculate discount amount from percentage
+      const tuitionFee = selectedStudent?.studentAccount?.[0]?.tuitionFee || 0;
+      const discountAmount =
+        (parseFloat(discountPercentage) / 100) * tuitionFee;
+
+      await updateStudentAccount(selectedStudent.id, paidType, discountAmount);
+      setDiscountSuccess(true);
+      setTimeout(() => setDiscountSuccess(false), 2000);
+    } catch (error) {
+      toast.error("Failed to update discount");
+      console.error("Error updating discount:", error);
+    } finally {
+      setDiscountLoading(false);
+    }
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -352,30 +404,40 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {/* <div>
-                <p className="text-sm text-muted-foreground">WhatsApp</p>
+              <div>
+                <p className="text-sm text-muted-foreground">Discount</p>
                 <div className="flex items-center mt-1 gap-2">
-                  <Input
-                    value={whatsApp}
-                    onChange={(e) => setWhatsApp(e.target.value)}
-                    className=""
-                  />
+                  <Select
+                    value={discountPercentage}
+                    onValueChange={setDiscountPercentage}
+                  >
+                    <SelectTrigger className="">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DISCOUNT_PERCENTAGES.map((discount) => (
+                        <SelectItem key={discount.value} value={discount.value}>
+                          {discount.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <Button
                     variant="default"
                     size="icon"
-                    onClick={handleWhatsAppChange}
-                    disabled={whatsAppLoading}
+                    onClick={handleDiscountChange}
+                    disabled={discountLoading}
                   >
-                    {whatsAppLoading ? (
+                    {discountLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : whatsAppSuccess ? (
+                    ) : discountSuccess ? (
                       <Check className="h-4 w-4" />
                     ) : (
                       <Check className="h-4 w-4" />
                     )}
                   </Button>
                 </div>
-              </div> */}
+              </div>
               <div>
                 <p className="text-sm text-muted-foreground">Department</p>
                 <p className="font-medium uppercase">
