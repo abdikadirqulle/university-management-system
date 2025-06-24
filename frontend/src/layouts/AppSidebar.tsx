@@ -24,11 +24,12 @@ import {
   UserPlus,
   UsersRound,
 } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const AppSidebar = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -37,7 +38,6 @@ const AppSidebar = () => {
   // Role-specific menu items
   const roleMenuItems = {
     admin: [
-      // Add admin role with same menu items as academic
       {
         title: "Dashboard",
         icon: Home,
@@ -63,7 +63,6 @@ const AppSidebar = () => {
         icon: UsersRound,
         path: "/admin/students",
       },
-
       {
         title: "Faculties",
         icon: Building,
@@ -92,7 +91,7 @@ const AppSidebar = () => {
       {
         title: "Settings",
         icon: Settings,
-        path: `/admin/settings`,
+        path: "/admin/settings",
       },
     ],
 
@@ -112,11 +111,6 @@ const AppSidebar = () => {
         icon: UsersRound,
         path: "/financial/students",
       },
-      //   {
-      //     title: "Reports",
-      //     icon: BarChart,
-      //     path: "/financial/reports",
-      //   },
     ],
     admission: [
       {
@@ -124,7 +118,6 @@ const AppSidebar = () => {
         icon: Home,
         path: "/admission/dashboard",
       },
-
       {
         title: "Registration",
         icon: UserPlus,
@@ -144,7 +137,7 @@ const AppSidebar = () => {
 
   // Map user role to display label with fallback
   const roleLabelMap = {
-    admin: "Academic Affairs", // Handle admin role same as academic
+    admin: "Academic Affairs",
     admission: "Admission Officer",
     student: "Student",
     financial: "Financial Officer",
@@ -161,6 +154,14 @@ const AppSidebar = () => {
         financial: "badge-role-financial",
       }[user.role]
     : "";
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   return (
     <Sidebar>
@@ -219,7 +220,7 @@ const AppSidebar = () => {
         <Button
           variant="ghost"
           className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
-          onClick={logout}
+          onClick={handleLogout}
         >
           <LogOut className="mr-2 h-5 w-5" />
           Logout

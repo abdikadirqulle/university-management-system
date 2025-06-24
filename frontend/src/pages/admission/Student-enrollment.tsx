@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import {
@@ -14,19 +13,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
-import {
-  Search,
-  Plus,
-  Edit,
-  Trash2,
-  RefreshCw,
-  UserPlus,
-  Eye,
-  PowerOff,
-  Power,
-} from "lucide-react";
+import { Search, Edit, Trash2, RefreshCw, UserPlus } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { useAuth } from "@/context/AuthContext";
 
 import {
   AlertDialog,
@@ -55,15 +45,10 @@ import StudentRegistrationDialog from "@/components/admission/student-registrati
 
 const StudentEnrollment = () => {
   useAuthGuard(["admin", "admission"]);
-  const navigate = useNavigate();
-  const {
-    students,
-    isLoading,
-    fetchStudents,
-    updateStudent,
-    deleteStudent,
-    toggleStudentActivation,
-  } = useStudentStore();
+  const { user } = useAuth();
+
+  const { students, isLoading, fetchStudents, deleteStudent } =
+    useStudentStore();
 
   // State for student management
   const [searchTerm, setSearchTerm] = useState("");
@@ -76,23 +61,10 @@ const StudentEnrollment = () => {
     fetchStudents();
   }, [fetchStudents]);
 
-  // Handle viewing student details
-  const handleViewStudent = (student: Student) => {
-    setSelectedStudent(student);
-    setIsViewDialogOpen(true);
-  };
-
   // Handle editing a student
   const handleEditStudent = (student: Student) => {
     setSelectedStudent(student);
     setIsEditDialogOpen(true);
-  };
-
-  // Handle saving edited student
-  const handleSaveStudent = (updatedStudent: Student) => {
-    updateStudent(updatedStudent.id, updatedStudent);
-    setIsEditDialogOpen(false);
-    toast.success("Student information updated successfully");
   };
 
   // Handle deleting a student
@@ -103,19 +75,6 @@ const StudentEnrollment = () => {
     } catch (error) {
       toast.error("Failed to delete student");
       console.error("Error deleting student:", error);
-    }
-  };
-
-  const handleToggleActivation = async (student: Student) => {
-    const action = student.isActive ? "deactivate" : "activate";
-    if (
-      window.confirm(`Are you sure you want to ${action} ${student.fullName}?`)
-    ) {
-      try {
-        await toggleStudentActivation(student.id);
-      } catch (error) {
-        toast.error(`Failed to ${action} student`);
-      }
     }
   };
 
@@ -132,7 +91,7 @@ const StudentEnrollment = () => {
     <div className="space-y-6">
       <PageHeader
         title="Student Enrollment Management"
-        description="View, update, and manage enrolled students"
+        description={`View, update, and manage enrolled students (Logged in as: ${user?.role || "Unknown"})`}
         action={{
           label: "Register New Student",
           icon: UserPlus,

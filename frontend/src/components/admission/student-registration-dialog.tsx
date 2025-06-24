@@ -176,7 +176,7 @@ const StudentRegistrationDialog = ({
   onSuccess,
   student,
 }: StudentRegistrationDialogProps) => {
-  useAuthGuard(["admission"]);
+  useAuthGuard(["admin", "admission"]);
 
   // Determine if we're in edit mode
   const isEditMode = !!student;

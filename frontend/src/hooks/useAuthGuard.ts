@@ -33,9 +33,10 @@ export const useAuthGuard = (
           case "admission":
             navigate("/admission/dashboard");
             break;
-          case "student":
-            navigate("/student/dashboard");
+          case "financial":
+            navigate("/financial/dashboard");
             break;
+
           default:
             navigate(redirectTo);
         }

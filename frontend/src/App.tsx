@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -71,6 +71,7 @@ const App = () => (
 
             {/* Admin routes */}
             <Route path="/admin" element={<AppLayout />}>
+              <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<UsersPage />} />
               <Route path="students" element={<StudentList />} />
@@ -95,6 +96,7 @@ const App = () => (
 
             {/* admission routes */}
             <Route path="/admission" element={<AppLayout />}>
+              <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<AdmissionDashboard />} />
               <Route
                 path="student-enrollment"
@@ -108,6 +110,7 @@ const App = () => (
 
             {/* Financial Admin routes */}
             <Route path="/financial" element={<AppLayout />}>
+              <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<FinancialDashboard />} />
               <Route path="students" element={<FinancialStudentsPage />} />
               <Route path="payments" element={<PaymentsPage />} />

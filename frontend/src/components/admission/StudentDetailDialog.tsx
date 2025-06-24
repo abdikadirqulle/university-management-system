@@ -24,13 +24,18 @@ const StudentDetailDialog = ({
 }: StudentDetailDialogProps) => {
   if (!student) return null;
 
-  const InfoRow = ({ label, value }: { label: string; value: string | null | undefined }) => (
+  const InfoRow = ({
+    label,
+    value,
+  }: {
+    label: string;
+    value: string | null | undefined;
+  }) => (
     <div className="flex flex-col space-y-1">
       <span className="text-sm font-medium text-gray-500">{label}</span>
-      <span className="text-base">{value || '-'}</span>
+      <span className="text-base">{value || "-"}</span>
     </div>
   );
-
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -53,7 +58,10 @@ const StudentDetailDialog = ({
             <Card className="p-6">
               <div className="grid grid-cols-2 gap-6">
                 <InfoRow label="Student ID" value={student.studentId} />
-                <InfoRow label="Status" value={`${student.is_active? "Active": "InActive"}`} />
+                <InfoRow
+                  label="Status"
+                  value={`${student.isActive ? "Active" : "InActive"}`}
+                />
                 <InfoRow label="Full Name" value={student.fullName} />
                 <InfoRow label="Email" value={student.email} />
                 <InfoRow label="Gender" value={student.gender} />
@@ -77,17 +85,31 @@ const StudentDetailDialog = ({
           <TabsContent value="personal">
             <Card className="p-6">
               <div className="grid grid-cols-2 gap-6">
-                <InfoRow label="Date of Birth" value={ student.dateOfBirth.toString()} />
-                <InfoRow label="High School Name" value={student.highSchoolName} />
-                <InfoRow label="High School City" value={student.highSchoolCity} />
-                  <InfoRow label="Graduation Year" value={student.graduationYear} />
+                <InfoRow
+                  label="Date of Birth"
+                  value={student.dateOfBirth.toString()}
+                />
+                <InfoRow
+                  label="High School Name"
+                  value={student.highSchoolName}
+                />
+                <InfoRow
+                  label="High School City"
+                  value={student.highSchoolCity}
+                />
+                <InfoRow
+                  label="Graduation Year"
+                  value={student.graduationYear.toString()}
+                />
               </div>
             </Card>
           </TabsContent>
         </Tabs>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Close</Button>
+          <Button variant="outline" onClick={onClose}>
+            Close
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
