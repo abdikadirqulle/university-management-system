@@ -1,4 +1,9 @@
-import { Student, StudentResponse, StudentsResponse } from "@/types/student";
+import {
+  Student,
+  StudentResponse,
+  StudentsResponse,
+  StudentAccount,
+} from "@/types/student";
 import { api } from "./api";
 
 const studentService = {
@@ -83,6 +88,22 @@ const studentService = {
     );
     if (!response.data.success) {
       throw new Error("Failed to fetch students by faculty");
+    }
+    return response.data.data;
+  },
+
+  // Update student account
+  updateStudentAccount: async (
+    id: string,
+    accountData: { paidType: string },
+  ): Promise<StudentAccount> => {
+    const response = await api.patch<{
+      success: boolean;
+      message: string;
+      data: StudentAccount;
+    }>(`/students/${id}/account`, accountData);
+    if (!response.data.success) {
+      throw new Error("Failed to update student account");
     }
     return response.data.data;
   },

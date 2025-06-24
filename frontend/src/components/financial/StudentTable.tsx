@@ -196,7 +196,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
               <TableHead>Forwarded</TableHead>
               <TableHead>Discount</TableHead>
               <TableHead>Paid</TableHead>
-              <TableHead>Net</TableHead>
+              <TableHead>Balance</TableHead>
               <TableHead>TF Type</TableHead>
             </TableRow>
           </TableHeader>

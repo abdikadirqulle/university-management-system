@@ -50,6 +50,7 @@ export interface Student {
     otherCharges: number;
     discount: number;
     is_active?: boolean;
+    paidType?: string;
     totalDue: number;
     status: "pending" | "paid" | "overdue" | "partial";
     createdAt: string;
@@ -67,6 +68,7 @@ export interface StudentAccount {
   discount: number;
   totalDue: number;
   paidAmount: number;
+  paidType?: string;
   status: "pending" | "paid" | "overdue" | "partial";
   createdAt: string;
   updatedAt: string;

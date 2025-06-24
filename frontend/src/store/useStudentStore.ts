@@ -18,6 +18,7 @@ interface StudentState {
   getStudentsByDepartment: (departmentId: string) => Promise<void>;
   getStudentsByFaculty: (facultyId: string) => Promise<void>;
   toggleStudentActivation: (id: string) => Promise<void>;
+  updateStudentAccount: (id: string, paidType: string) => Promise<void>;
   resetSelectedStudent: () => void;
 }
 
@@ -190,6 +191,62 @@ export const useStudentStore = create<StudentState>((set) => ({
         error instanceof Error
           ? error.message
           : "Failed to toggle student activation";
+      toast.error(errorMessage);
+      set({
+        error: errorMessage,
+        isLoading: false,
+      });
+    }
+  },
+
+  updateStudentAccount: async (id: string, paidType: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      await studentService.updateStudentAccount(id, { paidType });
+
+      // Update the student in the store
+      set((state) => {
+        const updatedStudents = state.students.map((student) => {
+          if (student.id === id && student.studentAccount) {
+            return {
+              ...student,
+              studentAccount: {
+                ...student.studentAccount,
+                paidType,
+              },
+            };
+          }
+          return student;
+        });
+
+        let updatedSelectedStudent = state.selectedStudent;
+        if (
+          state.selectedStudent?.id === id &&
+          state.selectedStudent.studentAccount
+        ) {
+          updatedSelectedStudent = {
+            ...state.selectedStudent,
+            studentAccount: {
+              ...state.selectedStudent.studentAccount,
+              paidType,
+            },
+          };
+        }
+
+        return {
+          students: updatedStudents,
+          selectedStudent: updatedSelectedStudent,
+          isLoading: false,
+          error: null,
+        };
+      });
+
+      toast.success("Student payment type updated successfully");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to update student payment type";
       toast.error(errorMessage);
       set({
         error: errorMessage,

@@ -538,6 +538,64 @@ const toggleStudentActivation = async (req, res) => {
   }
 }
 
+/**
+ * Update student account
+ * @route PATCH /api/students/:id/account
+ * @access Private (Admin, Financial)
+ */
+const updateStudentAccount = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { paidType } = req.body
+
+    // Check if student exists
+    const student = await prisma.student.findUnique({
+      where: { id },
+      include: {
+        studentAccount: true,
+      },
+    })
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      })
+    }
+
+    // Get the most recent student account
+    const studentAccount = student.studentAccount?.[0]
+
+    if (!studentAccount) {
+      return res.status(404).json({
+        success: false,
+        message: "Student account not found",
+      })
+    }
+
+    // Update student account
+    const updatedAccount = await prisma.studentAccount.update({
+      where: { id: studentAccount.id },
+      data: {
+        paidType: paidType || studentAccount.paidType,
+      },
+    })
+
+    res.status(200).json({
+      success: true,
+      message: "Student account updated successfully",
+      data: updatedAccount,
+    })
+  } catch (error) {
+    console.error("Error updating student account:", error)
+    res.status(500).json({
+      success: false,
+      message: "Server error while updating student account",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    })
+  }
+}
+
 export {
   getAllStudents,
   getStudentById,
@@ -547,4 +605,5 @@ export {
   getStudentsByDepartment,
   getStudentsByFaculty,
   toggleStudentActivation,
+  updateStudentAccount,
 }

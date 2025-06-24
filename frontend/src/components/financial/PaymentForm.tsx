@@ -32,7 +32,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Loader2, Pencil, PrinterIcon, Trash2 } from "lucide-react";
+import { Loader2, Pencil, PrinterIcon, Trash2, Check } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -56,6 +56,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePaymentStore } from "@/store/usePaymentStore";
 import { exportService } from "@/services/exportService";
+import { useStudentStore } from "@/store/useStudentStore";
 
 // Form schema
 const formSchema = z.object({
@@ -67,6 +68,23 @@ const formSchema = z.object({
   type: z.string().min(1, "Payment type is required"),
   paymentMethod: z.string().min(1, "Payment method is required"),
 });
+
+// Payment methods
+const PAYMENT_METHODS = [
+  { value: "cash", label: "Cash" },
+  { value: "bank_transfer", label: "Bank Transfer" },
+  { value: "mobile_money", label: "Mobile Money" },
+  { value: "check", label: "Check" },
+  { value: "other", label: "Other" },
+];
+
+// Paid types
+const PAID_TYPES = [
+  { value: "per_month", label: "Per Month" },
+  { value: "per_semester", label: "Per Semester" },
+  { value: "per_year", label: "Per Year" },
+  { value: "one_time", label: "One Time" },
+];
 
 interface PaymentFormProps {
   payment?: Payment;
@@ -95,7 +113,26 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   );
   const [isPrinting, setIsPrinting] = useState(false);
 
+  // New state for student status, paid type, and WhatsApp
+  const [studentStatus, setStudentStatus] = useState(
+    selectedStudent?.isActive ? "active" : "inactive",
+  );
+  const [statusLoading, setStatusLoading] = useState(false);
+  const [statusSuccess, setStatusSuccess] = useState(false);
+
+  const [paidType, setPaidType] = useState(
+    selectedStudent?.studentAccount?.[0]?.paidType || "per_month",
+  );
+  const [paidTypeLoading, setPaidTypeLoading] = useState(false);
+  const [paidTypeSuccess, setPaidTypeSuccess] = useState(false);
+
+  const [whatsApp, setWhatsApp] = useState(selectedStudent?.phoneNumber || "");
+  const [whatsAppLoading, setWhatsAppLoading] = useState(false);
+  const [whatsAppSuccess, setWhatsAppSuccess] = useState(false);
+
   const { deletePayment, fetchPayments } = usePaymentStore();
+  const { updateStudent, toggleStudentActivation, updateStudentAccount } =
+    useStudentStore();
 
   // Initialize form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -198,6 +235,64 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     }
   };
 
+  // Handle status change
+  const handleStatusChange = async () => {
+    if (!selectedStudent) return;
+
+    setStatusLoading(true);
+    setStatusSuccess(false);
+
+    try {
+      await toggleStudentActivation(selectedStudent.id);
+      setStudentStatus(studentStatus === "active" ? "inactive" : "active");
+      setStatusSuccess(true);
+      setTimeout(() => setStatusSuccess(false), 2000);
+    } catch (error) {
+      toast.error("Failed to update student status");
+      console.error("Error updating student status:", error);
+    } finally {
+      setStatusLoading(false);
+    }
+  };
+
+  // Handle paid type change
+  const handlePaidTypeChange = async () => {
+    if (!selectedStudent) return;
+
+    setPaidTypeLoading(true);
+    setPaidTypeSuccess(false);
+
+    try {
+      await updateStudentAccount(selectedStudent.id, paidType);
+      setPaidTypeSuccess(true);
+      setTimeout(() => setPaidTypeSuccess(false), 2000);
+    } catch (error) {
+      toast.error("Failed to update payment type");
+      console.error("Error updating payment type:", error);
+    } finally {
+      setPaidTypeLoading(false);
+    }
+  };
+
+  // Handle WhatsApp change
+  const handleWhatsAppChange = async () => {
+    if (!selectedStudent) return;
+
+    setWhatsAppLoading(true);
+    setWhatsAppSuccess(false);
+
+    try {
+      await updateStudent(selectedStudent.id, { phoneNumber: whatsApp });
+      setWhatsAppSuccess(true);
+      setTimeout(() => setWhatsAppSuccess(false), 2000);
+    } catch (error) {
+      toast.error("Failed to update WhatsApp number");
+      console.error("Error updating WhatsApp number:", error);
+    } finally {
+      setWhatsAppLoading(false);
+    }
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -216,10 +311,66 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
               <div>
                 <p className="text-sm text-muted-foreground">Student Status</p>
-                <div className="flex items-center mt-1">
-                  <Badge variant="outline" className="bg-primary/10">
-                    Active
-                  </Badge>
+                <div className="flex items-center mt-1 gap-2">
+                  <Select
+                    value={studentStatus}
+                    onValueChange={setStudentStatus}
+                  >
+                    <SelectTrigger className="w-[120px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-9 w-9 bg-teal-500 hover:bg-teal-600 text-white"
+                    onClick={handleStatusChange}
+                    disabled={statusLoading}
+                  >
+                    {statusLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : statusSuccess ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Check className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Paid Type</p>
+                <div className="flex items-center mt-1 gap-2">
+                  <Select value={paidType} onValueChange={setPaidType}>
+                    <SelectTrigger className="w-[120px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PAID_TYPES.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-9 w-9 bg-teal-500 hover:bg-teal-600 text-white"
+                    onClick={handlePaidTypeChange}
+                    disabled={paidTypeLoading}
+                  >
+                    {paidTypeLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : paidTypeSuccess ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Check className="h-4 w-4" />
+                    )}
+                  </Button>
                 </div>
               </div>
               <div>
@@ -230,13 +381,34 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                 <p className="text-sm text-muted-foreground">Full Name</p>
                 <p className="font-medium">{selectedStudent?.fullName}</p>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">WhatsApp</p>
-                <p className="font-medium">{selectedStudent?.phoneNumber}</p>
-              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">WhatsApp</p>
+                <div className="flex items-center mt-1 gap-2">
+                  <Input
+                    value={whatsApp}
+                    onChange={(e) => setWhatsApp(e.target.value)}
+                    className="max-w-[180px]"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-9 w-9 bg-teal-500 hover:bg-teal-600 text-white"
+                    onClick={handleWhatsAppChange}
+                    disabled={whatsAppLoading}
+                  >
+                    {whatsAppLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : whatsAppSuccess ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Check className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
               <div>
                 <p className="text-sm text-muted-foreground">Department</p>
                 <p className="font-medium uppercase">
@@ -252,10 +424,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               <div>
                 <p className="text-sm text-muted-foreground">Semester</p>
                 <p className="font-medium">{selectedStudent?.semester}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Session</p>
-                <p className="font-medium">{selectedStudent?.session}</p>
               </div>
             </div>
           </CardContent>

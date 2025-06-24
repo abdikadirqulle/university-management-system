@@ -9,6 +9,7 @@ import {
   getStudentsByDepartment,
   getStudentsByFaculty,
   toggleStudentActivation,
+  updateStudentAccount,
 } from "../controllers/studentController.js"
 
 import { authenticateUser, authorize } from "../middleware/authMiddleware.js"
@@ -61,6 +62,14 @@ router.patch(
   authenticateUser,
   // authorize(['admin', 'financial', 'admission']),
   toggleStudentActivation
+)
+
+// Update student account - Admin, Financial access
+router.patch(
+  "/:id/account",
+  authenticateUser,
+  // authorize(['admin', 'financial']),
+  updateStudentAccount
 )
 
 // Get students by department - Admin and Admission access
