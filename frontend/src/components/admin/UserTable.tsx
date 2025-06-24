@@ -3,7 +3,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { User, UserRole } from "@/types/auth";
 import { DataTable } from "@/components/DataTable";
 import { Button } from "@/components/ui/button";
-import { Edit, MoreHorizontal, Trash2 } from "lucide-react";
+import { Edit, MoreHorizontal, Trash2, Power, PowerOff } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,12 +12,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 
 interface UserTableProps {
   users: User[];
   isLoading: boolean;
   onEditUser: (user: User) => void;
   onDeleteUser: (user: User) => void;
+  onToggleActivation: (user: User) => void;
 }
 
 const UserTable: React.FC<UserTableProps> = ({
@@ -25,12 +27,17 @@ const UserTable: React.FC<UserTableProps> = ({
   isLoading,
   onEditUser,
   onDeleteUser,
+  onToggleActivation,
 }) => {
   // Define table columns
   const columns: ColumnDef<User>[] = [
     {
       accessorKey: "name",
       header: "Name",
+    },
+    {
+      accessorKey: "username",
+      header: "Username",
     },
     {
       accessorKey: "role",
@@ -61,10 +68,21 @@ const UserTable: React.FC<UserTableProps> = ({
       accessorKey: "email",
       header: "Email",
     },
-  
-
+    {
+      accessorKey: "isActive",
+      header: "Status",
+      cell: ({ row }) => {
+        const isActive = row.getValue("isActive") as boolean;
+        return (
+          <Badge variant={isActive ? "default" : "secondary"}>
+            {isActive ? "Active" : "Inactive"}
+          </Badge>
+        );
+      },
+    },
     {
       id: "actions",
+      header: "Actions",
       cell: ({ row }) => {
         const user = row.original;
 
@@ -81,6 +99,19 @@ const UserTable: React.FC<UserTableProps> = ({
               <DropdownMenuItem onClick={() => onEditUser(user)}>
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onToggleActivation(user)}>
+                {user.isActive ? (
+                  <>
+                    <PowerOff className="mr-2 h-4 w-4" />
+                    Deactivate
+                  </>
+                ) : (
+                  <>
+                    <Power className="mr-2 h-4 w-4" />
+                    Activate
+                  </>
+                )}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => onDeleteUser(user)}

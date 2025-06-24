@@ -8,6 +8,7 @@ import {
   deleteUser,
   getAllUsers,
   getUserById,
+  toggleUserActivation,
 } from "../controllers/userController.js"
 import { authenticateUser, authorize } from "../middleware/authMiddleware.js"
 
@@ -28,8 +29,13 @@ router.get("/:id", authenticateUser, authorize("admin"), getUserById)
 router.post("/", authenticateUser, authorize("admin"), registerUser)
 router.put("/:id", authenticateUser, authorize("admin"), updateUser)
 router.delete("/:id", authenticateUser, authorize("admin"), deleteUser)
+router.patch(
+  "/:id/toggle-activation",
+  authenticateUser,
+  authorize("admin"),
+  toggleUserActivation
+)
 
 // Role-based dashboard routes
-
 
 export default router

@@ -1,4 +1,4 @@
-export type UserRole = "admin" | "admission" | "financial";
+export type UserRole = "admin" | "admission" | "financial" | "student";
 
 export interface User {
   id: string;
@@ -6,6 +6,7 @@ export interface User {
   username: string;
   email: string;
   role: UserRole;
+  isActive: boolean;
   password?: string;
   department?: string;
   studentId?: string;

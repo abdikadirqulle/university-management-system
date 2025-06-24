@@ -29,9 +29,6 @@ import AdmissionDashboard from "./pages/admission/admission-dashboard";
 import StudentEnrollment from "./pages/admission/Student-enrollment";
 import StudentList from "./pages/admission/Students-list";
 
-// Student Pages
-import StudentDashboard from "./pages/student/Dashboard";
-
 // Financial Admin Pages
 import FinancialDashboard from "./pages/financial/Dashboard";
 import PaymentsPage from "./pages/financial/Payments";
@@ -104,15 +101,6 @@ const App = () => (
                 element={<StudentEnrollment />}
               />
               <Route path="students" element={<StudentList />} />
-
-              {/* 404 Page */}
-              <Route path="*" element={<NotFound />} />
-            </Route>
-
-            {/* Student routes */}
-            <Route path="/student" element={<AppLayout />}>
-              <Route path="dashboard" element={<StudentDashboard />} />
-              {/* Add other student routes as needed */}
 
               {/* 404 Page */}
               <Route path="*" element={<NotFound />} />

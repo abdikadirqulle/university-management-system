@@ -60,4 +60,15 @@ export const userService = {
       throw new Error("Failed to delete user");
     }
   },
+
+  // Toggle user activation status
+  toggleUserActivation: async (id: string): Promise<User> => {
+    const response = await api.patch<UserResponse>(
+      `/users/${id}/toggle-activation`,
+    );
+    if (!response.data.success) {
+      throw new Error("Failed to toggle user activation");
+    }
+    return response.data.user;
+  },
 };

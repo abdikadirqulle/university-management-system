@@ -78,6 +78,14 @@ const loginUser = async (req, res) => {
       })
     }
 
+    // Check if user is active
+    if (!user.isActive) {
+      return res.status(403).json({
+        success: false,
+        message: "This user is deactivated. Please contact the administrator.",
+      })
+    }
+
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password)
 
@@ -101,6 +109,7 @@ const loginUser = async (req, res) => {
         username: user.username,
         email: user.email,
         role: user.role,
+        isActive: user.isActive,
       },
     })
   } catch (error) {
@@ -273,8 +282,10 @@ const getAllUsers = async (req, res) => {
       select: {
         id: true,
         name: true,
+        username: true,
         email: true,
         role: true,
+        isActive: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -303,10 +314,12 @@ const getUserById = async (req, res) => {
       select: {
         id: true,
         name: true,
+        username: true,
         email: true,
         role: true,
         createdAt: true,
         updatedAt: true,
+        isActive: true,
       },
     })
 
@@ -397,6 +410,55 @@ const logoutUser = async (req, res) => {
   }
 }
 
+// Toggle user activation status (admin only)
+const toggleUserActivation = async (req, res) => {
+  try {
+    const { id } = req.params
+
+    // Find user by ID
+    const user = await prisma.user.findUnique({
+      where: { id },
+    })
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      })
+    }
+
+    // Toggle activation status
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: { isActive: !user.isActive },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    })
+
+    const status = updatedUser.isActive ? "activated" : "deactivated"
+
+    res.status(200).json({
+      success: true,
+      message: `User ${status} successfully`,
+      user: updatedUser,
+    })
+  } catch (error) {
+    console.error("Toggle user activation error:", error)
+    res.status(500).json({
+      success: false,
+      message: "Server error toggling user activation",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    })
+  }
+}
+
 // Generate JWT token
 const generateToken = (userId) => {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
@@ -414,4 +476,5 @@ export {
   getAllUsers,
   getUserById,
   deleteUser,
+  toggleUserActivation,
 }

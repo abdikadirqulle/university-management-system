@@ -16,8 +16,15 @@ import {
 const UsersPage = () => {
   useAuthGuard(["admin"]);
 
-  const { users, isLoading, fetchUsers, addUser, updateUser, deleteUser } =
-    useUserStore();
+  const {
+    users,
+    isLoading,
+    fetchUsers,
+    addUser,
+    updateUser,
+    deleteUser,
+    toggleUserActivation,
+  } = useUserStore();
 
   // Dialog state
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -44,6 +51,18 @@ const UsersPage = () => {
     if (window.confirm(`Are you sure you want to delete ${user.name}?`)) {
       await deleteUser(user.id);
       toast.success("User deleted successfully");
+    }
+  };
+
+  const handleToggleActivation = async (user: User) => {
+    const action = user.isActive ? "deactivate" : "activate";
+    if (window.confirm(`Are you sure you want to ${action} ${user.name}?`)) {
+      try {
+        await toggleUserActivation(user.id);
+        toast.success(`User ${action}d successfully`);
+      } catch (error) {
+        toast.error(`Failed to ${action} user`);
+      }
     }
   };
 
@@ -83,6 +102,7 @@ const UsersPage = () => {
         isLoading={isLoading}
         onEditUser={handleEditUser}
         onDeleteUser={handleDeleteUser}
+        onToggleActivation={handleToggleActivation}
       />
 
       <UserFormDialog
