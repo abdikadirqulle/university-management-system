@@ -251,7 +251,9 @@ const StudentTable: React.FC<StudentTableProps> = ({
                     {formatCurrency(getNetAmount(student))}
                   </TableCell>
                   <TableCell className="font-medium uppercase text-nowrap">
-                    <Badge variant="outline">{getPaymentType(student)}</Badge>
+                    <Badge variant="outline">
+                      {student.studentAccount?.[0]?.paidType || "N/A"}
+                    </Badge>
                   </TableCell>
                 </TableRow>
               ))

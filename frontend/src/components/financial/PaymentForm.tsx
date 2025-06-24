@@ -310,13 +310,21 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
               <div>
+                <p className="text-sm text-muted-foreground">Student ID</p>
+                <p className="font-medium">{selectedStudent?.studentId}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Full Name</p>
+                <p className="font-medium">{selectedStudent?.fullName}</p>
+              </div>
+              <div>
                 <p className="text-sm text-muted-foreground">Student Status</p>
                 <div className="flex items-center mt-1 gap-2">
                   <Select
                     value={studentStatus}
                     onValueChange={setStudentStatus}
                   >
-                    <SelectTrigger className="w-[120px]">
+                    <SelectTrigger className="">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -325,9 +333,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                     </SelectContent>
                   </Select>
                   <Button
-                    variant="outline"
+                    variant="default"
                     size="icon"
-                    className="h-9 w-9 bg-teal-500 hover:bg-teal-600 text-white"
                     onClick={handleStatusChange}
                     disabled={statusLoading}
                   >
@@ -345,7 +352,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                 <p className="text-sm text-muted-foreground">Paid Type</p>
                 <div className="flex items-center mt-1 gap-2">
                   <Select value={paidType} onValueChange={setPaidType}>
-                    <SelectTrigger className="w-[120px]">
+                    <SelectTrigger className="">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -357,9 +364,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                     </SelectContent>
                   </Select>
                   <Button
-                    variant="outline"
+                    variant="default"
                     size="icon"
-                    className="h-9 w-9 bg-teal-500 hover:bg-teal-600 text-white"
                     onClick={handlePaidTypeChange}
                     disabled={paidTypeLoading}
                   >
@@ -373,29 +379,20 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                   </Button>
                 </div>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Student ID</p>
-                <p className="font-medium">{selectedStudent?.studentId}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Full Name</p>
-                <p className="font-medium">{selectedStudent?.fullName}</p>
-              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
+              {/* <div>
                 <p className="text-sm text-muted-foreground">WhatsApp</p>
                 <div className="flex items-center mt-1 gap-2">
                   <Input
                     value={whatsApp}
                     onChange={(e) => setWhatsApp(e.target.value)}
-                    className="max-w-[180px]"
+                    className=""
                   />
                   <Button
-                    variant="outline"
+                    variant="default"
                     size="icon"
-                    className="h-9 w-9 bg-teal-500 hover:bg-teal-600 text-white"
                     onClick={handleWhatsAppChange}
                     disabled={whatsAppLoading}
                   >
@@ -408,7 +405,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                     )}
                   </Button>
                 </div>
-              </div>
+              </div> */}
               <div>
                 <p className="text-sm text-muted-foreground">Department</p>
                 <p className="font-medium uppercase">
@@ -474,7 +471,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                 </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground mb-1">NET</p>
+                <p className="text-sm text-muted-foreground mb-1">BALANCE</p>
                 <p className="font-semibold text-primary bg-primary/10 px-2 py-1 rounded">
                   {new Intl.NumberFormat("en-US", {
                     style: "currency",

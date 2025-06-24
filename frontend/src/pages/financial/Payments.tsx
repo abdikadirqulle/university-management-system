@@ -123,7 +123,7 @@ const PaymentsPage = () => {
 
       {/* Payment Form Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {selectedPayment ? "Edit Payment" : "Create New Payment"}
