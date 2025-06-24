@@ -496,11 +496,23 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                             <SelectItem value={PaymentType.TUITION}>
                               Tuition Fee
                             </SelectItem>
-                            <SelectItem value={PaymentType.ACCOMMODATION}>
-                              Accommodation
+                            <SelectItem value={PaymentType.ID_CARD}>
+                              ID Card
                             </SelectItem>
-                            <SelectItem value={PaymentType.LIBRARY}>
-                              Library
+                            <SelectItem value={PaymentType.CERTIFICATE}>
+                              Certificate
+                            </SelectItem>
+                            <SelectItem value={PaymentType.GRADUATION}>
+                              Graduation
+                            </SelectItem>
+                            <SelectItem value={PaymentType.HOUSING}>
+                              Housing
+                            </SelectItem>
+                            <SelectItem value={PaymentType.ADMINISTRATIVE}>
+                              Administrative
+                            </SelectItem>
+                            <SelectItem value={PaymentType.DEPOSITS}>
+                              Deposits
                             </SelectItem>
                             <SelectItem value={PaymentType.OTHER}>
                               Other

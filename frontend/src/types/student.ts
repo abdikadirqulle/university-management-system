@@ -81,12 +81,22 @@ export interface Payment {
   paymentDate: string;
   dueDate: string;
   status: "pending" | "paid" | "overdue" | "partial";
-  type: "tuition" | "accommodation" | "library" | "other";
+  type:
+    | "tuition"
+    | "id_card"
+    | "certificate"
+    | "graduation"
+    | "housing"
+    | "administrative"
+    | "deposits"
+    | "other";
   tuitionFee?: number;
   otherCharges?: number;
   forwarded?: number;
   extraFee?: number;
   discount?: number;
+  paid: number;
+  net: number;
   createdAt: string;
   updatedAt: string;
 }

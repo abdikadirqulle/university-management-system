@@ -1,4 +1,3 @@
-
 export enum PaymentStatus {
   PENDING = "pending",
   PAID = "paid",
@@ -8,8 +7,12 @@ export enum PaymentStatus {
 
 export enum PaymentType {
   TUITION = "tuition",
-  ACCOMMODATION = "accommodation",
-  LIBRARY = "library",
+  ID_CARD = "id_card",
+  CERTIFICATE = "certificate",
+  GRADUATION = "graduation",
+  HOUSING = "housing",
+  ADMINISTRATIVE = "administrative",
+  DEPOSITS = "deposits",
   OTHER = "other",
 }
 
@@ -20,7 +23,7 @@ export interface StudentFinancial {
   sem: string;
   session: string;
   tuitionFee: number;
-  
+
   discount: number;
   paid: number;
   net: number;

@@ -38,8 +38,12 @@ enum PaymentStatus {
 
 enum PaymentType {
   tuition
-  accommodation
-  library
+  id_card
+  certificate
+  graduation
+  housing
+  administrative
+  deposits
   other
 }
 
