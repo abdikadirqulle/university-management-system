@@ -10,14 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Student } from "@/types/student";
-import {
-  PrinterIcon,
-  Search,
-  FileTextIcon,
-  Power,
-  PowerOff,
-  Filter,
-} from "lucide-react";
+import { Search, FileTextIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Payment } from "@/types/payment";
 import { Button } from "../ui/button";
@@ -146,24 +139,6 @@ const StudentTable: React.FC<StudentTableProps> = ({
     }).format(amount);
   };
 
-  // Get payment type for a student
-  const getPaymentType = (student: Student) => {
-    const studentPayments = payments.filter(
-      (p) => p.studentId === student.studentId,
-    );
-    if (studentPayments.length === 0) return "Not set";
-
-    // Get the most recent payment type
-    const latestPayment = studentPayments.sort(
-      (a, b) =>
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-    )[0];
-
-    return (
-      latestPayment.type.charAt(0).toUpperCase() + latestPayment.type.slice(1)
-    );
-  };
-
   // Get net amount for a student
   const getNetAmount = (student: Student) => {
     const studentAccount = student.studentAccount?.[0];
@@ -174,13 +149,6 @@ const StudentTable: React.FC<StudentTableProps> = ({
       return tuition - paid - discount;
     }
     return 0;
-  };
-
-  const handleToggleActivation = (e: React.MouseEvent, student: Student) => {
-    e.stopPropagation();
-    if (onToggleActivation) {
-      onToggleActivation(student);
-    }
   };
 
   if (isLoading) {
@@ -393,7 +361,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
                   <TableCell className="font-medium">
                     {formatCurrency(getNetAmount(student))}
                   </TableCell>
-                  <TableCell className="font-medium uppercase text-nowrap">
+                  <TableCell className="font-medium  text-nowrap">
                     <Badge variant="outline">
                       {student.studentAccount?.[0]?.paidType || "N/A"}
                     </Badge>

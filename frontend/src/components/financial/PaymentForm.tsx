@@ -70,20 +70,13 @@ const formSchema = z.object({
 });
 
 // Payment methods
-const PAYMENT_METHODS = [
-  { value: "cash", label: "Cash" },
-  { value: "bank_transfer", label: "Bank Transfer" },
-  { value: "mobile_money", label: "Mobile Money" },
-  { value: "check", label: "Check" },
-  { value: "other", label: "Other" },
-];
 
 // Paid types
 const PAID_TYPES = [
-  { value: "per_month", label: "Per Month" },
-  { value: "per_semester", label: "Per Semester" },
-  { value: "per_year", label: "Per Year" },
-  { value: "one_time", label: "One Time" },
+  { value: "Per Month", label: "Per Month" },
+  { value: "Per Semester", label: "Per Semester" },
+  { value: "Per Year", label: "Per Year" },
+  { value: "One Time", label: "One Time" },
 ];
 
 interface PaymentFormProps {
@@ -121,18 +114,13 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const [statusSuccess, setStatusSuccess] = useState(false);
 
   const [paidType, setPaidType] = useState(
-    selectedStudent?.studentAccount?.[0]?.paidType || "per_month",
+    selectedStudent?.studentAccount?.[0]?.paidType || "Per Month",
   );
   const [paidTypeLoading, setPaidTypeLoading] = useState(false);
   const [paidTypeSuccess, setPaidTypeSuccess] = useState(false);
 
-  const [whatsApp, setWhatsApp] = useState(selectedStudent?.phoneNumber || "");
-  const [whatsAppLoading, setWhatsAppLoading] = useState(false);
-  const [whatsAppSuccess, setWhatsAppSuccess] = useState(false);
-
   const { deletePayment, fetchPayments } = usePaymentStore();
-  const { updateStudent, toggleStudentActivation, updateStudentAccount } =
-    useStudentStore();
+  const { toggleStudentActivation, updateStudentAccount } = useStudentStore();
 
   // Initialize form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -255,6 +243,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     }
   };
 
+  console.log("paidType", paidType);
   // Handle paid type change
   const handlePaidTypeChange = async () => {
     if (!selectedStudent) return;
@@ -271,25 +260,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       console.error("Error updating payment type:", error);
     } finally {
       setPaidTypeLoading(false);
-    }
-  };
-
-  // Handle WhatsApp change
-  const handleWhatsAppChange = async () => {
-    if (!selectedStudent) return;
-
-    setWhatsAppLoading(true);
-    setWhatsAppSuccess(false);
-
-    try {
-      await updateStudent(selectedStudent.id, { phoneNumber: whatsApp });
-      setWhatsAppSuccess(true);
-      setTimeout(() => setWhatsAppSuccess(false), 2000);
-    } catch (error) {
-      toast.error("Failed to update WhatsApp number");
-      console.error("Error updating WhatsApp number:", error);
-    } finally {
-      setWhatsAppLoading(false);
     }
   };
 
