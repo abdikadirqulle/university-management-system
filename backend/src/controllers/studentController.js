@@ -298,18 +298,19 @@ const updateStudent = async (req, res) => {
     })
 
     // Update the student account with the payment amount
-    await prisma.studentAccount.create({
-      data: {
-        studentId: updatedStudent.studentId,
-        academicYear: updatedStudent.academicYear,
-        semester: updatedStudent.semester,
-        tuitionFee: department.price,
-        discount: 0,
-        paidAmount: 0,
-        totalDue: department.price,
-        is_active: true,
-      },
-    })
+    // await prisma.studentAccount.update({
+    //   where: { studentId: updatedStudent.studentId },
+    //   data: {
+    //     studentId: updatedStudent.studentId,
+    //     academicYear: updatedStudent.academicYear,
+    //     semester: updatedStudent.semester,
+    //     tuitionFee: department.price,
+    //     discount: 0,
+    //     paidAmount: 0,
+    //     totalDue: department.price,
+    //     is_active: true,
+    //   },
+    // })
 
     res.status(200).json({
       success: true,

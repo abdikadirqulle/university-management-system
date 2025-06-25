@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Download, PlusCircle, RefreshCcw } from "lucide-react";
+import { ArrowRight, Download, PlusCircle, RefreshCcw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,7 @@ import { useAuth } from "@/context/AuthContext";
 import { AcademicCalendarEvent, EventType } from "@/types/academicCalendar";
 
 import { toast } from "sonner";
+import SemesterTransitionDialog from "@/components/academic-calendar/SemesterTransitionDialog";
 
 const AcademicCalendarPage: React.FC = () => {
   const navigate = useNavigate();
@@ -62,7 +63,8 @@ const AcademicCalendarPage: React.FC = () => {
     new Date(),
   );
   const [activeTab, setActiveTab] = useState("list");
-
+  const [isSemesterTransitionOpen, setIsSemesterTransitionOpen] =
+    useState(false);
   console.log(events);
   // Fetch data on component mount
   useEffect(() => {
@@ -205,11 +207,19 @@ const AcademicCalendarPage: React.FC = () => {
               <TabsTrigger value="list">List View</TabsTrigger>
               <TabsTrigger value="calendar">Calendar View</TabsTrigger>
             </TabsList>
-
             {/* <Button variant="outline" className="flex items-center gap-2">
               <Download className="h-4 w-4" />
               Export
             </Button> */}
+
+            <Button
+              variant="outline"
+              className="flex items-center gap-2 bg-blue-500 text-white"
+              onClick={() => setIsSemesterTransitionOpen(true)}
+            >
+              <ArrowRight className="h-4 w-4" />
+              Semester Transition
+            </Button>
           </div>
 
           <div className="flex items-center gap-2">
@@ -425,6 +435,11 @@ const AcademicCalendarPage: React.FC = () => {
             </div>
           </DialogContent>
         </Dialog>
+
+        <SemesterTransitionDialog
+          open={isSemesterTransitionOpen}
+          onClose={() => setIsSemesterTransitionOpen(false)}
+        />
       </div>
     </div>
   );

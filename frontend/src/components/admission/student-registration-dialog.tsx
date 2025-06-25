@@ -38,7 +38,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "../ui/button";
 
-const SEMESTERS = Array.from({ length: 4 }, (_, i) => ({
+const SEMESTERS = Array.from({ length: 12 }, (_, i) => ({
   id: `${i + 1}`,
   name: `${i + 1}`,
 }));

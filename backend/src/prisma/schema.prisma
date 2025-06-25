@@ -144,7 +144,7 @@ model Student {
 
 model StudentAccount {
   id              String      @id @default(auto()) @map("_id") @db.ObjectId
-  studentId       String
+  studentId       String      @unique 
   academicYear    String
   semester        String
   is_active        Boolean?    @default(true)

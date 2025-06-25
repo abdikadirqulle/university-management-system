@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client"
+import chalk from "chalk"
 const prisma = new PrismaClient()
 
 /**
@@ -60,12 +61,10 @@ const createCalendarEvent = async (req, res) => {
     res.status(201).json(calendarEvent)
   } catch (error) {
     console.error("Error creating calendar event:", error)
-    res
-      .status(500)
-      .json({
-        message: "Failed to create calendar event",
-        error: error.message,
-      })
+    res.status(500).json({
+      message: "Failed to create calendar event",
+      error: error.message,
+    })
   }
 }
 
@@ -95,12 +94,10 @@ const getAllCalendarEvents = async (req, res) => {
     res.status(200).json(calendarEvents)
   } catch (error) {
     console.error("Error fetching calendar events:", error)
-    res
-      .status(500)
-      .json({
-        message: "Failed to fetch calendar events",
-        error: error.message,
-      })
+    res.status(500).json({
+      message: "Failed to fetch calendar events",
+      error: error.message,
+    })
   }
 }
 
@@ -191,12 +188,10 @@ const updateCalendarEvent = async (req, res) => {
     res.status(200).json(updatedEvent)
   } catch (error) {
     console.error("Error updating calendar event:", error)
-    res
-      .status(500)
-      .json({
-        message: "Failed to update calendar event",
-        error: error.message,
-      })
+    res.status(500).json({
+      message: "Failed to update calendar event",
+      error: error.message,
+    })
   }
 }
 
@@ -225,12 +220,43 @@ const deleteCalendarEvent = async (req, res) => {
     res.status(200).json({ message: "Calendar event deleted successfully" })
   } catch (error) {
     console.error("Error deleting calendar event:", error)
-    res
-      .status(500)
-      .json({
-        message: "Failed to delete calendar event",
-        error: error.message,
+    res.status(500).json({
+      message: "Failed to delete calendar event",
+      error: error.message,
+    })
+  }
+}
+
+const handleTransition = async (req, res) => {
+  try {
+    const { semester, academicYear, departmentIds } = req.body
+
+    if (
+      !semester ||
+      !academicYear ||
+      !departmentIds ||
+      !Array.isArray(departmentIds)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Missing required fields: semester, academicYear, and departmentIds (array)",
       })
+    }
+
+    await handleSemesterTransition(semester, academicYear, departmentIds)
+
+    res.status(200).json({
+      success: true,
+      message: `Semester transition completed for semester ${semester}, academic year ${academicYear}`,
+    })
+  } catch (error) {
+    console.error("Error triggering semester transition:", error)
+    res.status(500).json({
+      success: false,
+      message: "Failed to process semester transition",
+      error: error.message,
+    })
   }
 }
 
@@ -247,7 +273,7 @@ const handleSemesterTransition = async (
     // Get all active students in the affected departments
     const students = await prisma.student.findMany({
       where: {
-        is_active: true,
+        isActive: true,
         departmentId: {
           in: affectedDepartments,
         },
@@ -255,8 +281,16 @@ const handleSemesterTransition = async (
       },
       include: {
         department: true,
+        studentAccount: {
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 1,
+        },
       },
     })
+
+    console.log(`Found ${students.length} students for semester transition`)
 
     // Process each student
     for (const student of students) {
@@ -264,20 +298,40 @@ const handleSemesterTransition = async (
       const currentSemester = parseInt(student.semester)
       let nextSemester = currentSemester + 1
 
-      // Get the total number of semesters for this department
-      // This would need to be configured somewhere in your system
-      // For now, let's assume 8 semesters (4 years) is standard
-      const totalSemesters = 8
+      // Get the department's current semester (from department record)
+      const departmentSemester = student.department.semester
+        ? parseInt(student.department.semester)
+        : 8 // Default to 8 semesters if not specified
 
-      if (nextSemester > totalSemesters) {
-        // Student has completed all semesters, mark as inactive (graduated)
+      // Get the current student account
+      const currentAccount = student.studentAccount?.[0]
+
+      // Calculate pending balance to forward
+      const pendingAmount = currentAccount
+        ? currentAccount.totalDue -
+          (currentAccount.paidAmount || 0) -
+          (currentAccount.discount || 0)
+        : 0
+
+      // Check if student will become an alumnus
+      if (nextSemester > departmentSemester) {
+        // Student has completed all semesters, mark as inactive (graduated/alumnus)
         await prisma.student.update({
           where: { id: student.id },
           data: {
-            is_active: false,
+            isActive: false,
             semester: "Graduated",
           },
         })
+
+        // Send notification to student about becoming an alumnus
+        await sendAlumnusNotification(student)
+
+        console.log(
+          chalk.yellow.bold(
+            `Student ${student.fullName} (${student.studentId}) has graduated`
+          )
+        )
       } else {
         // Update to next semester
         await prisma.student.update({
@@ -287,26 +341,69 @@ const handleSemesterTransition = async (
           },
         })
 
-        // Create new tuition fee record for next semester
+        // Calculate new tuition fee
         const tuitionFee = student.department.price || 0
 
-        await prisma.studentAccount.create({
+        // Create new student account for the next semester
+        const updateStudentAccount = await prisma.studentAccount.update({
+          where: { studentId: student.studentId },
           data: {
-            studentId: student.studentId,
             academicYear: academicYear,
             semester: nextSemester.toString(),
             tuitionFee: tuitionFee,
-            totalDue: tuitionFee,
+            forwarded: pendingAmount > 0 ? pendingAmount : 0, // Forward pending amount if positive
+            totalDue: tuitionFee + (pendingAmount > 0 ? pendingAmount : 0), // Add forwarded amount to total due
+            paidAmount: 0, // Reset paid amount for new semester
+            paidType: currentAccount?.paidType || "Per Semester", // Maintain the same payment type
+            discount: 0, // Reset discount for new semester
           },
         })
+
+        console.log("updateStudentAccount", updateStudentAccount)
+
+        console.log(
+          chalk.green(
+            `Student ${student.fullName} (${student.studentId}) promoted to semester ${nextSemester} with ${pendingAmount > 0 ? pendingAmount : 0} forwarded`
+          )
+        )
       }
     }
 
-    console.log(`Processed semester transition for ${students.length} students`)
+    console.log(
+      chalk.green.bold(
+        `Completed semester transition for ${students.length} students`
+      )
+    )
     return true
   } catch (error) {
     console.error("Error handling semester transition:", error)
     throw error
+  }
+}
+
+/**
+ * Send notification to student about becoming an alumnus
+ * This is a placeholder function - implement actual notification logic
+ */
+const sendAlumnusNotification = async (student) => {
+  try {
+    // Here you would implement your notification logic
+    // For example, sending an email or SMS
+    console.log(
+      chalk.bgGreenBright.black.bold(
+        `Notification sent to ${student.fullName} (${student.email}) about alumnus status`
+      )
+    )
+
+    // For now, we'll just log the notification
+    return true
+  } catch (error) {
+    console.error(
+      chalk.red.bold(
+        `Error sending alumnus notification to ${student.email}: ${error}`
+      )
+    )
+    return false
   }
 }
 
@@ -316,4 +413,6 @@ export {
   getCalendarEventById,
   updateCalendarEvent,
   deleteCalendarEvent,
+  handleSemesterTransition,
+  handleTransition,
 }

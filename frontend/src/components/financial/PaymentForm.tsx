@@ -462,7 +462,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         {/* Tuition Fee Section */}
         <Card className="mb-4 border-primary/20">
           <CardContent className="pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-6 ">
+            <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
               {/* Tuition Fee */}
               <div>
                 <p className="text-sm text-muted-foreground mb-1">
@@ -475,6 +475,17 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                   }).format(
                     selectedStudent?.studentAccount[0]?.tuitionFee || 0,
                   )}
+                </p>
+              </div>
+              <p>+</p>
+              {/* Forwarded */}
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">FORWARDED</p>
+                <p className="font-semibold">
+                  {new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                  }).format(selectedStudent?.studentAccount[0]?.forwarded || 0)}
                 </p>
               </div>
               <p>-</p>
@@ -509,7 +520,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                     style: "currency",
                     currency: "USD",
                   }).format(
-                    (selectedStudent?.studentAccount[0]?.tuitionFee || 0) -
+                    (selectedStudent?.studentAccount[0]?.tuitionFee || 0) +
+                      (selectedStudent?.studentAccount[0]?.forwarded || 0) -
                       (selectedStudent?.studentAccount[0]?.discount || 0) -
                       (selectedStudent?.studentAccount[0]?.paidAmount || 0),
                   )}

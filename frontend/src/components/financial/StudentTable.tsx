@@ -146,7 +146,8 @@ const StudentTable: React.FC<StudentTableProps> = ({
       const tuition = studentAccount.tuitionFee || 0;
       const paid = studentAccount.paidAmount || 0;
       const discount = studentAccount.discount || 0;
-      return tuition - paid - discount;
+      const forwarded = studentAccount.forwarded || 0;
+      return tuition - paid - discount + forwarded;
     }
     return 0;
   };
@@ -166,11 +167,11 @@ const StudentTable: React.FC<StudentTableProps> = ({
                 <TableHead>Batch</TableHead>
                 <TableHead>Sem</TableHead>
                 <TableHead>Session</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Forwarded</TableHead>
+                <TableHead>Discount</TableHead>
                 <TableHead>Paid</TableHead>
-                <TableHead>Net</TableHead>
+                <TableHead>Balance</TableHead>
                 <TableHead>TF Type</TableHead>
-                {onToggleActivation && <TableHead>Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -216,6 +217,8 @@ const StudentTable: React.FC<StudentTableProps> = ({
       </div>
     );
   }
+
+  console.log("search forwarded", filteredStudents);
 
   return (
     <div className="space-y-4">
