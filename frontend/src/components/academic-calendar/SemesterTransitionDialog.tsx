@@ -56,9 +56,9 @@ const SemesterTransitionDialog: React.FC<SemesterTransitionDialogProps> = ({
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
 
   // Generate semester options (1-8)
-  const semesterOptions = Array.from({ length: 8 }, (_, i) =>
-    (i + 1).toString(),
-  );
+  const semesterOptions = Array.from({ length: 12 }, (_, i) => i + 1);
+
+  console.log(semesterOptions);
 
   // Generate academic year options
   const currentYear = new Date().getFullYear();
@@ -149,7 +149,7 @@ const SemesterTransitionDialog: React.FC<SemesterTransitionDialogProps> = ({
                   <FormItem>
                     <FormLabel>Current Semester</FormLabel>
                     <Select
-                      onValueChange={field.onChange}
+                      onValueChange={(value) => field.onChange(value)}
                       defaultValue={field.value}
                     >
                       <FormControl>
@@ -159,7 +159,7 @@ const SemesterTransitionDialog: React.FC<SemesterTransitionDialogProps> = ({
                       </FormControl>
                       <SelectContent>
                         {semesterOptions.map((sem) => (
-                          <SelectItem key={sem} value={sem}>
+                          <SelectItem key={sem} value={sem.toString()}>
                             Semester {sem}
                           </SelectItem>
                         ))}

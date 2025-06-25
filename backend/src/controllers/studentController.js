@@ -171,6 +171,8 @@ const createStudent = async (req, res) => {
         discount: 0,
         paidAmount: 0,
         totalDue: department.price,
+        status: "normal",
+        paidType: "Per Semester",
         is_active: true,
       },
     })
@@ -547,7 +549,7 @@ const toggleStudentActivation = async (req, res) => {
 const updateStudentAccount = async (req, res) => {
   try {
     const { id } = req.params
-    const { paidType, discount } = req.body
+    const { paidType, discount, status } = req.body
 
     // Check if student exists
     const student = await prisma.student.findUnique({
@@ -583,6 +585,7 @@ const updateStudentAccount = async (req, res) => {
           discount !== undefined
             ? parseFloat(discount)
             : studentAccount.discount,
+        status: status || studentAccount.status,
       },
     })
 

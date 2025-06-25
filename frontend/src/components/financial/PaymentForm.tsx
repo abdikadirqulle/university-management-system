@@ -129,7 +129,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const [statusSuccess, setStatusSuccess] = useState(false);
 
   const [paidType, setPaidType] = useState(
-    selectedStudent?.studentAccount?.[0]?.paidType || "Per Month",
+    (selectedStudent?.studentAccount?.[0]?.paidType || 1).toString(),
   );
   const [paidTypeLoading, setPaidTypeLoading] = useState(false);
   const [paidTypeSuccess, setPaidTypeSuccess] = useState(false);
@@ -187,7 +187,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   }, [fetchPayments]);
 
   // Handle payment delete
-  const handleDeletePayment = (transaction: any) => {
+  const handleDeletePayment = (transaction: Payment) => {
     setSelectedPayment(transaction);
     setIsDeleteDialogOpen(true);
   };
@@ -304,7 +304,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       const discountAmount =
         (parseFloat(discountPercentage) / 100) * tuitionFee;
 
-      await updateStudentAccount(selectedStudent.id, paidType, discountAmount);
+      await updateStudentAccount(
+        selectedStudent.id,
+        paidType,
+        discountAmount,
+        studentStatus,
+      );
       setDiscountSuccess(true);
       setTimeout(() => setDiscountSuccess(false), 2000);
     } catch (error) {

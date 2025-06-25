@@ -22,6 +22,7 @@ interface StudentState {
     id: string,
     paidType: string,
     discount?: number,
+    status?: string,
   ) => Promise<void>;
   resetSelectedStudent: () => void;
 }
@@ -207,10 +208,15 @@ export const useStudentStore = create<StudentState>((set) => ({
     id: string,
     paidType: string,
     discount?: number,
+    status?: string,
   ) => {
     set({ isLoading: true, error: null });
     try {
-      await studentService.updateStudentAccount(id, { paidType, discount });
+      await studentService.updateStudentAccount(id, {
+        paidType,
+        discount,
+        status,
+      });
 
       // Update the student in the store
       set((state) => {
@@ -222,6 +228,7 @@ export const useStudentStore = create<StudentState>((set) => ({
                 ...student.studentAccount,
                 paidType,
                 ...(discount !== undefined && { discount }),
+                ...(status !== undefined && { status }),
               },
             };
           }
@@ -239,6 +246,7 @@ export const useStudentStore = create<StudentState>((set) => ({
               ...state.selectedStudent.studentAccount,
               paidType,
               ...(discount !== undefined && { discount }),
+              ...(status !== undefined && { status }),
             },
           };
         }

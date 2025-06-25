@@ -52,7 +52,7 @@ export interface Student {
     is_active?: boolean;
     paidType?: string;
     totalDue: number;
-    status: "pending" | "paid" | "overdue" | "partial";
+    status?: string;
     createdAt: string;
     updatedAt: string;
   };
@@ -69,7 +69,8 @@ export interface StudentAccount {
   totalDue: number;
   paidAmount: number;
   paidType?: string;
-  status: "pending" | "paid" | "overdue" | "partial";
+  status?: string;
+  is_active?: boolean;
   createdAt: string;
   updatedAt: string;
 }

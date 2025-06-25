@@ -244,7 +244,11 @@ const handleTransition = async (req, res) => {
       })
     }
 
-    await handleSemesterTransition(semester, academicYear, departmentIds)
+    const semesterInt = parseInt(semester, 10)
+    if (isNaN(semesterInt)) {
+      throw new Error("Invalid semester value. Expected a number.")
+    }
+    await handleSemesterTransition(semesterInt, academicYear, departmentIds)
 
     res.status(200).json({
       success: true,
@@ -265,7 +269,7 @@ const handleTransition = async (req, res) => {
  * This function updates student semesters and tuition fees
  */
 const handleSemesterTransition = async (
-  semester,
+  semesterInt,
   academicYear,
   affectedDepartments
 ) => {
@@ -274,10 +278,11 @@ const handleSemesterTransition = async (
     const students = await prisma.student.findMany({
       where: {
         isActive: true,
+        // status: "normal",
         departmentId: {
           in: affectedDepartments,
         },
-        semester: semester,
+        semester: semesterInt,
       },
       include: {
         department: true,
@@ -320,7 +325,16 @@ const handleSemesterTransition = async (
           where: { id: student.id },
           data: {
             isActive: false,
-            semester: "Graduated",
+            status: "Graduated",
+          },
+        })
+
+        // Update student account status to graduated
+        await prisma.studentAccount.update({
+          where: { studentId: student.studentId },
+          data: {
+            status: "graduated",
+            is_active: false,
           },
         })
 
@@ -354,8 +368,9 @@ const handleSemesterTransition = async (
             forwarded: pendingAmount > 0 ? pendingAmount : 0, // Forward pending amount if positive
             totalDue: tuitionFee + (pendingAmount > 0 ? pendingAmount : 0), // Add forwarded amount to total due
             paidAmount: 0, // Reset paid amount for new semester
-            paidType: currentAccount?.paidType || "Per Semester", // Maintain the same payment type
+            paidType: currentAccount?.paidType || null, // Maintain the same payment type
             discount: 0, // Reset discount for new semester
+            status: "normal", // Set status to normal for regular semester transition
           },
         })
 

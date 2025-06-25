@@ -130,7 +130,8 @@ model Student {
   session           String
   academicYear      String
   registerYear      Int
-  semester          String
+  semester          Int
+  status          String      @default("normal") // Added status field with default "normal"
   isActive          Boolean    @default(true)
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
@@ -146,9 +147,10 @@ model StudentAccount {
   id              String      @id @default(auto()) @map("_id") @db.ObjectId
   studentId       String      @unique 
   academicYear    String
-  semester        String
-  is_active        Boolean?    @default(true)
+  semester        Int
+  is_active       Boolean?    @default(true)
   paidType        String?       // e.g., "per_month", "per_semester"
+  status          String      @default("normal") // Added status field with default "normal"
 
 // payments
   TuitionFeeType  String?
