@@ -174,6 +174,7 @@ const createStudent = async (req, res) => {
         totalDue: department.price,
         status: "normal",
         paidType: "Per Semester",
+        scholarship: 0,
         is_active: true,
       },
     })
@@ -552,7 +553,7 @@ const toggleStudentActivation = async (req, res) => {
 const updateStudentAccount = async (req, res) => {
   try {
     const { id } = req.params
-    const { paidType, discount, status } = req.body
+    const { paidType, discount, status, scholarship } = req.body
 
     // Check if student exists
     const student = await prisma.student.findUnique({
@@ -579,15 +580,41 @@ const updateStudentAccount = async (req, res) => {
       })
     }
 
+    // Calculate total due based on scholarship and discount
+    let updatedTotalDue = studentAccount.tuitionFee
+    let updatedDiscount =
+      discount !== undefined
+        ? parseFloat(discount)
+        : studentAccount.discount || 0
+    let updatedScholarship =
+      scholarship !== undefined
+        ? parseFloat(scholarship)
+        : studentAccount.scholarship || 0
+
+    // Apply scholarship first
+    const scholarshipAmount =
+      (updatedScholarship / 100) * studentAccount.tuitionFee
+
+    // Then apply discount to the remaining amount
+    const discountAmount = (updatedDiscount / 100) * studentAccount.tuitionFee
+
+    // Calculate new total due
+    updatedTotalDue =
+      studentAccount.tuitionFee - scholarshipAmount - discountAmount
+
+    // If there's a forwarded amount, add it
+    if (studentAccount.forwarded && studentAccount.forwarded > 0) {
+      updatedTotalDue += studentAccount.forwarded
+    }
+
     // Update student account
     const updatedAccount = await prisma.studentAccount.update({
       where: { id: studentAccount.id },
       data: {
         paidType: paidType || studentAccount.paidType,
-        discount:
-          discount !== undefined
-            ? parseFloat(discount)
-            : studentAccount.discount,
+        discount: updatedDiscount,
+        scholarship: updatedScholarship,
+        totalDue: updatedTotalDue,
         status: status || studentAccount.status,
       },
     })

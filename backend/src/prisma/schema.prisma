@@ -151,6 +151,7 @@ model StudentAccount {
   is_active       Boolean?    @default(true)
   paidType        String?       // e.g., "per_month", "per_semester"
   status          String      @default("normal") // Added status field with default "normal"
+  scholarship     Float?      @default(0) // Scholarship percentage (0-100)
 
 // payments
   TuitionFeeType  String?

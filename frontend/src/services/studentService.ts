@@ -95,7 +95,12 @@ const studentService = {
   // Update student account
   updateStudentAccount: async (
     id: string,
-    accountData: { paidType?: string; discount?: number; status?: string },
+    accountData: {
+      paidType?: string;
+      discount?: number;
+      status?: string;
+      scholarship?: number;
+    },
   ): Promise<StudentAccount> => {
     const response = await api.patch<{
       success: boolean;

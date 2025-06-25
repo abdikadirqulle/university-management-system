@@ -94,6 +94,16 @@ const DISCOUNT_PERCENTAGES = [
   { value: "100", label: "100%" },
 ];
 
+// Scholarship percentages
+const SCHOLARSHIP_PERCENTAGES = [
+  { value: "0", label: "0%" },
+  { value: "10", label: "10%" },
+  { value: "25", label: "25%" },
+  { value: "50", label: "50%" },
+  { value: "75", label: "75%" },
+  { value: "100", label: "100%" },
+];
+
 interface PaymentFormProps {
   payment?: Payment;
   selectedStudent: Student | null;
@@ -146,6 +156,15 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   );
   const [discountLoading, setDiscountLoading] = useState(false);
   const [discountSuccess, setDiscountSuccess] = useState(false);
+
+  // New state for scholarship
+  const [scholarshipPercentage, setScholarshipPercentage] = useState(
+    selectedStudent?.studentAccount?.[0]?.scholarship
+      ? Math.round(selectedStudent?.studentAccount[0].scholarship).toString()
+      : "0",
+  );
+  const [scholarshipLoading, setScholarshipLoading] = useState(false);
+  const [scholarshipSuccess, setScholarshipSuccess] = useState(false);
 
   const { deletePayment, fetchPayments } = usePaymentStore();
   const { toggleStudentActivation, updateStudentAccount } = useStudentStore();
@@ -320,6 +339,33 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     }
   };
 
+  // Handle scholarship change
+  const handleScholarshipChange = async () => {
+    if (!selectedStudent) return;
+
+    setScholarshipLoading(true);
+    setScholarshipSuccess(false);
+
+    try {
+      const scholarshipAmount = parseFloat(scholarshipPercentage);
+
+      await updateStudentAccount(
+        selectedStudent.id,
+        paidType,
+        undefined,
+        undefined,
+        scholarshipAmount,
+      );
+      setScholarshipSuccess(true);
+      setTimeout(() => setScholarshipSuccess(false), 2000);
+    } catch (error) {
+      toast.error("Failed to update scholarship");
+      console.error("Error updating scholarship:", error);
+    } finally {
+      setScholarshipLoading(false);
+    }
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -443,6 +489,45 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                   </Button>
                 </div>
               </div>
+
+              <div>
+                <p className="text-sm text-muted-foreground">Scholarship</p>
+                <div className="flex items-center mt-1 gap-2">
+                  <Select
+                    value={scholarshipPercentage}
+                    onValueChange={setScholarshipPercentage}
+                  >
+                    <SelectTrigger className="">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SCHOLARSHIP_PERCENTAGES.map((scholarship) => (
+                        <SelectItem
+                          key={scholarship.value}
+                          value={scholarship.value}
+                        >
+                          {scholarship.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    variant="default"
+                    size="icon"
+                    onClick={handleScholarshipChange}
+                    disabled={scholarshipLoading}
+                  >
+                    {scholarshipLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : scholarshipSuccess ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Check className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
               <div>
                 <p className="text-sm text-muted-foreground">Department</p>
                 <p className="font-medium uppercase">
@@ -454,10 +539,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                 <p className="font-medium uppercase">
                   {selectedStudent?.faculty?.name || "N/A"}
                 </p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Semester</p>
-                <p className="font-medium">{selectedStudent?.semester}</p>
               </div>
             </div>
           </CardContent>
@@ -482,7 +563,27 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                   )}
                 </p>
               </div>
-              <p>+</p>
+
+              {/* Scholarship */}
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">
+                  SCHOLARSHIP
+                </p>
+                <p className="font-semibold text-green-600">
+                  {new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                  }).format(
+                    ((selectedStudent?.studentAccount[0]?.scholarship || 0) /
+                      100) *
+                      (selectedStudent?.studentAccount[0]?.tuitionFee || 0),
+                  )}
+                  <span className="text-xs ml-1">
+                    ({selectedStudent?.studentAccount[0]?.scholarship || 0}%)
+                  </span>
+                </p>
+              </div>
+
               {/* Forwarded */}
               <div>
                 <p className="text-sm text-muted-foreground mb-1">FORWARDED</p>

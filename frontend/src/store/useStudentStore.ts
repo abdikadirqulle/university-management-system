@@ -23,6 +23,7 @@ interface StudentState {
     paidType: string,
     discount?: number,
     status?: string,
+    scholarship?: number,
   ) => Promise<void>;
   resetSelectedStudent: () => void;
 }
@@ -209,6 +210,7 @@ export const useStudentStore = create<StudentState>((set) => ({
     paidType: string,
     discount?: number,
     status?: string,
+    scholarship?: number,
   ) => {
     set({ isLoading: true, error: null });
     try {
@@ -216,6 +218,7 @@ export const useStudentStore = create<StudentState>((set) => ({
         paidType,
         discount,
         status,
+        scholarship,
       });
 
       // Update the student in the store
@@ -229,6 +232,7 @@ export const useStudentStore = create<StudentState>((set) => ({
                 paidType,
                 ...(discount !== undefined && { discount }),
                 ...(status !== undefined && { status }),
+                ...(scholarship !== undefined && { scholarship }),
               },
             };
           }
@@ -247,6 +251,7 @@ export const useStudentStore = create<StudentState>((set) => ({
               paidType,
               ...(discount !== undefined && { discount }),
               ...(status !== undefined && { status }),
+              ...(scholarship !== undefined && { scholarship }),
             },
           };
         }

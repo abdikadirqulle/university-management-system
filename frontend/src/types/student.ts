@@ -1,4 +1,5 @@
 import { User } from "./auth";
+import { PaymentStatus, PaymentType } from "./payment";
 
 export type Gender = "male" | "female";
 
@@ -53,6 +54,7 @@ export interface Student {
     paidType?: string;
     totalDue: number;
     status?: string;
+    scholarship?: number;
     createdAt: string;
     updatedAt: string;
   };
@@ -71,6 +73,7 @@ export interface StudentAccount {
   paidType?: string;
   status?: string;
   is_active?: boolean;
+  scholarship?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -81,16 +84,8 @@ export interface Payment {
   amount: number;
   paymentDate: string;
   dueDate: string;
-  status: "pending" | "paid" | "overdue" | "partial";
-  type:
-    | "tuition"
-    | "id_card"
-    | "certificate"
-    | "graduation"
-    | "housing"
-    | "administrative"
-    | "deposits"
-    | "other";
+  status: PaymentStatus;
+  type: PaymentType;
   tuitionFee?: number;
   otherCharges?: number;
   forwarded?: number;

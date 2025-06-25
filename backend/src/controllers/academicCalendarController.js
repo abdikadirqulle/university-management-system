@@ -369,6 +369,7 @@ const handleSemesterTransition = async (
             paidAmount: 0, // Reset paid amount for new semester
             paidType: currentAccount?.paidType || null, // Maintain the same payment type
             discount: 0, // Reset discount for new semester
+            scholarship: currentAccount?.scholarship || 0, // Maintain scholarship for new semester
             status: "normal", // Set status to normal for regular semester transition
           },
         })
