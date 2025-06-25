@@ -138,6 +138,7 @@ const createStudent = async (req, res) => {
         message: "Department not found",
       })
     }
+    const semesterInt = Number(semester)
 
     const student = await prisma.student.create({
       data: {
@@ -158,7 +159,7 @@ const createStudent = async (req, res) => {
         session,
         academicYear,
         registerYear: parseInt(registerYear),
-        semester,
+        semester: semesterInt,
       },
     })
 
@@ -166,7 +167,7 @@ const createStudent = async (req, res) => {
       data: {
         studentId: student.studentId,
         academicYear: student.academicYear,
-        semester: student.semester,
+        semester: Number(student.semester),
         tuitionFee: department.price,
         discount: 0,
         paidAmount: 0,
@@ -271,6 +272,8 @@ const updateStudent = async (req, res) => {
       })
     }
 
+    const semesterInt = Number(semester)
+
     const updatedStudent = await prisma.student.update({
       where: { id },
       data: {
@@ -295,7 +298,7 @@ const updateStudent = async (req, res) => {
         registerYear: registerYear
           ? parseInt(registerYear)
           : existingStudent.registerYear,
-        semester: semester || existingStudent.semester,
+        semester: semesterInt || existingStudent.semester,
       },
     })
 

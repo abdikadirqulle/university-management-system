@@ -244,10 +244,8 @@ const handleTransition = async (req, res) => {
       })
     }
 
-    const semesterInt = parseInt(semester, 10)
-    if (isNaN(semesterInt)) {
-      throw new Error("Invalid semester value. Expected a number.")
-    }
+    const semesterInt = Number(semester)
+
     await handleSemesterTransition(semesterInt, academicYear, departmentIds)
 
     res.status(200).json({
@@ -334,6 +332,7 @@ const handleSemesterTransition = async (
           where: { studentId: student.studentId },
           data: {
             status: "graduated",
+            semester: Number(nextSemester),
             is_active: false,
           },
         })
@@ -351,7 +350,7 @@ const handleSemesterTransition = async (
         await prisma.student.update({
           where: { id: student.id },
           data: {
-            semester: nextSemester.toString(),
+            semester: Number(nextSemester),
           },
         })
 
@@ -363,7 +362,7 @@ const handleSemesterTransition = async (
           where: { studentId: student.studentId },
           data: {
             academicYear: academicYear,
-            semester: nextSemester.toString(),
+            semester: Number(nextSemester),
             tuitionFee: tuitionFee,
             forwarded: pendingAmount > 0 ? pendingAmount : 0, // Forward pending amount if positive
             totalDue: tuitionFee + (pendingAmount > 0 ? pendingAmount : 0), // Add forwarded amount to total due
