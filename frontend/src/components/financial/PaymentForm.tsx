@@ -366,6 +366,14 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     }
   };
 
+  const scholarshipAmount = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(
+    ((selectedStudent?.studentAccount[0]?.scholarship || 0) / 100) *
+      (selectedStudent?.studentAccount[0]?.tuitionFee || 0),
+  );
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -628,6 +636,9 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                   }).format(
                     (selectedStudent?.studentAccount[0]?.tuitionFee || 0) +
                       (selectedStudent?.studentAccount[0]?.forwarded || 0) -
+                      ((selectedStudent?.studentAccount[0]?.scholarship || 0) /
+                        100) *
+                        (selectedStudent?.studentAccount[0]?.tuitionFee || 0) -
                       (selectedStudent?.studentAccount[0]?.discount || 0) -
                       (selectedStudent?.studentAccount[0]?.paidAmount || 0),
                   )}

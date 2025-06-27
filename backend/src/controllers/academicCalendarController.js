@@ -357,6 +357,11 @@ const handleSemesterTransition = async (
         // Calculate new tuition fee
         const tuitionFee = student.department.price || 0
 
+        const scholarshipInt =
+          currentAccount?.tuitionFee - currentAccount?.scholarship || 0
+
+        console.log(chalk.yellow.bold(`scholarshipInt: ${scholarshipInt}`))
+
         // Create new student account for the next semester
         const updateStudentAccount = await prisma.studentAccount.update({
           where: { studentId: student.studentId },
@@ -369,7 +374,7 @@ const handleSemesterTransition = async (
             paidAmount: 0, // Reset paid amount for new semester
             paidType: currentAccount?.paidType || null, // Maintain the same payment type
             discount: 0, // Reset discount for new semester
-            scholarship: currentAccount?.scholarship || 0, // Maintain scholarship for new semester
+            scholarship: scholarshipInt, // Maintain scholarship for new semester
             status: "normal", // Set status to normal for regular semester transition
           },
         })

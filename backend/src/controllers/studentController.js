@@ -1,3 +1,4 @@
+import chalk from "chalk"
 import { prisma } from "../config/db.js"
 
 /**
@@ -594,6 +595,11 @@ const updateStudentAccount = async (req, res) => {
     // Apply scholarship first
     const scholarshipAmount =
       (updatedScholarship / 100) * studentAccount.tuitionFee
+    console.log(
+      chalk.yellow.bold(
+        `scholarshipAmount: ${scholarshipAmount} updatedScholarship: ${updatedScholarship} tuitionFee: ${studentAccount.tuitionFee}`
+      )
+    )
 
     // Then apply discount to the remaining amount
     const discountAmount = (updatedDiscount / 100) * studentAccount.tuitionFee

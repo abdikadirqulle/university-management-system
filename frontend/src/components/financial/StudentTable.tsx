@@ -146,8 +146,11 @@ const StudentTable: React.FC<StudentTableProps> = ({
       const tuition = studentAccount.tuitionFee || 0;
       const paid = studentAccount.paidAmount || 0;
       const discount = studentAccount.discount || 0;
+      const scholarship =
+        ((studentAccount.scholarship || 0) / 100) *
+        (studentAccount.tuitionFee || 0);
       const forwarded = studentAccount.forwarded || 0;
-      return tuition - paid - discount + forwarded;
+      return tuition - paid - discount + forwarded - scholarship;
     }
     return 0;
   };
