@@ -4,20 +4,27 @@ import { Skeleton } from "@/components/ui/skeleton";
 import PageHeader from "@/components/PageHeader";
 import { Users, CreditCard, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  Cell,
+  Tooltip,
+} from "recharts";
 import { usePaymentStore } from "@/store/usePaymentStore";
 import { PaymentStatus } from "@/types/payment";
 import { useStudentStore } from "@/store/useStudentStore";
 
-// Mock data for charts until we have real data
-const mockMonthlyRevenue = [
-  { month: "Jan", revenue: 0 },
-  { month: "Feb", revenue: 0 },
-  { month: "Mar", revenue: 0 },
-  { month: "Apr", revenue: 0 },
-  { month: "May", revenue: 0 },
-  { month: "Jun", revenue: 0 },
-  { month: "Jul", revenue: 0 },
+const monthlyStudentPayments = [
+  { month: "Jan", payments: 100 },
+  { month: "Feb", payments: 200 },
+  { month: "Mar", payments: 300 },
+  { month: "Apr", payments: 400 },
+  { month: "May", payments: 500 },
+  { month: "Jun", payments: 600 },
+  { month: "Jul", payments: 20 },
 ];
 
 const FinancialDashboard = () => {
@@ -53,6 +60,14 @@ const FinancialDashboard = () => {
   useEffect(() => {
     fetchStudents();
   }, [fetchStudents]);
+
+  // Real data for charts
+  //   const monthlyStudentPayments = payments.map((payment) => ({
+  //     month: new Date(payment.paymentDate).toLocaleString("default", {
+  //       month: "short",
+  //     }),
+  //     payments: payment.amount,
+  //   }));
 
   return (
     <div className="space-y-6">
@@ -136,20 +151,22 @@ const FinancialDashboard = () => {
             <Card className="shadow-sm bg-purple-50 dark:bg-purple-900/20">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Highest Payment Type
+                  Total Active Scholarship
                 </CardTitle>
                 <TrendingUp className="h-4 w-4 text-purple-600 dark:text-purple-400" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                  {statistics?.paymentsByType?.[0]?.type || "N/A"}
+                  {
+                    students.filter(
+                      (s) =>
+                        s.isActive === true &&
+                        s.studentAccount[0]?.scholarship > 0,
+                    ).length
+                  }
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {statistics?.paymentsByType?.[0]
-                    ? formatCurrency(
-                        statistics.paymentsByType[0]._sum.amount || 0,
-                      )
-                    : "$0.00"}
+                  Total active scholarship
                 </p>
               </CardContent>
             </Card>
@@ -161,14 +178,17 @@ const FinancialDashboard = () => {
         {/* Payment Statistics */}
         <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle>Payment Statistics</CardTitle>
+            <CardTitle>Monthly Student Payment Trend</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={mockMonthlyRevenue}>
+              <BarChart data={monthlyStudentPayments}>
                 <XAxis dataKey="month" />
                 <YAxis />
-                <Bar dataKey="revenue" fill="#8884d8" />
+                <Tooltip />
+                <Bar dataKey="payments" fill="#8884d8">
+                  <Cell cursor="pointer" />
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
