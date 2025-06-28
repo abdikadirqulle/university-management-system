@@ -633,6 +633,44 @@ const ReportsPage = () => {
             <>
               {/* Financial Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card className="border-l-4 border-l-blue-500">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-100 rounded-lg">
+                        <CreditCard className="h-4 w-4 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          Total Payments
+                        </p>
+                        <p className="text-xl font-bold text-blue-600">
+                          {reportsData?.paymentSummary.totalPayments || 0}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="border-l-4 border-l-purple-500">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-purple-100 rounded-lg">
+                        <DollarSign className="h-4 w-4 text-purple-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          Total Expected
+                        </p>
+                        <p className="text-xl font-bold text-purple-600">
+                          $
+                          {reportsData?.tuitionFeeIncome.reduce(
+                            (sum, dept) => sum + dept.totalTuitionFee,
+                            0,
+                          ) || 0}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
                 <Card className="border-l-4 border-l-green-500">
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
@@ -665,42 +703,6 @@ const ReportsPage = () => {
                           $
                           {reportsData?.paymentSummary.totalPending.toLocaleString() ||
                             0}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-l-4 border-l-red-500">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-red-100 rounded-lg">
-                        <DollarSign className="h-4 w-4 text-red-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Overdue</p>
-                        <p className="text-xl font-bold text-red-600">
-                          $
-                          {reportsData?.paymentSummary.totalOverdue.toLocaleString() ||
-                            0}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-l-4 border-l-blue-500">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <CreditCard className="h-4 w-4 text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          Total Payments
-                        </p>
-                        <p className="text-xl font-bold text-blue-600">
-                          {reportsData?.paymentSummary.totalPayments || 0}
                         </p>
                       </div>
                     </div>
