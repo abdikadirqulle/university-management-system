@@ -356,6 +356,9 @@ const deleteStudent = async (req, res) => {
     await prisma.payment.deleteMany({
       where: { studentId: student.studentId },
     })
+    await prisma.studentAccount.delete({
+      where: { studentId: student.studentId },
+    })
 
     // Then delete the student
     await prisma.student.delete({

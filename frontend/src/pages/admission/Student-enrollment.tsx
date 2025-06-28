@@ -71,7 +71,7 @@ const StudentEnrollment = () => {
   const handleDeleteStudent = async (id: string) => {
     try {
       await deleteStudent(id);
-      toast.success("Student deleted successfully");
+      //   toast.success("Student deleted successfully");
     } catch (error) {
       toast.error("Failed to delete student");
       console.error("Error deleting student:", error);
@@ -200,7 +200,7 @@ const StudentEnrollment = () => {
                         {student.department?.name || "N/A"}
                       </TableCell>
                       <TableCell className="hidden md:table-cell uppercase">
-                        {student.department.batch || "N/A"}
+                        {student.department?.batch || "N/A"}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">
                         {student.semester || "N/A"}
