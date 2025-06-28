@@ -42,9 +42,10 @@ const StudentTable: React.FC<StudentTableProps> = ({
   const [statusFilter, setStatusFilter] = useState("all");
   const [paymentFilter, setPaymentFilter] = useState("all");
   const [departmentFilter, setDepartmentFilter] = useState("all");
+  const [facultyFilter, setFacultyFilter] = useState("all");
   const [semesterFilter, setSemesterFilter] = useState("all");
 
-  // Extract unique departments and semesters for filter options
+  // Extract unique departments, faculties, and semesters for filter options
   const departments = useMemo(() => {
     const depts = new Set<string>();
     students.forEach((student) => {
@@ -53,6 +54,16 @@ const StudentTable: React.FC<StudentTableProps> = ({
       }
     });
     return Array.from(depts).sort();
+  }, [students]);
+
+  const faculties = useMemo(() => {
+    const facs = new Set<string>();
+    students.forEach((student) => {
+      if (student.faculty?.name) {
+        facs.add(student.faculty.name);
+      }
+    });
+    return Array.from(facs).sort();
   }, [students]);
 
   const semesters = useMemo(() => {
@@ -88,6 +99,10 @@ const StudentTable: React.FC<StudentTableProps> = ({
         departmentFilter === "all" ||
         student.department?.name === departmentFilter;
 
+      // Faculty filter
+      const matchesFaculty =
+        facultyFilter === "all" || student.faculty?.name === facultyFilter;
+
       // Semester filter
       const matchesSemester =
         semesterFilter === "all" || student.semester === semesterFilter;
@@ -118,6 +133,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
         matchesSearch &&
         matchesStatus &&
         matchesDepartment &&
+        matchesFaculty &&
         matchesSemester &&
         matchesPayment
       );
@@ -127,6 +143,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
     searchTerm,
     statusFilter,
     departmentFilter,
+    facultyFilter,
     semesterFilter,
     paymentFilter,
   ]);
@@ -248,17 +265,19 @@ const StudentTable: React.FC<StudentTableProps> = ({
             </SelectContent>
           </Select>
 
-          {/* <Select value={paymentFilter} onValueChange={setPaymentFilter}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Payment" />
+          <Select value={facultyFilter} onValueChange={setFacultyFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Faculty" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Payments</SelectItem>
-              <SelectItem value="paid">Paid</SelectItem>
-              <SelectItem value="partial">Partial</SelectItem>
-              <SelectItem value="unpaid">Unpaid</SelectItem>
+              <SelectItem value="all">All Faculties</SelectItem>
+              {faculties.map((faculty) => (
+                <SelectItem key={faculty} value={faculty}>
+                  {faculty}
+                </SelectItem>
+              ))}
             </SelectContent>
-          </Select> */}
+          </Select>
 
           <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
             <SelectTrigger className="w-[180px]">
