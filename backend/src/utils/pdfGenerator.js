@@ -228,13 +228,38 @@ export const generateEnrollmentByDepartmentPDF = (data, filters) => {
   const { academicYear, semester } = filters
   const columns = [
     { header: "Department", key: "department" },
+    { header: "Faculty", key: "faculty" },
     { header: "Total Students", key: "totalStudents" },
-    { header: "Male Students", key: "maleStudents" },
-    { header: "Female Students", key: "femaleStudents" },
+    { header: "Male", key: "maleStudents" },
+    { header: "Female", key: "femaleStudents" },
     { header: "Full Time", key: "fullTime" },
     { header: "Part Time", key: "partTime" },
   ]
 
   const title = `Enrollment by Department - ${academicYear} ${semester}`
+  return generatePDF(data, title, columns)
+}
+
+/**
+ * Generate a PDF for tuition fee income report
+ * @param {Array} data - Array of tuition fee income data objects
+ * @param {Object} filters - Report filters (academicYear, semester)
+ * @returns {PDFDocument} - The generated PDF document
+ */
+export const generateTuitionFeeIncomePDF = (data, filters) => {
+  const { academicYear, semester } = filters
+  const columns = [
+    { header: "Department", key: "department" },
+    { header: "Batch", key: "batch" },
+    { header: "Active Students", key: "activeStudents" },
+    { header: "Total Tuition Fee", key: "totalTuitionFee" },
+    { header: "Forwarded", key: "forwarded" },
+    { header: "Discount", key: "discount" },
+    { header: "Income Expected", key: "incomeExpected" },
+    { header: "Accrued Income", key: "accruedIncome" },
+    { header: "Deferred Income", key: "deferredIncome" },
+  ]
+
+  const title = `Tuition Fee Income Report - ${academicYear} ${semester} (Active Students Only)`
   return generatePDF(data, title, columns)
 }

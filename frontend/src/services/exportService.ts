@@ -272,6 +272,31 @@ class ExportService {
       `enrollment-by-department-${academicYear}-${semester}.xlsx`,
     );
   }
+
+  /**
+   * Export tuition fee income report as PDF
+   * @param filters - Report filters (academicYear, semester)
+   */
+  async exportTuitionFeeIncomePDF(filters: ReportFilters): Promise<void> {
+    const { academicYear, semester } = filters;
+    return this.downloadFile(
+      `/reports/tuition-fee-income/pdf?academicYear=${encodeURIComponent(academicYear)}&semester=${encodeURIComponent(semester)}`,
+      `tuition-fee-income-${academicYear}-${semester}.pdf`,
+      true,
+    );
+  }
+
+  /**
+   * Export tuition fee income report as Excel
+   * @param filters - Report filters (academicYear, semester)
+   */
+  async exportTuitionFeeIncomeExcel(filters: ReportFilters): Promise<void> {
+    const { academicYear, semester } = filters;
+    return this.downloadFile(
+      `/reports/tuition-fee-income/excel?academicYear=${encodeURIComponent(academicYear)}&semester=${encodeURIComponent(semester)}`,
+      `tuition-fee-income-${academicYear}-${semester}.xlsx`,
+    );
+  }
 }
 
 export const exportService = new ExportService();

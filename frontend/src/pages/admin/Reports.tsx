@@ -26,7 +26,7 @@ import {
 } from "recharts";
 import {
   BarChart as BarChartIcon,
-  PieChart as PieChartIcon,
+  DollarSign,
   LineChart as LineChartIcon,
   Users,
   GraduationCap,
@@ -35,6 +35,7 @@ import {
   TrendingUp,
   Filter,
   RefreshCw,
+  CreditCard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -53,11 +54,14 @@ import reportsService, {
   EnrollmentByDepartment,
   ReportFilters,
   CourseEnrollment,
+  TuitionFeeIncome,
 } from "@/services/reportsService";
 import { departmentService } from "@/services/departmentService";
 import { Department } from "@/types/department";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Faculty } from "@/types/faculty";
+import { facultyService } from "@/services/facultyService";
 
 // Define columns for the enrollment by department data table
 const columns: ColumnDef<EnrollmentByDepartment>[] = [
@@ -117,6 +121,85 @@ const columns: ColumnDef<EnrollmentByDepartment>[] = [
     cell: ({ row }) => (
       <div className="text-center text-orange-600">
         {row.getValue("partTime")}
+      </div>
+    ),
+  },
+];
+
+// Define columns for the tuition fee income data table
+const tuitionFeeColumns: ColumnDef<TuitionFeeIncome>[] = [
+  {
+    accessorKey: "department",
+    header: "Department",
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue("department")}</div>
+    ),
+  },
+  {
+    accessorKey: "batch",
+    header: "Batch",
+    cell: ({ row }) => <Badge variant="outline">{row.getValue("batch")}</Badge>,
+  },
+  {
+    accessorKey: "activeStudents",
+    header: "Active Students",
+    cell: ({ row }) => (
+      <div className="text-center font-semibold text-blue-600">
+        {row.getValue("activeStudents")}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "totalTuitionFee",
+    header: "Total Tuition Fee",
+    cell: ({ row }) => (
+      <div className="text-center font-semibold text-green-600">
+        ${Number(row.getValue("totalTuitionFee")).toLocaleString()}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "forwarded",
+    header: "Forwarded",
+    cell: ({ row }) => (
+      <div className="text-center text-orange-600">
+        ${Number(row.getValue("forwarded")).toLocaleString()}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "discount",
+    header: "Discount",
+    cell: ({ row }) => (
+      <div className="text-center text-red-600">
+        ${Number(row.getValue("discount")).toLocaleString()}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "incomeExpected",
+    header: "Income Expected",
+    cell: ({ row }) => (
+      <div className="text-center font-semibold text-purple-600">
+        ${Number(row.getValue("incomeExpected")).toLocaleString()}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "accruedIncome",
+    header: "Accrued Income",
+    cell: ({ row }) => (
+      <div className="text-center text-green-500">
+        ${Number(row.getValue("accruedIncome")).toLocaleString()}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "deferredIncome",
+    header: "Deferred Income",
+    cell: ({ row }) => (
+      <div className="text-center text-yellow-600">
+        ${Number(row.getValue("deferredIncome")).toLocaleString()}
       </div>
     ),
   },
@@ -184,26 +267,26 @@ const courseColumns: ColumnDef<CourseEnrollment>[] = [
 
 const ReportsPage = () => {
   const [academicYear, setAcademicYear] = useState("2024-2025");
-  const [selectedDepartment, setSelectedDepartment] = useState<string>("");
-  const [departments, setDepartments] = useState<Department[]>([]);
+  const [selectedFaculty, setSelectedFaculty] = useState<string>("");
+  const [faculties, setFaculties] = useState<Faculty[]>([]);
 
-  // Fetch departments for filter
+  // Fetch faculties for filter
   useEffect(() => {
-    const fetchDepartments = async () => {
+    const fetchFaculties = async () => {
       try {
-        const depts = await departmentService.getAllDepartments();
-        setDepartments(depts);
+        const faculties = await facultyService.getAllFaculties();
+        setFaculties(faculties);
       } catch (error) {
-        console.error("Error fetching departments:", error);
+        console.error("Error fetching faculties:", error);
       }
     };
-    fetchDepartments();
+    fetchFaculties();
   }, []);
 
   // Prepare filters
   const filters: ReportFilters = {
     academicYear,
-    departmentId: selectedDepartment || undefined,
+    facultyId: selectedFaculty || undefined,
   };
 
   // Fetch reports data using React Query
@@ -230,13 +313,9 @@ const ReportsPage = () => {
 
       if (fileType === "pdf") {
         switch (reportIdentifier) {
-          case "enrollmentTrends":
+          case "tuitionFeeIncome":
             downloadPromise =
-              exportService.exportEnrollmentTrendsPDF(downloadFilters);
-            break;
-          case "facultyDistribution":
-            downloadPromise =
-              exportService.exportFacultyDistributionPDF(downloadFilters);
+              exportService.exportTuitionFeeIncomePDF(downloadFilters);
             break;
           case "courseEnrollment":
             downloadPromise =
@@ -253,13 +332,9 @@ const ReportsPage = () => {
         }
       } else if (fileType === "excel") {
         switch (reportIdentifier) {
-          case "enrollmentTrends":
+          case "tuitionFeeIncome":
             downloadPromise =
-              exportService.exportEnrollmentTrendsExcel(downloadFilters);
-            break;
-          case "facultyDistribution":
-            downloadPromise =
-              exportService.exportFacultyDistributionExcel(downloadFilters);
+              exportService.exportTuitionFeeIncomeExcel(downloadFilters);
             break;
           case "courseEnrollment":
             downloadPromise =
@@ -330,6 +405,68 @@ const ReportsPage = () => {
         title="Academic Reports"
         description="Comprehensive analytics and insights for university management"
       />
+
+      {/* Filters Section */}
+      <Card className="border-2 border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Filter className="h-5 w-5 text-blue-600" />
+            <CardTitle className="text-blue-900">Report Filters</CardTitle>
+          </div>
+          <CardDescription>
+            Select parameters to generate customized reports
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-blue-900">
+                Academic Year
+              </label>
+              <Select value={academicYear} onValueChange={setAcademicYear}>
+                <SelectTrigger className="border-blue-200">
+                  <SelectValue placeholder="Select Year" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 6 }, (_, i) => {
+                    const year = new Date().getFullYear() - i;
+                    const academicYear = `${year}-${year + 1}`;
+                    return (
+                      <SelectItem key={academicYear} value={academicYear}>
+                        {academicYear}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-blue-900">
+                Faculty
+              </label>
+              <Select
+                value={selectedFaculty || "all"}
+                onValueChange={(value) =>
+                  setSelectedFaculty(value === "all" ? "" : value)
+                }
+              >
+                <SelectTrigger className="border-blue-200">
+                  <SelectValue placeholder="All Faculties" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Faculties</SelectItem>
+                  {faculties.map((faculty) => (
+                    <SelectItem key={faculty.id} value={faculty.id}>
+                      {faculty.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Quick Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="border-l-4 border-l-blue-500">
@@ -357,14 +494,14 @@ const ReportsPage = () => {
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-green-100 rounded-lg">
-                <Building2 className="h-5 w-5 text-green-600" />
+                <CreditCard className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Faculties</p>
+                <p className="text-sm text-muted-foreground">Total Payments</p>
                 <p className="text-2xl font-bold text-green-600">
                   {isLoading
                     ? "..."
-                    : reportsData?.facultyDistribution.length || 0}
+                    : `$${reportsData?.paymentSummary.totalPaid.toLocaleString() || 0}`}
                 </p>
               </div>
             </div>
@@ -407,66 +544,6 @@ const ReportsPage = () => {
           </CardContent>
         </Card>
       </div>
-      {/* Filters Section */}
-      <Card className="border-2 border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-blue-600" />
-            <CardTitle className="text-blue-900">Report Filters</CardTitle>
-          </div>
-          <CardDescription>
-            Select parameters to generate customized reports
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-blue-900">
-                Academic Year
-              </label>
-              <Select value={academicYear} onValueChange={setAcademicYear}>
-                <SelectTrigger className="border-blue-200">
-                  <SelectValue placeholder="Select Year" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Array.from({ length: 6 }, (_, i) => {
-                    const year = new Date().getFullYear() - i;
-                    const academicYear = `${year}-${year + 1}`;
-                    return (
-                      <SelectItem key={academicYear} value={academicYear}>
-                        {academicYear}
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-blue-900">
-                Department
-              </label>
-              <Select
-                value={selectedDepartment || "all"}
-                onValueChange={(value) =>
-                  setSelectedDepartment(value === "all" ? "" : value)
-                }
-              >
-                <SelectTrigger className="border-blue-200">
-                  <SelectValue placeholder="All Departments" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Departments</SelectItem>
-                  {departments.map((dept) => (
-                    <SelectItem key={dept.id} value={dept.id}>
-                      {dept.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Reports Tabs */}
       <Tabs defaultValue="enrollment" className="space-y-4">
@@ -479,11 +556,11 @@ const ReportsPage = () => {
             Enrollment
           </TabsTrigger>
           <TabsTrigger
-            value="faculty"
+            value="financial"
             className="flex items-center gap-2 data-[state=active]:bg-white"
           >
-            <PieChartIcon className="h-4 w-4" />
-            Faculty
+            <DollarSign className="h-4 w-4" />
+            Financial
           </TabsTrigger>
           <TabsTrigger
             value="courses"
@@ -501,64 +578,6 @@ const ReportsPage = () => {
             <ErrorComponent />
           ) : (
             <>
-              {/* Enrollment Trends Chart */}
-              <Card className="shadow-lg border-0">
-                <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <CardTitle className="flex items-center gap-2">
-                        <TrendingUp className="h-5 w-5 text-blue-600" />
-                        Enrollment Trends
-                      </CardTitle>
-                      <CardDescription>
-                        Monthly student enrollment for {academicYear}
-                        {selectedDepartment &&
-                          ` - ${departments.find((d) => d.id === selectedDepartment)?.name}`}
-                      </CardDescription>
-                    </div>
-                    <ExportButtons
-                      onExportPDF={() =>
-                        handleDownloadReport(
-                          "enrollmentTrends",
-                          "Enrollment Trends",
-                          "pdf",
-                        )
-                      }
-                      onExportExcel={() =>
-                        handleDownloadReport(
-                          "enrollmentTrends",
-                          "Enrollment Trends",
-                          "excel",
-                        )
-                      }
-                    />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={400}>
-                    <BarChart data={reportsData?.enrollmentTrends || []}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                      <XAxis dataKey="month" stroke="#666" />
-                      <YAxis stroke="#666" />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: "white",
-                          border: "1px solid #e0e0e0",
-                          borderRadius: "8px",
-                        }}
-                      />
-                      <Legend />
-                      <Bar
-                        dataKey="students"
-                        fill="#3b82f6"
-                        name="Students"
-                        radius={[4, 4, 0, 0]}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
               {/* Enrollment by Department Table */}
               <Card className="shadow-lg border-0">
                 <CardHeader>
@@ -566,10 +585,14 @@ const ReportsPage = () => {
                     <div>
                       <CardTitle className="flex items-center gap-2">
                         <Users className="h-5 w-5 text-green-600" />
-                        Enrollment by Department
+                        {selectedFaculty
+                          ? `Students by Department - ${faculties.find((f) => f.id === selectedFaculty)?.name}`
+                          : "Enrollment by Department"}
                       </CardTitle>
                       <CardDescription>
-                        Detailed student distribution across departments
+                        {selectedFaculty
+                          ? "Detailed student distribution in selected faculty"
+                          : "Student distribution across all departments"}
                       </CardDescription>
                     </div>
                     <ExportButtons
@@ -601,74 +624,210 @@ const ReportsPage = () => {
           )}
         </TabsContent>
 
-        <TabsContent value="faculty" className="space-y-6">
+        <TabsContent value="financial" className="space-y-6">
           {isLoading ? (
             <LoadingSkeleton />
           ) : error ? (
             <ErrorComponent />
           ) : (
-            <Card className="shadow-lg border-0">
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Building2 className="h-5 w-5 text-purple-600" />
-                      Faculty Distribution
-                    </CardTitle>
-                    <CardDescription>
-                      Distribution of students across faculties
-                    </CardDescription>
+            <>
+              {/* Financial Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card className="border-l-4 border-l-green-500">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-green-100 rounded-lg">
+                        <DollarSign className="h-4 w-4 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          Total Paid
+                        </p>
+                        <p className="text-xl font-bold text-green-600">
+                          $
+                          {reportsData?.paymentSummary.totalPaid.toLocaleString() ||
+                            0}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-l-4 border-l-yellow-500">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-yellow-100 rounded-lg">
+                        <DollarSign className="h-4 w-4 text-yellow-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Pending</p>
+                        <p className="text-xl font-bold text-yellow-600">
+                          $
+                          {reportsData?.paymentSummary.totalPending.toLocaleString() ||
+                            0}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-l-4 border-l-red-500">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-red-100 rounded-lg">
+                        <DollarSign className="h-4 w-4 text-red-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Overdue</p>
+                        <p className="text-xl font-bold text-red-600">
+                          $
+                          {reportsData?.paymentSummary.totalOverdue.toLocaleString() ||
+                            0}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-l-4 border-l-blue-500">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-100 rounded-lg">
+                        <CreditCard className="h-4 w-4 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          Total Payments
+                        </p>
+                        <p className="text-xl font-bold text-blue-600">
+                          {reportsData?.paymentSummary.totalPayments || 0}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Tuition Fee Income Chart */}
+              <Card className="shadow-lg border-0">
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <DollarSign className="h-5 w-5 text-green-600" />
+                        Tuition Fee Income Overview
+                      </CardTitle>
+                      <CardDescription>
+                        Financial overview by department (Active Students Only)
+                      </CardDescription>
+                    </div>
                   </div>
-                  <ExportButtons
-                    onExportPDF={() =>
-                      handleDownloadReport(
-                        "facultyDistribution",
-                        "Faculty Distribution",
-                        "pdf",
-                      )
-                    }
-                    onExportExcel={() =>
-                      handleDownloadReport(
-                        "facultyDistribution",
-                        "Faculty Distribution",
-                        "excel",
-                      )
-                    }
-                  />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={400}>
-                  <PieChart>
-                    <Pie
-                      data={reportsData?.facultyDistribution || []}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={150}
-                      fill="#8884d8"
-                      dataKey="value"
-                      nameKey="name"
-                      label={({ name, value }) => `${name}: ${value}`}
-                    >
-                      {reportsData?.facultyDistribution.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "white",
-                        border: "1px solid #e0e0e0",
-                        borderRadius: "8px",
-                      }}
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={400}>
+                    <BarChart data={reportsData?.tuitionFeeIncome || []}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis
+                        dataKey="department"
+                        stroke="#666"
+                        angle={-45}
+                        textAnchor="end"
+                        height={120}
+                        interval={0}
+                        tick={{ fontSize: 12 }}
+                      />
+                      <YAxis stroke="#666" />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "white",
+                          border: "1px solid #e0e0e0",
+                          borderRadius: "8px",
+                        }}
+                        formatter={(value, name) => [
+                          `$${Number(value).toLocaleString()}`,
+                          name,
+                        ]}
+                      />
+                      <Legend />
+                      <Bar
+                        dataKey="totalTuitionFee"
+                        fill="#3b82f6"
+                        name="Total Tuition Fee"
+                        radius={[2, 2, 0, 0]}
+                      />
+                      <Bar
+                        dataKey="accruedIncome"
+                        fill="#10b981"
+                        name="Accrued Income"
+                        radius={[2, 2, 0, 0]}
+                      />
+                      <Bar
+                        dataKey="deferredIncome"
+                        fill="#f59e0b"
+                        name="Deferred Income"
+                        radius={[2, 2, 0, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Tuition Fee Income Table */}
+              <Card className="shadow-lg border-0">
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <Building2 className="h-5 w-5 text-purple-600" />
+                        Tuition Fee Income Details
+                      </CardTitle>
+                      <CardDescription>
+                        Comprehensive financial breakdown by department and
+                        batch (Active Students Only)
+                      </CardDescription>
+                    </div>
+                    <ExportButtons
+                      onExportPDF={() =>
+                        handleDownloadReport(
+                          "tuitionFeeIncome",
+                          "Tuition Fee Income",
+                          "pdf",
+                        )
+                      }
+                      onExportExcel={() =>
+                        handleDownloadReport(
+                          "tuitionFeeIncome",
+                          "Tuition Fee Income",
+                          "excel",
+                        )
+                      }
                     />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {reportsData?.tuitionFeeIncome &&
+                  reportsData.tuitionFeeIncome.length > 0 ? (
+                    <DataTable
+                      columns={tuitionFeeColumns}
+                      data={reportsData.tuitionFeeIncome}
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12">
+                      <div className="text-center">
+                        <div className="text-gray-400 text-6xl mb-4">💰</div>
+                        <h3 className="text-lg font-semibold mb-2">
+                          No Financial Data Available
+                        </h3>
+                        <p className="text-muted-foreground">
+                          No tuition fee data found for the selected filters.
+                          Try adjusting your search criteria.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </>
           )}
         </TabsContent>
 
@@ -679,93 +838,6 @@ const ReportsPage = () => {
             <ErrorComponent />
           ) : (
             <>
-              {/* Course Enrollment by Department Chart */}
-              {/* <Card className="shadow-lg border-0">
-                <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <CardTitle className="flex items-center gap-2">
-                        <BarChartIcon className="h-5 w-5 text-blue-600" />
-                        Course Enrollment by Department
-                      </CardTitle>
-                      <CardDescription>
-                        Top courses grouped by department for {academicYear}
-                        {selectedDepartment &&
-                          ` - ${departments.find((d) => d.id === selectedDepartment)?.name}`}
-                      </CardDescription>
-                    </div>
-                    <ExportButtons
-                      onExportPDF={() =>
-                        handleDownloadReport(
-                          "courseEnrollment",
-                          "Course Enrollment",
-                          "pdf",
-                        )
-                      }
-                      onExportExcel={() =>
-                        handleDownloadReport(
-                          "courseEnrollment",
-                          "Course Enrollment",
-                          "excel",
-                        )
-                      }
-                    />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {reportsData?.courseEnrollment &&
-                  reportsData.courseEnrollment.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={400}>
-                      <BarChart data={reportsData.courseEnrollment}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                        <XAxis
-                          dataKey="name"
-                          stroke="#666"
-                          angle={-45}
-                          textAnchor="end"
-                          height={120}
-                          interval={0}
-                          tick={{ fontSize: 12 }}
-                        />
-                        <YAxis stroke="#666" />
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "white",
-                            border: "1px solid #e0e0e0",
-                            borderRadius: "8px",
-                          }}
-                          formatter={(value, name, props) => [
-                            `${value} students`,
-                            "Enrollment",
-                          ]}
-                          labelFormatter={(label) => `Course: ${label}`}
-                        />
-                        <Legend />
-                        <Bar
-                          dataKey="students"
-                          fill="#3b82f6"
-                          name="Students"
-                          radius={[4, 4, 0, 0]}
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-12">
-                      <div className="text-center">
-                        <div className="text-gray-400 text-6xl mb-4">📚</div>
-                        <h3 className="text-lg font-semibold mb-2">
-                          No Course Data Available
-                        </h3>
-                        <p className="text-muted-foreground">
-                          No courses found for the selected filters. Try
-                          adjusting your search criteria.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card> */}
-
               {/* Course Enrollment Detailed Table */}
               <Card className="shadow-lg border-0">
                 <CardHeader>
