@@ -82,22 +82,6 @@ export function UserFormDialog({
     },
   });
 
-  const handleGeneratePassword = () => {
-    const newPassword = generatePassword();
-    form.setValue("password", newPassword);
-    // Copy to clipboard
-    navigator.clipboard
-      .writeText(newPassword)
-      .then(() => {
-        toast.success("Password generated and copied to clipboard!");
-        // Show the password temporarily
-        setShowPassword(true);
-      })
-      .catch(() => {
-        toast.success("Password generated! Please copy it manually.");
-      });
-  };
-
   useEffect(() => {
     if (initialData) {
       form.reset({

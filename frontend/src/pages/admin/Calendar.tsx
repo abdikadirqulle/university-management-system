@@ -186,7 +186,6 @@ const CalendarPage = () => {
         event.id === editingEvent.id ? { ...event, ...data } : event,
       );
       setEvents(updatedEvents);
-      toast.success("Event updated successfully");
     } else {
       // Add new event
       const newEvent: CalendarEvent = {
@@ -194,7 +193,6 @@ const CalendarPage = () => {
         ...data,
       };
       setEvents([...events, newEvent]);
-      toast.success("Event added successfully");
     }
     handleDialogOpenChange(false);
   };
@@ -218,7 +216,6 @@ const CalendarPage = () => {
   const handleDelete = (id: string) => {
     const updatedEvents = events.filter((event) => event.id !== id);
     setEvents(updatedEvents);
-    toast.success("Event deleted successfully");
   };
 
   // Filter events
@@ -688,8 +685,12 @@ const CalendarPage = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="semester one">Semester One</SelectItem>
-                          <SelectItem value="semester two">Semester Two</SelectItem>
+                          <SelectItem value="semester one">
+                            Semester One
+                          </SelectItem>
+                          <SelectItem value="semester two">
+                            Semester Two
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

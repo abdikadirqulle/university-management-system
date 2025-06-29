@@ -109,11 +109,9 @@ const FacultiesPage = () => {
       if (editingFaculty) {
         // Update existing faculty
         await updateFaculty(editingFaculty.id, data);
-        toast.success("Faculty updated successfully");
       } else {
         // Add new faculty
         await addFaculty(data);
-        toast.success("Faculty added successfully");
       }
       handleDialogOpenChange(false);
     } catch (error) {
@@ -144,7 +142,6 @@ const FacultiesPage = () => {
     ) {
       try {
         await deleteFaculty(id);
-        toast.success("Faculty deleted successfully");
       } catch (error) {
         toast.error("Failed to delete faculty");
         console.error(error);

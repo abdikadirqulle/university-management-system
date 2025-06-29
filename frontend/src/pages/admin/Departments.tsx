@@ -142,7 +142,6 @@ const DepartmentsPage = () => {
           batch: data.batch,
           phone: data.phone,
         });
-        toast.success("Department updated successfully");
       } else {
         // Add new department
         await addDepartment({
@@ -154,7 +153,6 @@ const DepartmentsPage = () => {
           batch: data.batch,
           phone: data.phone,
         } as Omit<Department, "id">);
-        toast.success("Department added successfully");
       }
       handleDialogOpenChange(false);
     } catch (error) {
@@ -187,7 +185,6 @@ const DepartmentsPage = () => {
     ) {
       try {
         await deleteDepartment(id);
-        toast.success("Department deleted successfully");
       } catch (error) {
         toast.error("Failed to delete department");
         console.error(error);

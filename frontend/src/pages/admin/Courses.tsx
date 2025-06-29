@@ -69,7 +69,9 @@ const CoursesPage = () => {
   } = useCourseStore();
   const [isOpen, setIsOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
-  const [departments, setDepartments] = useState<{id: string, name: string}[]>([]);
+  const [departments, setDepartments] = useState<
+    { id: string; name: string }[]
+  >([]);
   const [loadingDepartments, setLoadingDepartments] = useState(false);
 
   // Setup form
@@ -97,7 +99,7 @@ const CoursesPage = () => {
       setLoadingDepartments(true);
       try {
         const data = await departmentService.getAllDepartments();
-        setDepartments(data.map(dept => ({ id: dept.id, name: dept.name })));
+        setDepartments(data.map((dept) => ({ id: dept.id, name: dept.name })));
       } catch (error) {
         console.error("Error fetching departments:", error);
         toast.error("Failed to load departments");
@@ -122,8 +124,10 @@ const CoursesPage = () => {
   const onSubmit = async (data: CourseFormValues) => {
     try {
       // Find department name for display purposes
-      const selectedDept = departments.find(d => d.id === data.departmentId);
-      const departmentName = selectedDept ? selectedDept.name : "Unknown Department";
+      const selectedDept = departments.find((d) => d.id === data.departmentId);
+      const departmentName = selectedDept
+        ? selectedDept.name
+        : "Unknown Department";
 
       if (editingCourse) {
         // Update existing course
@@ -132,7 +136,6 @@ const CoursesPage = () => {
           department: departmentName,
           instructor: data.instructor || "Not assigned",
         });
-        toast.success("Course updated successfully");
       } else {
         // Add new course
         await addCourse({
@@ -140,7 +143,6 @@ const CoursesPage = () => {
           department: departmentName,
           instructor: data.instructor || "Not assigned",
         });
-        toast.success("Course added successfully");
       }
       handleDialogOpenChange(false);
     } catch (error) {
@@ -166,10 +168,13 @@ const CoursesPage = () => {
 
   // Handle delete course
   const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this course? This action cannot be undone.")) {
+    if (
+      confirm(
+        "Are you sure you want to delete this course? This action cannot be undone.",
+      )
+    ) {
       try {
         await deleteCourse(id);
-        toast.success("Course deleted successfully");
       } catch (error) {
         toast.error("Failed to delete course");
         console.error(error);
@@ -254,15 +259,13 @@ const CoursesPage = () => {
           onClick: () => setIsOpen(true),
         }}
       />
-      
+
       <div className="flex justify-end mb-4">
         <ExportButtons
           onExportPDF={() => exportService.exportCoursesPDF()}
           onExportExcel={() => exportService.exportCoursesExcel()}
         />
       </div>
-        
-     
 
       <div className="mt-6">
         {isLoading ? (
@@ -279,12 +282,12 @@ const CoursesPage = () => {
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>
-              {editingCourse ? 'Edit Course' : 'Add New Course'}
+              {editingCourse ? "Edit Course" : "Add New Course"}
             </DialogTitle>
             <DialogDescription>
               {editingCourse
-                ? 'Update the course details below'
-                : 'Fill in the course details below to add a new course'}
+                ? "Update the course details below"
+                : "Fill in the course details below to add a new course"}
             </DialogDescription>
           </DialogHeader>
 
@@ -370,12 +373,7 @@ const CoursesPage = () => {
                     <FormItem>
                       <FormLabel>Credits</FormLabel>
                       <FormControl>
-                        <Input
-                          type="number"
-                          min={1}
-                          max={6}
-                          {...field}
-                        />
+                        <Input type="number" min={1} max={6} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -437,10 +435,7 @@ const CoursesPage = () => {
                     <FormItem>
                       <FormLabel>Instructor</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="e.g. Dr. John Doe"
-                          {...field}
-                        />
+                        <Input placeholder="e.g. Dr. John Doe" {...field} />
                       </FormControl>
                       <FormDescription>
                         Optional. Leave blank if not yet assigned.
@@ -460,8 +455,8 @@ const CoursesPage = () => {
                 >
                   Cancel
                 </Button>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={form.formState.isSubmitting || isLoading}
                 >
                   {form.formState.isSubmitting ? (
@@ -469,8 +464,10 @@ const CoursesPage = () => {
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       {editingCourse ? "Updating..." : "Adding..."}
                     </>
+                  ) : editingCourse ? (
+                    "Update Course"
                   ) : (
-                    editingCourse ? "Update Course" : "Add Course"
+                    "Add Course"
                   )}
                 </Button>
               </DialogFooter>
