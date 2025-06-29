@@ -29,17 +29,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useDepartmentStore } from "@/store/useDepartmentStore";
 import { api } from "@/services/api";
 
 // Define the form schema
 const formSchema = z.object({
   semester: z.string().min(1, "Semester is required"),
   academicYear: z.string().min(1, "Academic year is required"),
-  departmentIds: z
-    .array(z.string())
-    .min(1, "At least one department must be selected"),
 });
 
 interface SemesterTransitionDialogProps {
@@ -52,8 +47,6 @@ const SemesterTransitionDialog: React.FC<SemesterTransitionDialogProps> = ({
   onClose,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { departments } = useDepartmentStore();
-  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
 
   // Generate semester options (1-8)
   const semesterOptions = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -74,31 +67,8 @@ const SemesterTransitionDialog: React.FC<SemesterTransitionDialogProps> = ({
     defaultValues: {
       semester: "",
       academicYear: `${currentYear}-${currentYear + 1}`,
-      departmentIds: [],
     },
   });
-
-  // Handle department selection
-  const handleDepartmentToggle = (departmentId: string) => {
-    setSelectedDepartments((prev) => {
-      if (prev.includes(departmentId)) {
-        return prev.filter((id) => id !== departmentId);
-      } else {
-        return [...prev, departmentId];
-      }
-    });
-
-    // Update form value
-    const currentDepts = form.getValues("departmentIds");
-    if (currentDepts.includes(departmentId)) {
-      form.setValue(
-        "departmentIds",
-        currentDepts.filter((id) => id !== departmentId),
-      );
-    } else {
-      form.setValue("departmentIds", [...currentDepts, departmentId]);
-    }
-  };
 
   // Handle form submission
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -133,7 +103,7 @@ const SemesterTransitionDialog: React.FC<SemesterTransitionDialogProps> = ({
           <DialogTitle>End-of-Semester Transition</DialogTitle>
           <DialogDescription>
             This will process end-of-semester transitions for all students in
-            the selected departments. Pending fees will be forwarded to the next
+            the selected semester. Pending fees will be forwarded to the next
             semester, and students will be promoted.
           </DialogDescription>
         </DialogHeader>
@@ -198,38 +168,6 @@ const SemesterTransitionDialog: React.FC<SemesterTransitionDialogProps> = ({
                   </FormItem>
                 )}
               />
-            </div>
-
-            {/* Department Selection */}
-            <div>
-              <FormLabel>Affected Departments</FormLabel>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2 max-h-[200px] overflow-y-auto p-2 border rounded-md">
-                {departments.map((department) => (
-                  <div
-                    key={department.id}
-                    className="flex items-center space-x-2"
-                  >
-                    <Checkbox
-                      id={department.id}
-                      checked={selectedDepartments.includes(department.id)}
-                      onCheckedChange={() =>
-                        handleDepartmentToggle(department.id)
-                      }
-                    />
-                    <label
-                      htmlFor={department.id}
-                      className="text-sm cursor-pointer"
-                    >
-                      {department.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
-              {form.formState.errors.departmentIds && (
-                <p className="text-sm text-destructive mt-1">
-                  {form.formState.errors.departmentIds.message}
-                </p>
-              )}
             </div>
 
             <DialogFooter>

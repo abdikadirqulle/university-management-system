@@ -229,24 +229,18 @@ const deleteCalendarEvent = async (req, res) => {
 
 const handleTransition = async (req, res) => {
   try {
-    const { semester, academicYear, departmentIds } = req.body
+    const { semester, academicYear } = req.body
 
-    if (
-      !semester ||
-      !academicYear ||
-      !departmentIds ||
-      !Array.isArray(departmentIds)
-    ) {
+    if (!semester || !academicYear) {
       return res.status(400).json({
         success: false,
-        message:
-          "Missing required fields: semester, academicYear, and departmentIds (array)",
+        message: "Missing required fields: semester, academicYear",
       })
     }
 
     const semesterInt = Number(semester)
 
-    await handleSemesterTransition(semesterInt, academicYear, departmentIds)
+    await handleSemesterTransition(semesterInt, academicYear)
 
     res.status(200).json({
       success: true,
@@ -266,20 +260,13 @@ const handleTransition = async (req, res) => {
  * Handle semester transition logic when a semester ends
  * This function updates student semesters and tuition fees
  */
-const handleSemesterTransition = async (
-  semesterInt,
-  academicYear,
-  affectedDepartments
-) => {
+const handleSemesterTransition = async (semesterInt, academicYear) => {
   try {
     // Get all active students in the affected departments
     const students = await prisma.student.findMany({
       where: {
         isActive: true,
         // status: "normal",
-        departmentId: {
-          in: affectedDepartments,
-        },
         semester: semesterInt,
       },
       include: {
@@ -292,6 +279,7 @@ const handleSemesterTransition = async (
         },
       },
     })
+    console.log(semesterInt)
 
     console.log(`Found ${students.length} students for semester transition`)
 
@@ -357,10 +345,13 @@ const handleSemesterTransition = async (
         // Calculate new tuition fee
         const tuitionFee = student.department.price || 0
 
-        const scholarshipInt =
-          currentAccount?.tuitionFee - currentAccount?.scholarship || 0
+        // let scholarshipInt = 0
+        // if (currentAccount.scholarship !== 0) {
+        //   scholarshipInt =
+        //     currentAccount?.tuitionFee - currentAccount?.scholarship || 0
+        // }
 
-        console.log(chalk.yellow.bold(`scholarshipInt: ${scholarshipInt}`))
+        // console.log(chalk.yellow.bold(`scholarshipInt: ${scholarshipInt}`))
 
         // Create new student account for the next semester
         const updateStudentAccount = await prisma.studentAccount.update({
@@ -374,7 +365,7 @@ const handleSemesterTransition = async (
             paidAmount: 0, // Reset paid amount for new semester
             paidType: currentAccount?.paidType || null, // Maintain the same payment type
             discount: 0, // Reset discount for new semester
-            scholarship: scholarshipInt, // Maintain scholarship for new semester
+            // scholarship: scholarshipInt, // Maintain scholarship for new semester
             status: "normal", // Set status to normal for regular semester transition
           },
         })
