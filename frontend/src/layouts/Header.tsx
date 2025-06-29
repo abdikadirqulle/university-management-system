@@ -41,15 +41,7 @@ const Header = () => {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link
-                  to={`/${user?.role}/profile`}
-                  className="flex w-full cursor-pointer items-center"
-                >
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
-                </Link>
-              </DropdownMenuItem>
+
               <DropdownMenuItem asChild>
                 <Link
                   to={`/${user?.role}/settings`}

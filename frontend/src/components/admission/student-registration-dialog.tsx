@@ -118,10 +118,10 @@ const studentSchema = z.object({
   graduationYear: z
     .string()
     .min(1, "Graduation year is required")
-    .transform((val) => parseInt(val))
-    .refine((year) => {
+    .refine((val) => {
+      const year = parseInt(val);
       const currentYear = new Date().getFullYear();
-      return year <= currentYear && year >= currentYear - 10;
+      return !isNaN(year) && year <= currentYear && year >= currentYear - 10;
     }, "Graduation year must be between current year and 10 years ago"),
   averagePass: z
     .string()
@@ -175,10 +175,10 @@ const studentSchema = z.object({
   registerYear: z
     .string()
     .min(1, "Register year is required")
-    .transform((val) => parseInt(val))
-    .refine((year) => {
+    .refine((val) => {
+      const year = parseInt(val);
       const currentYear = new Date().getFullYear();
-      return year === currentYear;
+      return !isNaN(year) && year === currentYear;
     }, "Registration year must be current year"),
   semester: z.string().min(1, "Semester is required"),
 
@@ -241,8 +241,11 @@ const StudentRegistrationDialog = ({
   useEffect(() => {
     if (isEditMode && student && open) {
       // Convert numeric values to strings for the form
-      const graduationYearStr = student.graduationYear?.toString() || "";
-      const registerYearStr = student.registerYear?.toString() || "";
+      const graduationYearStr =
+        student.graduationYear?.toString() ||
+        new Date().getFullYear().toString();
+      const registerYearStr =
+        student.registerYear?.toString() || new Date().getFullYear().toString();
       const averagePassStr = student.averagePass?.toString() || "";
 
       // Reset the form with student data
@@ -258,7 +261,7 @@ const StudentRegistrationDialog = ({
         // Academic Background
         highSchoolName: student.highSchoolName || "",
         highSchoolCity: student.highSchoolCity || "",
-        graduationYear: parseInt(graduationYearStr),
+        graduationYear: graduationYearStr,
         averagePass: averagePassStr,
 
         // Program Information
@@ -266,7 +269,7 @@ const StudentRegistrationDialog = ({
         departmentId: student.departmentId || "",
         session: student.session || "",
         academicYear: student.academicYear || "",
-        registerYear: parseInt(registerYearStr),
+        registerYear: registerYearStr,
         semester: student.semester || "",
       });
 
@@ -276,7 +279,29 @@ const StudentRegistrationDialog = ({
       }
     } else if (!isEditMode && open) {
       // Reset form when opening for a new student
-      form.reset();
+      form.reset({
+        // Personal Information
+        fullName: "",
+        gender: "male",
+        dateOfBirth: "",
+        placeOfBirth: "",
+        email: "",
+        phoneNumber: "",
+
+        // Academic Background
+        highSchoolName: "",
+        highSchoolCity: "",
+        graduationYear: new Date().getFullYear().toString(),
+        averagePass: "",
+
+        // Program Information
+        facultyId: "",
+        departmentId: "",
+        session: "",
+        academicYear: "",
+        registerYear: new Date().getFullYear().toString(),
+        semester: "",
+      });
     }
   }, [student, isEditMode, open]);
 
@@ -295,7 +320,7 @@ const StudentRegistrationDialog = ({
       // Academic Background
       highSchoolName: "",
       highSchoolCity: "",
-      graduationYear: new Date().getFullYear(),
+      graduationYear: new Date().getFullYear().toString(),
       averagePass: "",
 
       // Program Information
@@ -303,7 +328,7 @@ const StudentRegistrationDialog = ({
       departmentId: "",
       session: "",
       academicYear: "",
-      registerYear: 0,
+      registerYear: new Date().getFullYear().toString(),
       semester: "",
     },
   });
@@ -335,22 +360,9 @@ const StudentRegistrationDialog = ({
     try {
       // Prepare student data - ensure it matches the API expected structure
       const studentData = {
-        fullName: data.fullName,
-        gender: data.gender,
-        dateOfBirth: data.dateOfBirth,
-        placeOfBirth: data.placeOfBirth,
-        email: data.email,
-        phoneNumber: data.phoneNumber,
-        highSchoolName: data.highSchoolName,
-        highSchoolCity: data.highSchoolCity,
-        graduationYear: data.graduationYear,
-        averagePass: data.averagePass,
-        facultyId: data.facultyId,
-        departmentId: data.departmentId,
-        session: data.session,
-        academicYear: data.academicYear,
-        registerYear: data.registerYear,
-        semester: data.semester,
+        ...data,
+        graduationYear: parseInt(data.graduationYear),
+        registerYear: parseInt(data.registerYear),
       };
 
       if (isEditMode && student) {
@@ -358,13 +370,13 @@ const StudentRegistrationDialog = ({
         await updateStudent(student.id, studentData);
         toast.success("Student updated successfully");
       } else {
-        // Generate a student ID for new students (this would normally be done by the backend)
+        // Generate a student ID for new students
         const year = new Date().getFullYear().toString().slice(-2);
         const facultyName =
-          faculties.find((f) => f.id === data.facultyId)?.code || "XX";
+          faculties.find((f) => f.id === data.facultyId)?.name || "XX";
         const deptName =
-          departments.find((d) => d.id === data.departmentId)?.code || "XX";
-        const randomNum = Math.floor(1000 + Math.random() * 9000); // 4-digit random number
+          departments.find((d) => d.id === data.departmentId)?.name || "XX";
+        const randomNum = Math.floor(1000 + Math.random() * 9000);
 
         // Use first 2 letters of faculty and department names
         const facultyCode = facultyName.substring(0, 2).toUpperCase();
@@ -587,7 +599,12 @@ const StudentRegistrationDialog = ({
                     <FormItem>
                       <FormLabel>Graduation Year</FormLabel>
                       <FormControl>
-                        <Input placeholder="2023" {...field} />
+                        <Input
+                          type="number"
+                          placeholder={new Date().getFullYear().toString()}
+                          {...field}
+                          onChange={(e) => field.onChange(e.target.value)}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -762,8 +779,10 @@ const StudentRegistrationDialog = ({
                       <FormLabel>Registration Year</FormLabel>
                       <FormControl>
                         <Input
+                          type="number"
                           placeholder={new Date().getFullYear().toString()}
                           {...field}
+                          onChange={(e) => field.onChange(e.target.value)}
                         />
                       </FormControl>
                       <FormMessage />
