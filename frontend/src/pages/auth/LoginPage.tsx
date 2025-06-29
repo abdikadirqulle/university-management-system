@@ -143,6 +143,17 @@ const LoginPage = () => {
             )}
           />
 
+          {/* <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center">
+              <Link
+                to="/forgot-password"
+                className="text-sm text-primary hover:underline"
+              >
+                Forgot your password?
+              </Link>
+            </div>
+          </div> */}
+
           <Button
             type="submit"
             className="w-full bg-primary hover:bg-primary/90 text-white py-3 flex items-center justify-center gap-2"

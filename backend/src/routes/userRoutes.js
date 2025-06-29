@@ -9,6 +9,8 @@ import {
   getAllUsers,
   getUserById,
   toggleUserActivation,
+  requestPasswordReset,
+  resetPassword,
 } from "../controllers/userController.js"
 import { authenticateUser, authorize } from "../middleware/authMiddleware.js"
 
@@ -17,6 +19,8 @@ const router = express.Router()
 // Public routes
 router.post("/register", registerUser)
 router.post("/login", loginUser)
+router.post("/forgot-password", requestPasswordReset)
+router.post("/reset-password", resetPassword)
 
 // Protected routes
 router.post("/logout", authenticateUser, logoutUser)

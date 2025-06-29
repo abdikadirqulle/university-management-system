@@ -13,6 +13,11 @@ interface UserResponse {
   user: User;
 }
 
+interface ResetResponse {
+  success: boolean;
+  message: string;
+}
+
 export const authService = {
   login: async (credentials: {
     username: string;
@@ -78,5 +83,26 @@ export const authService = {
       user: response.data.user,
       token: response.data.token,
     };
+  },
+
+  requestPasswordReset: async (email: string): Promise<void> => {
+    const response = await api.post<ResetResponse>("/users/forgot-password", {
+      email,
+    });
+    if (!response.data.success) {
+      throw new Error(
+        response.data.message || "Failed to request password reset",
+      );
+    }
+  },
+
+  resetPassword: async (token: string, newPassword: string): Promise<void> => {
+    const response = await api.post<ResetResponse>("/users/reset-password", {
+      token,
+      newPassword,
+    });
+    if (!response.data.success) {
+      throw new Error(response.data.message || "Failed to reset password");
+    }
   },
 };

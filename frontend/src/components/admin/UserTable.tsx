@@ -69,6 +69,18 @@ const UserTable: React.FC<UserTableProps> = ({
       header: "Email",
     },
     {
+      accessorKey: "password",
+      header: "Password",
+      cell: ({ row }) => {
+        const password = row.getValue("password") as string;
+        return (
+          <span className="text-muted-foreground">
+            {password ? "********" : "N/A"}
+          </span>
+        );
+      },
+    },
+    {
       accessorKey: "isActive",
       header: "Status",
       cell: ({ row }) => {

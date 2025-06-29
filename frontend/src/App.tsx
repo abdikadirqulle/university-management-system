@@ -13,6 +13,8 @@ import AppLayout from "./layouts/AppLayout";
 // Auth Pages
 import LoginPage from "./pages/auth/LoginPage";
 import StudentLoginPage from "./pages/auth/StudentLoginPage";
+import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -64,6 +66,11 @@ const App = () => (
               <Route
                 path="/auth/student-login"
                 element={<StudentLoginPage />}
+              />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route
+                path="/reset-password/:token"
+                element={<ResetPasswordPage />}
               />
               {/* Root redirect to login */}
               <Route path="/" element={<LoginPage />} />

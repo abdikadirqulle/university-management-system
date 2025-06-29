@@ -110,6 +110,7 @@ const UsersPage = () => {
         onOpenChange={setIsDialogOpen}
         initialData={currentUser}
         isSubmitting={false}
+        isLoading={isLoading}
         onSubmit={handleFormSubmit}
       />
     </div>

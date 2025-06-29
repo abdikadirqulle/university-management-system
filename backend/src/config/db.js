@@ -6,10 +6,10 @@ const prisma = new PrismaClient({
 })
 
 // Handle potential connection errors
-prisma.$on("query", (e) => {
-  console.log("Query: " + e.query)
-  console.log("Duration: " + e.duration + "ms")
-})
+// prisma.$on("query", (e) => {
+//   console.log("Query: " + e.query)
+//   console.log("Duration: " + e.duration + "ms")
+// })
 
 // Connect to the database
 async function connectDB() {

@@ -57,6 +57,8 @@ model User {
   password  String
   role      Role
   isActive  Boolean  @default(true)
+  resetToken String?
+  resetTokenExpiry DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
