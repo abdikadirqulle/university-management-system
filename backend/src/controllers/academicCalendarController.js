@@ -272,6 +272,9 @@ const handleSemesterTransition = async (semesterInt, academicYear) => {
       include: {
         department: true,
         studentAccount: {
+          where: {
+            is_active: true,
+          },
           orderBy: {
             createdAt: "desc",
           },
@@ -320,7 +323,6 @@ const handleSemesterTransition = async (semesterInt, academicYear) => {
           where: { studentId: student.studentId },
           data: {
             status: "graduated",
-            semester: Number(nextSemester),
             is_active: false,
           },
         })
@@ -337,6 +339,13 @@ const handleSemesterTransition = async (semesterInt, academicYear) => {
         // Update to next semester
         await prisma.student.update({
           where: { id: student.id },
+          data: {
+            semester: Number(nextSemester),
+          },
+        })
+
+        await prisma.studentAccount.update({
+          where: { studentId: student.studentId },
           data: {
             semester: Number(nextSemester),
           },

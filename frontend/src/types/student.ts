@@ -25,6 +25,7 @@ export interface Student {
   semester: string;
   batch?: string;
   isActive: boolean;
+  status: string;
   createdAt: string;
   updatedAt: string;
 

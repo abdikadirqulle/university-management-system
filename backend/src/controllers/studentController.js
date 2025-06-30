@@ -517,7 +517,9 @@ const toggleStudentActivation = async (req, res) => {
     // Toggle activation status
     const updatedStudent = await prisma.student.update({
       where: { id },
-      data: { isActive: !student.isActive },
+      data: {
+        isActive: !student.isActive,
+      },
       include: {
         faculty: {
           select: {
@@ -529,6 +531,13 @@ const toggleStudentActivation = async (req, res) => {
             name: true,
           },
         },
+      },
+    })
+
+    await prisma.studentAccount.update({
+      where: { studentId: student.studentId },
+      data: {
+        is_active: !student.isActive,
       },
     })
 
