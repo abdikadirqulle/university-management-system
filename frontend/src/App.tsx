@@ -121,7 +121,7 @@ const App = () => (
               <Route path="dashboard" element={<FinancialDashboard />} />
               <Route path="students" element={<FinancialStudentsPage />} />
               <Route path="payments" element={<PaymentsPage />} />
-              {/* <Route path="reports" element={<FinancialReportsPage />} /> */}
+              <Route path="reports" element={<FinancialReportsPage />} />
 
               {/* 404 Page */}
               <Route path="*" element={<NotFound />} />

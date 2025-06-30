@@ -111,6 +111,11 @@ const AppSidebar = () => {
         icon: UsersRound,
         path: "/financial/students",
       },
+      {
+        title: "Reports",
+        icon: BarChart,
+        path: "/financial/reports",
+      },
     ],
     admission: [
       {
