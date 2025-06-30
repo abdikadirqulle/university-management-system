@@ -13,6 +13,30 @@ interface PaymentsResponse {
   payments: Payment[];
 }
 
+interface FinancialReportResponse {
+  success: boolean;
+  data: {
+    totalPayment: number;
+    totalPaid: number;
+    incomeExpected: number;
+    accruedIncome: number;
+    deferredIncome: number;
+    monthlyPayments: {
+      month: string;
+      amount: number;
+    }[];
+    paymentsByType: {
+      type: string;
+      amount: number;
+    }[];
+    paymentStatus: {
+      status: string;
+      count: number;
+      amount: number;
+    }[];
+  };
+}
+
 interface PaymentStatisticsResponse {
   success: boolean;
   statistics: {
@@ -26,6 +50,14 @@ interface PaymentStatisticsResponse {
       _sum: { amount: number };
     }[];
   };
+}
+
+interface PaymentFilterParams {
+  startDate?: string;
+  endDate?: string;
+  paymentType?: string;
+  status?: string;
+  studentId?: string;
 }
 
 export const paymentService = {
@@ -46,7 +78,9 @@ export const paymentService = {
   },
 
   getPaymentsByStudentId: async (studentId: string): Promise<Payment[]> => {
-    const response = await api.get<PaymentsResponse>(`/payments/student/${studentId}`);
+    const response = await api.get<PaymentsResponse>(
+      `/payments/student/${studentId}`,
+    );
     if (!response.data.success) {
       throw new Error("Failed to fetch student payments");
     }
@@ -61,8 +95,14 @@ export const paymentService = {
     return response.data.payment;
   },
 
-  updatePayment: async (id: string, paymentData: Partial<PaymentFormData>): Promise<Payment> => {
-    const response = await api.put<PaymentResponse>(`/payments/${id}`, paymentData);
+  updatePayment: async (
+    id: string,
+    paymentData: Partial<PaymentFormData>,
+  ): Promise<Payment> => {
+    const response = await api.put<PaymentResponse>(
+      `/payments/${id}`,
+      paymentData,
+    );
     if (!response.data.success) {
       throw new Error(response.data.message || "Failed to update payment");
     }
@@ -77,10 +117,30 @@ export const paymentService = {
   },
 
   getPaymentStatistics: async () => {
-    const response = await api.get<PaymentStatisticsResponse>("/payments/statistics");
+    const response = await api.get<PaymentStatisticsResponse>(
+      "/payments/statistics",
+    );
     if (!response.data.success) {
       throw new Error("Failed to fetch payment statistics");
     }
     return response.data.statistics;
+  },
+
+  getFinancialReport: async (filters?: PaymentFilterParams) => {
+    const queryParams = new URLSearchParams();
+    if (filters?.startDate) queryParams.append("startDate", filters.startDate);
+    if (filters?.endDate) queryParams.append("endDate", filters.endDate);
+    if (filters?.paymentType)
+      queryParams.append("paymentType", filters.paymentType);
+    if (filters?.status) queryParams.append("status", filters.status);
+    if (filters?.studentId) queryParams.append("studentId", filters.studentId);
+
+    const url = `/financial-reports?${queryParams.toString()}`;
+    const response = await api.get<FinancialReportResponse>(url);
+
+    if (!response.data.success) {
+      throw new Error("Failed to fetch financial report");
+    }
+    return response.data.data;
   },
 };

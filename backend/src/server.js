@@ -15,6 +15,7 @@ import exportRoutes from "./routes/exportRoutes.js"
 import reportRoutes from "./routes/reportRoutes.js"
 import studentTransactionRoutes from "./routes/studentTransactionRoutes.js"
 import academicCalendarRoutes from "./routes/academicCalendarRoutes.js"
+import financialReportRoutes from "./routes/financialReportRoutes.js"
 import { connectDB } from "./config/db.js"
 
 // Load environment variables
@@ -45,6 +46,7 @@ app.use("/api/export", exportRoutes)
 app.use("/api/reports", reportRoutes)
 app.use("/api/student-transactions", studentTransactionRoutes)
 app.use("/api/academic-calendar", academicCalendarRoutes)
+app.use("/api/financial-reports", financialReportRoutes)
 
 // Default route
 app.get("/", (req, res) => {
