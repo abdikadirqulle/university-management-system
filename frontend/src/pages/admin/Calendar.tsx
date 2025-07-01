@@ -352,7 +352,7 @@ const CalendarPage = () => {
         <div className="flex justify-between items-center">
           <TabsList>
             <TabsTrigger value="list">List View</TabsTrigger>
-            <TabsTrigger value="calendar">Calendar View</TabsTrigger>
+            {/* <TabsTrigger value="calendar">Calendar View</TabsTrigger> */}
           </TabsList>
 
           <div className="flex items-center gap-2">
@@ -413,7 +413,7 @@ const CalendarPage = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="calendar">
+        {/* <TabsContent value="calendar">
           <Card>
             <CardHeader>
               <CardTitle>Calendar View</CardTitle>
@@ -536,7 +536,7 @@ const CalendarPage = () => {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
 
       <Dialog open={isOpen} onOpenChange={handleDialogOpenChange}>

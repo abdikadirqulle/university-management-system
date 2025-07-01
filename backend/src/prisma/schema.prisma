@@ -187,22 +187,6 @@ model Payment {
   student       Student       @relation(fields: [studentId], references: [studentId])
 }
 
-model Application {
-  id                String            @id @default(auto()) @map("_id") @db.ObjectId
-  fullName          String
-  email             String
-  gender            Gender
-  dateOfBirth       DateTime
-  desiredDepartment String
-  documents         String[]          @default([])
-  status            ApplicationStatus @default(pending)
-  applicationDate   DateTime          @default(now())
-  reviewedBy        String?
-  reviewedAt        DateTime?
-  notes             String?
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-}
 
 enum EventType {
   semesterStart

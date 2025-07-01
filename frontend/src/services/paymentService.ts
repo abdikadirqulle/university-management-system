@@ -60,7 +60,7 @@ interface PaymentFilterParams {
   studentId?: string;
 }
 
-export const paymentService = {
+const paymentService = {
   getAllPayments: async (): Promise<Payment[]> => {
     const response = await api.get<PaymentsResponse>("/payments");
     if (!response.data.success) {
@@ -88,25 +88,16 @@ export const paymentService = {
   },
 
   createPayment: async (paymentData: PaymentFormData): Promise<Payment> => {
-    const response = await api.post<PaymentResponse>("/payments", paymentData);
-    if (!response.data.success) {
-      throw new Error(response.data.message || "Failed to create payment");
-    }
-    return response.data.payment;
+    const response = await api.post<Payment>("/payments", paymentData);
+    return response.data;
   },
 
   updatePayment: async (
     id: string,
     paymentData: Partial<PaymentFormData>,
   ): Promise<Payment> => {
-    const response = await api.put<PaymentResponse>(
-      `/payments/${id}`,
-      paymentData,
-    );
-    if (!response.data.success) {
-      throw new Error(response.data.message || "Failed to update payment");
-    }
-    return response.data.payment;
+    const response = await api.put<Payment>(`/payments/${id}`, paymentData);
+    return response.data;
   },
 
   deletePayment: async (id: string): Promise<void> => {
@@ -144,3 +135,5 @@ export const paymentService = {
     return response.data.data;
   },
 };
+
+export { paymentService };

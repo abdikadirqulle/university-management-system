@@ -205,7 +205,7 @@ const AcademicCalendarPage: React.FC = () => {
           <div className="flex justify-between ">
             <TabsList>
               <TabsTrigger value="list">List View</TabsTrigger>
-              <TabsTrigger value="calendar">Calendar View</TabsTrigger>
+              {/* <TabsTrigger value="calendar">Calendar View</TabsTrigger> */}
             </TabsList>
             {/* <Button variant="outline" className="flex items-center gap-2">
               <Download className="h-4 w-4" />

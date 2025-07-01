@@ -137,25 +137,31 @@ export const usePaymentStore = create<PaymentStore>((set, get) => ({
   },
 
   createPayment: async (paymentData: PaymentFormData) => {
-    set({ isLoading: true, error: null });
     try {
-      const newPayment = await paymentService.createPayment(paymentData);
-      set((state) => ({
-        payments: [newPayment, ...state.payments],
-        isLoading: false,
-      }));
-      toast.success("Payment created successfully");
+      set({ isLoading: true, error: null });
+      if (paymentData.id) {
+        // If id exists, update the payment instead
+        await get().updatePayment(paymentData.id, paymentData);
+      } else {
+        // Create new payment
+        const newPayment = await paymentService.createPayment(paymentData);
+        set((state) => ({
+          payments: [...state.payments, newPayment],
+        }));
+        toast.success("Payment created successfully");
+      }
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to create payment";
-      set({ error: errorMessage, isLoading: false });
-      toast.error(errorMessage);
+      console.error("Create payment error:", error);
+      set({ error: "Failed to create payment" });
+      toast.error("Failed to create payment");
+    } finally {
+      set({ isLoading: false });
     }
   },
 
   updatePayment: async (id: string, paymentData: Partial<PaymentFormData>) => {
-    set({ isLoading: true, error: null });
     try {
+      set({ isLoading: true, error: null });
       const updatedPayment = await paymentService.updatePayment(
         id,
         paymentData,
@@ -164,15 +170,14 @@ export const usePaymentStore = create<PaymentStore>((set, get) => ({
         payments: state.payments.map((payment) =>
           payment.id === id ? updatedPayment : payment,
         ),
-        selectedPayment: updatedPayment,
-        isLoading: false,
       }));
       toast.success("Payment updated successfully");
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to update payment";
-      set({ error: errorMessage, isLoading: false });
-      toast.error(errorMessage);
+      console.error("Update payment error:", error);
+      set({ error: "Failed to update payment" });
+      toast.error("Failed to update payment");
+    } finally {
+      set({ isLoading: false });
     }
   },
 

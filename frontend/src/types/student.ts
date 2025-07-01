@@ -87,11 +87,12 @@ export interface Payment {
   dueDate: string;
   status: PaymentStatus;
   type: PaymentType;
-  tuitionFee?: number;
+  paymentMethod: string;
+  tuitionFee: number;
   otherCharges?: number;
   forwarded?: number;
   extraFee?: number;
-  discount?: number;
+  discount: number;
   paid: number;
   net: number;
   createdAt: string;

@@ -35,6 +35,7 @@ export interface Payment {
   dueDate: string;
   status: PaymentStatus;
   type: PaymentType;
+  paymentMethod: string;
   tuitionFee: number;
   discount: number;
   paid: number;
@@ -45,6 +46,7 @@ export interface Payment {
 }
 
 export interface PaymentFormData {
+  id?: string;
   studentId: string;
   amount: number;
   paymentDate: string;

@@ -169,6 +169,9 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const { deletePayment, fetchPayments } = usePaymentStore();
   const { toggleStudentActivation, updateStudentAccount } = useStudentStore();
 
+  const [editingPayment, setEditingPayment] = useState<Payment | null>(null);
+  const [activeTab, setActiveTab] = useState("payment");
+
   // Initialize form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -177,8 +180,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       paymentDate: payment?.paymentDate
         ? new Date(payment.paymentDate)
         : new Date(),
-      type: "tuition",
-      paymentMethod: "cash",
+      type: payment?.type || "tuition",
+      paymentMethod: payment?.paymentMethod || "cash",
     },
   });
 
@@ -227,19 +230,29 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     }
   };
 
+  // Handle editing payment
+  const handleEditPayment = (transaction: Payment) => {
+    setEditingPayment(transaction);
+    form.reset({
+      amount: transaction.amount,
+      paymentDate: new Date(transaction.paymentDate),
+      type: transaction.type,
+      paymentMethod: transaction.paymentMethod || "cash",
+    });
+    setActiveTab("payment");
+  };
+
   // Handle form submission
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     try {
       // Ensure all required fields are included
       const paymentData: PaymentFormData = {
+        id: editingPayment?.id, // Include payment ID if editing
         amount: values.amount,
         paymentDate: format(values.paymentDate, "yyyy-MM-dd"),
         type: values.type as PaymentType,
         paymentMethod: values.paymentMethod,
         studentId: selectedStudent?.studentId,
-        // dueDate: format(values.dueDate, "yyyy-MM-dd"),
-        // status: values.status as PaymentStatus,
-
         tuitionFee: selectedStudent?.studentAccount[0]?.tuitionFee || 0,
         discount: selectedStudent?.studentAccount[0]?.discount || 0,
         paid: selectedStudent?.studentAccount[0]?.paidAmount || 0,
@@ -247,6 +260,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       };
 
       onSubmit(paymentData);
+      setEditingPayment(null); // Reset editing state after submission
     } catch (error) {
       console.error("Form submission error:", error);
       toast.error("Failed to submit payment form");
@@ -650,7 +664,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           </CardContent>
         </Card>
 
-        <Tabs defaultValue="payment" className="w-full">
+        <Tabs
+          defaultValue="payment"
+          value={activeTab}
+          className="w-full"
+          onValueChange={setActiveTab}
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="payment">Payment Information</TabsTrigger>
             <TabsTrigger value="transaction">
