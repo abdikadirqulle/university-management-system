@@ -2,20 +2,19 @@ import express from "express"
 import cors from "cors"
 import dotenv from "dotenv"
 
-import userRoutes from "./routes/userRoutes.js"
-import courseRoutes from "./routes/courseRoutes.js"
-import departmentRoutes from "./routes/departmentRoutes.js"
-import facultyRoutes from "./routes/facultyRoutes.js"
-import studentRoutes from "./routes/studentRoutes.js"
-import dashboardRoutes from "./routes/dashboardRoutes.js"
-import applicationRoutes from "./routes/applicationRoutes.js"
-import paymentRoutes from "./routes/paymentRoutes.js"
-import studentAuthRoutes from "./routes/studentAuthRoutes.js"
-import exportRoutes from "./routes/exportRoutes.js"
-import reportRoutes from "./routes/reportRoutes.js"
-import studentTransactionRoutes from "./routes/studentTransactionRoutes.js"
-import academicCalendarRoutes from "./routes/academicCalendarRoutes.js"
-import financialReportRoutes from "./routes/financialReportRoutes.js"
+import userRoutes from "./routes/auth/userRoutes.js"
+import courseRoutes from "./routes/course/courseRoutes.js"
+import departmentRoutes from "./routes/department/departmentRoutes.js"
+import facultyRoutes from "./routes/faculties/facultyRoutes.js"
+import studentRoutes from "./routes/students/studentRoutes.js"
+import dashboardRoutes from "./routes/dashboard/dashboardRoutes.js"
+import paymentRoutes from "./routes/financial/paymentRoutes.js"
+import studentAuthRoutes from "./routes/students/studentAuthRoutes.js"
+import exportRoutes from "./routes/exports/exportRoutes.js"
+import reportRoutes from "./routes/report/reportRoutes.js"
+import studentTransactionRoutes from "./routes/exports/studentTransactionRoutes.js"
+import academicCalendarRoutes from "./routes/academic/academicCalendarRoutes.js"
+import financialReportRoutes from "./routes/report/financialReportRoutes.js"
 import { connectDB } from "./config/db.js"
 
 // Load environment variables
@@ -39,7 +38,6 @@ app.use("/api/departments", departmentRoutes)
 app.use("/api/faculties", facultyRoutes)
 app.use("/api/students", studentRoutes)
 app.use("/api/dashboard", dashboardRoutes)
-app.use("/api/applications", applicationRoutes)
 app.use("/api/payments", paymentRoutes)
 app.use("/api/student-auth", studentAuthRoutes)
 app.use("/api/export", exportRoutes)
