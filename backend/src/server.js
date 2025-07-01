@@ -44,6 +44,7 @@ app.use("/api/payments", paymentRoutes)
 app.use("/api/student-auth", studentAuthRoutes)
 app.use("/api/export", exportRoutes)
 app.use("/api/reports", reportRoutes)
+// student transaction routes
 app.use("/api/student-transactions", studentTransactionRoutes)
 app.use("/api/academic-calendar", academicCalendarRoutes)
 app.use("/api/financial-reports", financialReportRoutes)

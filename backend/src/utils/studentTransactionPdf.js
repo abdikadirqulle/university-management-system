@@ -92,7 +92,6 @@ export const generateStudentTransactionPDF = (student, transactions) => {
     { header: "Date", key: "date", width: 80 },
     { header: "Type", key: "type", width: 100 },
     { header: "Amount", key: "amount", width: 80 },
-    { header: "Status", key: "status", width: 80 },
     { header: "Reference", key: "description", width: 150 },
   ]
 
@@ -187,8 +186,8 @@ export const generateStudentTransactionPDF = (student, transactions) => {
         statusColor = "#000000"
     }
 
-    doc.fillColor(statusColor).text(transaction.status, xPos + 5, rowTop + 10)
-    xPos += columns[3].width
+    // doc.fillColor(statusColor).text(transaction.status, xPos + 5, rowTop + 10)
+    // xPos += columns[3].width
 
     // Reset text color
     doc.fillColor("#000")
@@ -203,7 +202,7 @@ export const generateStudentTransactionPDF = (student, transactions) => {
   doc
     .fontSize(10)
     .text(
-      "This is an official financial statement from the University Management System.",
+      "This is an official financial statement from the AqoonMaamul.",
       50,
       doc.page.height - 50,
       { align: "center" }

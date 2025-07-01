@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Student } from "@/types/student";
-import { Search, FileTextIcon } from "lucide-react";
+import { Search, FileTextIcon, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Payment } from "@/types/payment";
 import { Button } from "../ui/button";
@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
 
 interface StudentTableProps {
   students: Student[];
@@ -44,7 +45,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [facultyFilter, setFacultyFilter] = useState("all");
   const [semesterFilter, setSemesterFilter] = useState("all");
-
+  const [isExporting, setIsExporting] = useState(false);
   // Extract unique departments, faculties, and semesters for filter options
   const departments = useMemo(() => {
     const depts = new Set<string>();
@@ -238,7 +239,17 @@ const StudentTable: React.FC<StudentTableProps> = ({
     );
   }
 
-  console.log("search forwarded", filteredStudents);
+  const handleExportPaymentsExcel = async () => {
+    try {
+      setIsExporting(true);
+      await exportService.exportPaymentsExcel();
+      toast.success("Payments exported successfully");
+    } catch (error) {
+      console.error("Error exporting payments Excel:", error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -312,10 +323,16 @@ const StudentTable: React.FC<StudentTableProps> = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => exportService.exportStudentsExcel()}
+            onClick={() => handleExportPaymentsExcel()}
           >
-            <FileTextIcon className="h-4 w-4 mr-2" />
-            Excel Export
+            {isExporting ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <>
+                <FileTextIcon className="h-4 w-4 mr-2" />
+                Export Excel
+              </>
+            )}
           </Button>
         </div>
       </div>

@@ -11,8 +11,8 @@ export const generatePDF = (data, title, columns) => {
   // Create a new PDF document
   const doc = new PDFDocument({ margin: 50 })
 
-  // Add the title
-  doc.fontSize(20).text(title, { align: "center" })
+  // Add the system name and title
+  doc.fontSize(20).text("AqoonMaamul - " + title, { align: "center" })
   doc.moveDown()
 
   // Add the current date
@@ -115,11 +115,15 @@ export const generatePDF = (data, title, columns) => {
  */
 export const generateStudentsPDF = (students) => {
   const columns = [
-    { header: "ID", key: "id" },
-    { header: "Name", key: "name" },
-    { header: "Email", key: "email" },
+    { header: "Student ID", key: "studentId" },
+    { header: "Name", key: "fullName" },
+    { header: "Tel", key: "phoneNumber" },
+    { header: "Faculty", key: "faculty" },
     { header: "Department", key: "department" },
-    { header: "Registration Date", key: "registrationDate" },
+    { header: "Batch", key: "batch" },
+    { header: "Semester", key: "semester" },
+    { header: "Session", key: "session" },
+    { header: "Status", key: "status" },
   ]
 
   return generatePDF(students, "Student Records", columns)
@@ -152,12 +156,11 @@ export const generateCoursesPDF = (courses) => {
  */
 export const generatePaymentsPDF = (payments) => {
   const columns = [
-    { header: "ID", key: "id" },
-    { header: "Student", key: "student" },
+    { header: "Student ID", key: "studentId" },
+    { header: "Student", key: "fullName" },
     { header: "Amount", key: "amount" },
     { header: "Type", key: "type" },
     { header: "Date", key: "date" },
-    { header: "Status", key: "status" },
   ]
 
   return generatePDF(payments, "Payment Records", columns)

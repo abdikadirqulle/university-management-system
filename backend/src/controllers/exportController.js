@@ -23,16 +23,22 @@ export const exportStudentsPDF = async (req, res) => {
     const students = await prisma.student.findMany({
       include: {
         department: true,
+        faculty: true,
+        studentAccount: true,
       },
     })
 
     // Format data for PDF
     const formattedStudents = students.map((student) => ({
-      id: student.id,
-      name: student.fullName,
-      email: student.email,
+      studentId: student.studentId,
+      fullName: student.fullName,
+      phoneNumber: student.phoneNumber,
+      faculty: student.faculty?.name || "N/A",
       department: student.department?.name || "N/A",
-      registrationDate: new Date(student.createdAt).toLocaleDateString(),
+      batch: student.department?.batch || "N/A",
+      semester: student.semester,
+      session: student.session,
+      status: student.isActive,
     }))
 
     // Generate PDF
@@ -64,16 +70,22 @@ export const exportStudentsExcel = async (req, res) => {
     const students = await prisma.student.findMany({
       include: {
         department: true,
+        faculty: true,
+        studentAccount: true,
       },
     })
 
     // Format data for Excel
     const formattedStudents = students.map((student) => ({
-      id: student.id,
-      name: student.fullName,
-      email: student.email,
+      studentId: student.studentId,
+      fullName: student.fullName,
+      phoneNumber: student.phoneNumber,
+      faculty: student.faculty?.name || "N/A",
       department: student.department?.name || "N/A",
-      registrationDate: new Date(student.createdAt).toLocaleDateString(),
+      batch: student.department?.batch || "N/A",
+      semester: student.semester,
+      session: student.session,
+      status: student.isActive,
     }))
 
     // Generate Excel workbook
@@ -204,12 +216,11 @@ export const exportPaymentsPDF = async (req, res) => {
 
     // Format data for PDF
     const formattedPayments = payments.map((payment) => ({
-      id: payment.id,
-      student: payment.student?.fullName || "Unknown",
+      studentId: payment.student?.studentId || "Unknown",
+      fullName: payment.student?.fullName || "Unknown",
       amount: `$${payment.amount.toFixed(2)}`,
       date: new Date(payment.paymentDate).toLocaleDateString(),
       type: payment.paymentType,
-      status: payment.status,
     }))
 
     // Generate PDF
@@ -246,12 +257,12 @@ export const exportPaymentsExcel = async (req, res) => {
 
     // Format data for Excel
     const formattedPayments = payments.map((payment) => ({
-      id: payment.id,
-      student: payment.student?.fullName || "Unknown",
+      studentId: payment.student?.studentId || "Unknown",
+      fullName: payment.student?.fullName || "Unknown",
       amount: payment.amount,
       date: new Date(payment.paymentDate).toLocaleDateString(),
-      type: payment.paymentType,
-      status: payment.status,
+      type: payment.type,
+      method: payment.paymentMethod,
     }))
 
     // Generate Excel workbook

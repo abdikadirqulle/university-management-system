@@ -26,7 +26,6 @@ export const exportStudentTransactionPDF = async (req, res) => {
         department: true,
       },
     })
-    console.log("student", student)
     if (!student) {
       return res.status(404).json({
         success: false,
@@ -39,7 +38,7 @@ export const exportStudentTransactionPDF = async (req, res) => {
       where: { studentId },
       orderBy: { paymentDate: "desc" },
     })
-    console.log(transactions)
+
     // Generate PDF
     const doc = generateStudentTransactionPDF(student, transactions)
 

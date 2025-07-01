@@ -135,7 +135,7 @@ const studentSchema = z.object({
         return true;
       }
 
-      // Check if it's a letter grade (A, A+, A-, B, B+, B-, C, C+, C-, D, D+, D-, F)
+      // Check if it's a letter grade (A, A+, A-, B, B+, B-, C, C+, C-, D)
       const letterGrades = [
         "A+",
         "A",
@@ -148,15 +148,13 @@ const studentSchema = z.object({
         "C-",
         "D+",
         "D",
-        "D-",
-        "F",
       ];
       if (letterGrades.includes(trimmedVal)) {
         return true;
       }
 
       return false;
-    }, "Average pass must be either a percentage (0-100) or a letter grade (A+, A, A-, B+, B, B-, C+, C, C-, D+, D, D-, F)")
+    }, "Average pass must be either a percentage (0-100) or a letter grade (A+, A, A-, B+, B, B-, C+, C, C-, D+, D)")
     .transform((val) => val.trim().toUpperCase()),
 
   // Program Information
@@ -170,16 +168,16 @@ const studentSchema = z.object({
     .refine((year) => {
       const [startYear] = year.split("-").map(Number);
       const currentYear = new Date().getFullYear();
-      return startYear >= currentYear && startYear <= currentYear + 1;
-    }, "Academic year must be current or next year"),
+      return startYear >= currentYear - 10 && startYear <= currentYear;
+    }, "Academic year must be within the last 10 years including the current year"),
   registerYear: z
     .string()
     .min(1, "Register year is required")
     .refine((val) => {
       const year = parseInt(val);
       const currentYear = new Date().getFullYear();
-      return !isNaN(year) && year === currentYear;
-    }, "Registration year must be current year"),
+      return !isNaN(year) && year >= currentYear - 10 && year <= currentYear;
+    }, "Registration year must be within the last 10 years including the current year"),
   semester: z.string().min(1, "Semester is required"),
 
   // Hidden fields that will be set programmatically
@@ -368,7 +366,6 @@ const StudentRegistrationDialog = ({
       if (isEditMode && student) {
         // Update existing student
         await updateStudent(student.id, studentData);
-        toast.success("Student updated successfully");
       } else {
         // Generate a student ID for new students
         const year = new Date().getFullYear().toString().slice(-2);
@@ -400,7 +397,6 @@ const StudentRegistrationDialog = ({
 
         // Add student to database
         await addStudent(newStudentData);
-        toast.success("Student registered successfully");
       }
 
       // Close dialog and refresh data
@@ -631,7 +627,7 @@ const StudentRegistrationDialog = ({
                       </FormControl>
                       <FormDescription>
                         Enter percentage (0-100) or letter grade (A+, A, A-, B+,
-                        B, B-, C+, C, C-, D+, D, D-, F)
+                        B, B-, C+, C, C-, D+, D)
                       </FormDescription>
                       <FormMessage />
                     </FormItem>

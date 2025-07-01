@@ -71,11 +71,15 @@ export const generateExcel = async (data, sheetName, columns) => {
  */
 export const generateStudentsExcel = async (students) => {
   const columns = [
-    { header: "ID", key: "id", width: 10 },
-    { header: "Name", key: "name", width: 25 },
-    { header: "Email", key: "email", width: 30 },
+    { header: "Student ID", key: "studentId", width: 10 },
+    { header: "Name", key: "fullName", width: 25 },
+    { header: "Tel", key: "phoneNumber", width: 30 },
+    { header: "Faculty", key: "faculty", width: 20 },
     { header: "Department", key: "department", width: 20 },
-    { header: "Registration Date", key: "registrationDate", width: 20 },
+    { header: "Batch", key: "batch", width: 20 },
+    { header: "Semester", key: "semester", width: 20 },
+    { header: "Session", key: "session", width: 20 },
+    { header: "Status", key: "status", width: 20 },
   ]
 
   return generateExcel(students, "Student Records", columns)
@@ -105,12 +109,12 @@ export const generateCoursesExcel = async (courses) => {
  */
 export const generatePaymentsExcel = async (payments) => {
   const columns = [
-    { header: "ID", key: "id", width: 10 },
-    { header: "Student", key: "student", width: 25 },
+    { header: "Student ID", key: "studentId", width: 10 },
+    { header: "Student", key: "fullName", width: 25 },
     { header: "Amount", key: "amount", width: 15 },
     { header: "Type", key: "type", width: 15 },
+    { header: "Method", key: "method", width: 15 },
     { header: "Date", key: "date", width: 20 },
-    { header: "Status", key: "status", width: 15 },
   ]
 
   return generateExcel(payments, "Payment Records", columns)
