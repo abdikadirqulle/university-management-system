@@ -10,9 +10,6 @@ export enum PaymentType {
   ID_CARD = "id_card",
   CERTIFICATE = "certificate",
   GRADUATION = "graduation",
-  HOUSING = "housing",
-  ADMINISTRATIVE = "administrative",
-  DEPOSITS = "deposits",
   OTHER = "other",
 }
 

@@ -213,14 +213,26 @@ export const exportPaymentsPDF = async (req, res) => {
         student: true,
       },
     })
+    const student = await prisma.student.findUnique({
+      where: { studentId: payments.studentId },
+      include: {
+        department: true,
+        faculty: true,
+        studentAccount: true,
+      },
+    })
 
     // Format data for PDF
     const formattedPayments = payments.map((payment) => ({
       studentId: payment.student?.studentId || "Unknown",
       fullName: payment.student?.fullName || "Unknown",
+      batch: student.department?.batch || "Unknown",
+      semester: student.semester,
+      session: student.session,
       amount: `$${payment.amount.toFixed(2)}`,
       date: new Date(payment.paymentDate).toLocaleDateString(),
       type: payment.paymentType,
+      method: payment.paymentMethod,
     }))
 
     // Generate PDF
@@ -254,14 +266,23 @@ export const exportPaymentsExcel = async (req, res) => {
         student: true,
       },
     })
+    const student = await prisma.student.findMany({
+      include: {
+        department: true,
+        studentAccount: true,
+      },
+    })
 
     // Format data for Excel
     const formattedPayments = payments.map((payment) => ({
       studentId: payment.student?.studentId || "Unknown",
       fullName: payment.student?.fullName || "Unknown",
-      amount: payment.amount,
+      batch: student.department?.batch || "Unknown",
+      semester: student.semester,
+      session: student.session,
+
       date: new Date(payment.paymentDate).toLocaleDateString(),
-      type: payment.type,
+      type: payment.paymentType,
       method: payment.paymentMethod,
     }))
 

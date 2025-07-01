@@ -110,7 +110,10 @@ export const generateCoursesExcel = async (courses) => {
 export const generatePaymentsExcel = async (payments) => {
   const columns = [
     { header: "Student ID", key: "studentId", width: 10 },
-    { header: "Student", key: "fullName", width: 25 },
+    { header: "Full Name", key: "fullName", width: 25 },
+    { header: "Batch", key: "batch", width: 20 },
+    { header: "Semester", key: "semester", width: 20 },
+    { header: "Session", key: "session", width: 20 },
     { header: "Amount", key: "amount", width: 15 },
     { header: "Type", key: "type", width: 15 },
     { header: "Method", key: "method", width: 15 },

@@ -145,6 +145,7 @@ const createPayment = async (req, res) => {
         amount: parseFloat(body.amount),
         paymentDate: new Date(body.paymentDate),
         type: body.type,
+        paymentMethod: body.paymentMethod,
         // kuwan ka saar
         // dueDate: new Date(dueDate),
         status: body.status,

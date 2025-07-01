@@ -173,12 +173,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      amount: 0,
+      amount: "",
       paymentDate: payment?.paymentDate
         ? new Date(payment.paymentDate)
         : new Date(),
-      type: "",
-      paymentMethod: "",
+      type: "tuition",
+      paymentMethod: "cash",
     },
   });
 
@@ -676,7 +676,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                         <FormLabel>Payment Type</FormLabel>
                         <Select
                           onValueChange={field.onChange}
-                          defaultValue={field.value}
+                          defaultValue={field.value || "tuition"}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -695,15 +695,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                             </SelectItem>
                             <SelectItem value={PaymentType.GRADUATION}>
                               Graduation
-                            </SelectItem>
-                            <SelectItem value={PaymentType.HOUSING}>
-                              Housing
-                            </SelectItem>
-                            <SelectItem value={PaymentType.ADMINISTRATIVE}>
-                              Administrative
-                            </SelectItem>
-                            <SelectItem value={PaymentType.DEPOSITS}>
-                              Deposits
                             </SelectItem>
                             <SelectItem value={PaymentType.OTHER}>
                               Other
@@ -748,7 +739,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                         <FormLabel>Payment Method</FormLabel>
                         <Select
                           onValueChange={field.onChange}
-                          defaultValue={field.value}
+                          defaultValue={field.value || "cash"}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -882,7 +873,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  //   onClick={() => handleEditPayment(transaction)}
+                                  onClick={() => handleEditPayment(transaction)}
                                   title="Edit transaction"
                                 >
                                   <Pencil className="h-4 w-4" />
