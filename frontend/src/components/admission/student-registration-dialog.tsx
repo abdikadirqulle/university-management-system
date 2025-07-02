@@ -214,7 +214,7 @@ const StudentRegistrationDialog = ({
   // Get data from stores
   const { faculties, fetchFaculties } = useFacultyStore();
   const { departments, fetchDepartments } = useDepartmentStore();
-  const { addStudent, updateStudent, isLoading } = useStudentStore();
+  const { addStudent, updateStudent, isLoading, students } = useStudentStore();
 
   const [selectedFaculty, setSelectedFaculty] = useState<string>("");
   const [filteredDepartments, setFilteredDepartments] = useState<Department[]>(
@@ -367,19 +367,33 @@ const StudentRegistrationDialog = ({
         // Update existing student
         await updateStudent(student.id, studentData);
       } else {
-        // Generate a student ID for new students
+        // Generate a sequential student ID for new students
         const year = new Date().getFullYear().toString().slice(-2);
         const facultyName =
           faculties.find((f) => f.id === data.facultyId)?.name || "XX";
         const deptName =
           departments.find((d) => d.id === data.departmentId)?.name || "XX";
-        const randomNum = Math.floor(1000 + Math.random() * 9000);
 
         // Use first 2 letters of faculty and department names
         const facultyCode = facultyName.substring(0, 2).toUpperCase();
         const deptCode = deptName.substring(0, 2).toUpperCase();
 
-        const studentId = `${year}${facultyCode}${deptCode}${randomNum}`;
+        // Find the last student ID with the same year and department codes
+        const prefix = `${year}${facultyCode}${deptCode}`;
+        const matchingStudents = students.filter((s) =>
+          s.studentId.startsWith(prefix),
+        );
+        let lastNumber = 1000; // Start from 1000 if no existing students
+
+        if (matchingStudents.length > 0) {
+          // Extract the numeric part from existing IDs and find the highest
+          const existingNumbers = matchingStudents.map((s) =>
+            parseInt(s.studentId.slice(-4)),
+          );
+          lastNumber = Math.max(...existingNumbers) + 1;
+        }
+
+        const studentId = `${prefix}${lastNumber.toString().padStart(4, "0")}`;
 
         // Get current user ID from localStorage
         const userJson = localStorage.getItem("user");
