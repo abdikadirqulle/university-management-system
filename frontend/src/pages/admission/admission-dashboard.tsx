@@ -1,23 +1,11 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "@/context/AuthContext";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import PageHeader from "@/components/PageHeader";
 import StatsCard from "@/components/StatsCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  BookCheck,
-  GraduationCap,
-  Clock,
-  UserPlus,
-  PlusCircle,
-  Users,
-} from "lucide-react";
-import { DataTable } from "@/components/DataTable";
-import { ColumnDef } from "@tanstack/react-table";
-import { useStudentApplicationStore } from "@/store/useStudentApplicationStore";
+import { GraduationCap, Clock, Users } from "lucide-react";
 import { useStudentStore } from "@/store/useStudentStore";
 import { useDepartmentStore } from "@/store/useDepartmentStore";
-import { useFacultyStore } from "@/store/useFacultyStore";
 import dashboardService from "@/services/dashboardService";
 import { toast } from "sonner";
 
@@ -76,60 +64,6 @@ const createAdmissionStats = (
   },
 ];
 
-// Sample student data for the table
-interface Student {
-  id: string;
-  name: string;
-  email: string;
-  course: string;
-  enrollmentDate: string;
-  status: string;
-}
-
-// Define table columns
-const columns: ColumnDef<Student>[] = [
-  {
-    accessorKey: "id",
-    header: "Student ID",
-  },
-  {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
-  },
-  {
-    accessorKey: "course",
-    header: "Course",
-  },
-  {
-    accessorKey: "enrollmentDate",
-    header: "Enrollment Date",
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => {
-      const status = row.getValue("status") as string;
-      return (
-        <span
-          className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
-            status === "Active"
-              ? "bg-green-100 text-green-800"
-              : status === "On Leave"
-                ? "bg-amber-100 text-amber-800"
-                : "bg-gray-100 text-gray-800"
-          }`}
-        >
-          {status}
-        </span>
-      );
-    },
-  },
-];
-
 // Default enrollment data (will be replaced with real data)
 const defaultEnrollmentData = [
   { name: "2020", students: 0 },
@@ -151,13 +85,9 @@ const COLORS = ["#0088FE", "#FF8042", "#00C49F", "#FFBB28"];
 const AdmissionDashboard = () => {
   useAuthGuard(["admission"]);
 
-  const { user } = useAuth();
   const navigate = useNavigate();
-  const { applications, fetchApplications } = useStudentApplicationStore();
   const { students, fetchStudents } = useStudentStore();
   const { departments, fetchDepartments } = useDepartmentStore();
-  const { faculties, fetchFaculties } = useFacultyStore();
-
   const [isLoading, setIsLoading] = useState(true);
   const [enrollmentData, setEnrollmentData] = useState(defaultEnrollmentData);
   const [genderData, setGenderData] = useState(defaultGenderData);
@@ -169,12 +99,7 @@ const AdmissionDashboard = () => {
     const fetchAllData = async () => {
       try {
         setIsLoading(true);
-        await Promise.all([
-          fetchApplications(),
-          fetchStudents(),
-          fetchDepartments(),
-          fetchFaculties(),
-        ]);
+        await Promise.all([fetchStudents(), fetchDepartments()]);
 
         // Get enrollment trends
         try {
@@ -199,7 +124,7 @@ const AdmissionDashboard = () => {
     };
 
     fetchAllData();
-  }, [fetchApplications, fetchStudents, fetchDepartments, fetchFaculties]);
+  }, [fetchStudents, fetchDepartments]);
 
   // Calculate gender distribution
   useEffect(() => {
@@ -209,13 +134,6 @@ const AdmissionDashboard = () => {
       ).length;
       const femaleTotal = students.filter(
         (student) => student.gender === "female",
-      ).length;
-
-      const maleActive = students.filter(
-        (student) => student.gender === "male" && student.isActive,
-      ).length;
-      const femaleActive = students.filter(
-        (student) => student.gender === "female" && student.isActive,
       ).length;
 
       setGenderData([
@@ -242,11 +160,6 @@ const AdmissionDashboard = () => {
       setDepartmentStats(sortedDepts);
     }
   }, [students, departments]);
-
-  // Count pending applications
-  const pendingApplications = applications.filter(
-    (app) => app.status === "pending",
-  ).length;
 
   // Count active students and gender distribution
   const activeStudents = students.filter((student) => student.isActive).length;
