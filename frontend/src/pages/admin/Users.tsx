@@ -68,20 +68,32 @@ const UsersPage = () => {
 
   const handleFormSubmit = async (data: UserFormValues) => {
     try {
+      // Remove empty strings from data
+      const cleanData = Object.fromEntries(
+        Object.entries(data).filter(([_, value]) => value !== ""),
+      );
+
       if (dialogMode === "add") {
         await addUser({
           id: String(Date.now()),
-          ...data,
+          ...cleanData,
+          isActive: true, // Set default active status for new users
         } as User);
         toast.success("User added successfully");
       } else if (dialogMode === "edit" && currentUser) {
-        await updateUser(currentUser.id, data);
+        await updateUser(currentUser.id, cleanData);
         toast.success("User updated successfully");
       }
       setIsDialogOpen(false);
+      // Refresh the users list
+      await fetchUsers();
     } catch (error) {
-      toast.error("An error occurred");
-      console.error(error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to process user. Please try again.";
+      toast.error(errorMessage);
+      console.error("User operation error:", error);
     }
   };
 

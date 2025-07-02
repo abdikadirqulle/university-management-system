@@ -174,6 +174,8 @@ const updateUser = async (req, res) => {
       where: { username },
     })
 
+    console.log(chalk.green("User found: " + user.name))
+
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -196,18 +198,14 @@ const updateUser = async (req, res) => {
     // Update user in database
     const updatedUser = await prisma.user.update({
       where: { id: req.user.id },
-      data: updateData,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        isActive: true,
-        password: true,
-        createdAt: true,
-        updatedAt: true,
+      data: {
+        name,
+        email,
+        password,
       },
     })
+
+    console.log(chalk.green("User updated: " + updatedUser))
 
     res.status(200).json({
       success: true,

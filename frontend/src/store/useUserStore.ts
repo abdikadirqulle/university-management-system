@@ -63,8 +63,14 @@ export const useUserStore = create<UserState>((set) => ({
   updateUser: async (id: string, userData: Partial<User>) => {
     set({ isLoading: true, error: null });
     try {
+      // Remove empty password from userData if it exists
+      const { password, ...restUserData } = userData;
+      const dataToUpdate = password
+        ? { ...restUserData, password }
+        : restUserData;
+
       // Call the API to update the user
-      const updatedUser = await userService.updateUser(id, userData);
+      const updatedUser = await userService.updateUser(id, dataToUpdate);
 
       set((state) => ({
         users: state.users.map((user) =>
@@ -73,10 +79,18 @@ export const useUserStore = create<UserState>((set) => ({
         isLoading: false,
       }));
     } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : typeof error === "object" && error && "response" in error
+            ? error.response?.data?.message || "Failed to update user"
+            : "Failed to update user";
+
       set({
-        error: error instanceof Error ? error.message : "Failed to update user",
+        error: errorMessage,
         isLoading: false,
       });
+      throw new Error(errorMessage);
     }
   },
 

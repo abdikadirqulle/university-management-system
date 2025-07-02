@@ -45,7 +45,11 @@ const createUserFormSchema = (isEditing: boolean) =>
       ),
     email: z.string().email("Please enter a valid email"),
     password: isEditing
-      ? z.string().min(6, "Password must be at least 6 characters").optional()
+      ? z
+          .string()
+          .min(6, "Password must be at least 6 characters")
+          .optional()
+          .or(z.literal(""))
       : z.string().min(6, "Password is required"),
     role: z.enum(["admin", "admission", "financial"] as const),
   });
@@ -78,7 +82,7 @@ export function UserFormDialog({
       username: initialData?.username || "",
       email: initialData?.email || "",
       password: initialData?.password || "",
-      role: initialData?.role || "admission",
+      role: initialData?.role || "",
     },
   });
 
@@ -88,8 +92,16 @@ export function UserFormDialog({
         name: initialData.name || "",
         username: initialData.username || "",
         email: initialData.email || "",
-        password: initialData.password || "",
-        role: initialData.role || "admission",
+        password: "", // Reset password field when editing
+        role: initialData.role || "",
+      });
+    } else {
+      form.reset({
+        name: "",
+        username: "",
+        email: "",
+        password: "",
+        role: "",
       });
     }
   }, [initialData, form]);
