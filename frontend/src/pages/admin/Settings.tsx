@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PageHeader from "@/components/PageHeader";
 import {
   Card,
@@ -31,7 +31,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast } from "sonner";
-import { Building, Settings as SettingsIcon, Save, Bell } from "lucide-react";
+import {
+  Building,
+  Settings as SettingsIcon,
+  Save,
+  Bell,
+  Loader2,
+} from "lucide-react";
+import settingsService, {
+  UniversitySettings,
+  SystemSettings,
+} from "@/services/settingsService";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // University settings form schema
 const universityFormSchema = z.object({
@@ -51,21 +62,34 @@ const systemFormSchema = z.object({
 });
 
 const SettingsPage = () => {
+  const queryClient = useQueryClient();
+
+  // Fetch settings data
+  const { data: universityData, isLoading: isLoadingUniversity } = useQuery({
+    queryKey: ["universitySettings"],
+    queryFn: settingsService.getUniversitySettings,
+  });
+
+  const { data: systemData, isLoading: isLoadingSystem } = useQuery({
+    queryKey: ["systemSettings"],
+    queryFn: settingsService.getSystemSettings,
+  });
+
   // University form
   const universityForm = useForm<z.infer<typeof universityFormSchema>>({
     resolver: zodResolver(universityFormSchema),
-    defaultValues: {
-      name: "University of Knowledge",
-      email: "admin@university.edu",
-      phone: "123-456-7890",
-      address: "123 University Lane",
+    values: universityData || {
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
     },
   });
 
   // System form
   const systemForm = useForm<z.infer<typeof systemFormSchema>>({
     resolver: zodResolver(systemFormSchema),
-    defaultValues: {
+    values: systemData || {
       theme: "light",
       language: "en",
       dateFormat: "MM/DD/YYYY",
@@ -74,16 +98,45 @@ const SettingsPage = () => {
     },
   });
 
+  // Update mutations
+  const updateUniversityMutation = useMutation({
+    mutationFn: settingsService.updateUniversitySettings,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["universitySettings"] });
+      toast.success("University information saved successfully");
+    },
+    onError: (error) => {
+      toast.error("Failed to save university information");
+    },
+  });
+
+  const updateSystemMutation = useMutation({
+    mutationFn: settingsService.updateSystemSettings,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["systemSettings"] });
+      toast.success("System settings saved successfully");
+    },
+    onError: (error) => {
+      toast.error("Failed to save system settings");
+    },
+  });
+
   // Form submission handlers
   const onUniversitySubmit = (data: z.infer<typeof universityFormSchema>) => {
-    console.log("University settings:", data);
-    toast.success("University information saved successfully");
+    updateUniversityMutation.mutate(data);
   };
 
   const onSystemSubmit = (data: z.infer<typeof systemFormSchema>) => {
-    console.log("System settings:", data);
-    toast.success("System settings saved successfully");
+    updateSystemMutation.mutate(data);
   };
+
+  if (isLoadingUniversity || isLoadingSystem) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -176,8 +229,16 @@ const SettingsPage = () => {
                     />
                   </div>
 
-                  <Button type="submit" className="flex items-center gap-2">
-                    <Save className="h-4 w-4" />
+                  <Button
+                    type="submit"
+                    className="flex items-center gap-2"
+                    disabled={updateUniversityMutation.isPending}
+                  >
+                    {updateUniversityMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Save className="h-4 w-4" />
+                    )}
                     Save Changes
                   </Button>
                 </form>
@@ -327,8 +388,16 @@ const SettingsPage = () => {
                     </div>
                   </div>
 
-                  <Button type="submit" className="flex items-center gap-2">
-                    <Save className="h-4 w-4" />
+                  <Button
+                    type="submit"
+                    className="flex items-center gap-2"
+                    disabled={updateSystemMutation.isPending}
+                  >
+                    {updateSystemMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Save className="h-4 w-4" />
+                    )}
                     Save Settings
                   </Button>
                 </form>

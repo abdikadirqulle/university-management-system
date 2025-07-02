@@ -213,3 +213,24 @@ model AcademicCalendar {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
+
+model UniversitySettings {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String
+  phone     String
+  address   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SystemSettings {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  theme             String   @default("light")
+  language          String   @default("en")
+  dateFormat        String   @default("MM/DD/YYYY")
+  emailNotifications Boolean  @default(true)
+  smsNotifications   Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
