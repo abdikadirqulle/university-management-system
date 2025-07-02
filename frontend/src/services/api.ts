@@ -11,7 +11,9 @@ export const api = axios.create({
 });
 
 // Log which environment we're using (for debugging)
-console.log(`API is using ${config.isProduction ? 'production' : 'development'} environment: ${config.apiUrl}`);
+console.log(
+  `API is using ${config.isProduction ? "production" : "development"} environment: ${config.apiUrl}`,
+);
 
 // Request interceptor
 api.interceptors.request.use(

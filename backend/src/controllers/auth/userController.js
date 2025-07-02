@@ -167,11 +167,11 @@ const getCurrentUser = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     // Get user data from request body
-    const { name, email, password } = req.body
+    const { name, username, email, password } = req.body
 
     // Find user by ID
     const user = await prisma.user.findUnique({
-      where: { id: req.user.id },
+      where: { username },
     })
 
     if (!user) {
@@ -515,13 +515,6 @@ const requestPasswordReset = async (req, res) => {
       where: { email },
     })
 
-    if (user.role !== "admin") {
-      return res.status(403).json({
-        success: false,
-        message: "Only admins can reset passwords.",
-      })
-    }
-
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -529,6 +522,13 @@ const requestPasswordReset = async (req, res) => {
           "If a user with this email exists, they will receive reset instructions.",
       })
     }
+
+    // if (user.role !== "admin") {
+    //   return res.status(403).json({
+    //     success: false,
+    //     message: "Only admins can reset passwords.",
+    //   })
+    // }
 
     // Generate reset token (valid for 1 hour)
     const resetToken = jwt.sign(

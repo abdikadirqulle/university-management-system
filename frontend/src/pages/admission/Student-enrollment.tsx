@@ -93,7 +93,7 @@ const StudentEnrollment = () => {
         title="Student Enrollment Management"
         description={`View, update, and manage enrolled students (Logged in as: ${user?.role || "Unknown"})`}
         action={{
-          label: "Register New Student",
+          label: "Add Student",
           icon: UserPlus,
           onClick: () => {
             setSelectedStudent(null);
