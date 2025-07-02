@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { Skeleton } from "@/components/ui/skeleton";
 import PageHeader from "@/components/PageHeader";
@@ -17,16 +17,6 @@ import { usePaymentStore } from "@/store/usePaymentStore";
 import { PaymentStatus } from "@/types/payment";
 import { useStudentStore } from "@/store/useStudentStore";
 
-const monthlyStudentPayments = [
-  { month: "Jan", payments: 100 },
-  { month: "Feb", payments: 200 },
-  { month: "Mar", payments: 300 },
-  { month: "Apr", payments: 400 },
-  { month: "May", payments: 500 },
-  { month: "Jun", payments: 600 },
-  { month: "Jul", payments: 20 },
-];
-
 const FinancialDashboard = () => {
   // Use auth guard to protect this page
   useAuthGuard(["financial", "admin"]);
@@ -41,6 +31,33 @@ const FinancialDashboard = () => {
     fetchPaymentStatistics,
   } = usePaymentStore();
   console.log(payments);
+
+  // Process payments data for the chart
+  const monthlyStudentPayments = useMemo(() => {
+    // Get current year's payments only
+    const currentYear = new Date().getFullYear();
+    const currentYearPayments = payments.filter(
+      (payment) => new Date(payment.paymentDate).getFullYear() === currentYear,
+    );
+
+    // Create an array for all months (0-11)
+    const monthsData = Array.from({ length: 12 }, (_, monthIndex) => {
+      const monthDate = new Date(currentYear, monthIndex);
+      return {
+        month: monthDate.toLocaleString("default", { month: "short" }),
+        payments: 0,
+      };
+    });
+
+    // Aggregate payments by month
+    currentYearPayments.forEach((payment) => {
+      const paymentDate = new Date(payment.paymentDate);
+      const monthIndex = paymentDate.getMonth();
+      monthsData[monthIndex].payments += payment.amount;
+    });
+
+    return monthsData;
+  }, [payments]);
 
   // Fetch payment data on component mount
   useEffect(() => {
