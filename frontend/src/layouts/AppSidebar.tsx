@@ -49,14 +49,14 @@ const AppSidebar = () => {
         path: "/admin/users",
       },
       {
-        title: "Student Payments",
-        icon: CreditCard,
-        path: "/financial/payments",
-      },
-      {
         title: "Registration",
         icon: UserPlus,
         path: "/admin/student-enrollment",
+      },
+      {
+        title: "Student Payments",
+        icon: CreditCard,
+        path: "/financial/payments",
       },
       {
         title: "All Students",
@@ -111,11 +111,11 @@ const AppSidebar = () => {
         icon: UsersRound,
         path: "/financial/students",
       },
-      {
-        title: "Reports",
-        icon: BarChart,
-        path: "/financial/reports",
-      },
+      //   {
+      //     title: "Reports",
+      //     icon: BarChart,
+      //     path: "/financial/reports",
+      //   },
     ],
     admission: [
       {

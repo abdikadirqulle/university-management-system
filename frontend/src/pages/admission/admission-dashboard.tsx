@@ -39,8 +39,11 @@ import { useNavigate } from "react-router-dom";
 // Create stats cards with real data
 const createAdmissionStats = (
   totalStudents: number,
-  enrolledStudents: number,
-  pendingApplications: number,
+  activeStudents: number,
+  maleTotalCount: number,
+  femaleTotalCount: number,
+  maleActiveCount: number,
+  femaleActiveCount: number,
 ) => [
   {
     title: "Total Students",
@@ -50,27 +53,27 @@ const createAdmissionStats = (
     bgColor: "bg-blue-600",
     trend: { value: 0, isPositive: true },
   },
+  //   {
+  //     title: "Active Students",
+  //     value: activeStudents.toString(),
+  //     icon: Users,
+  //     iconColor: "text-green-600",
+  //     bgColor: "bg-green-600",
+  //   },
   {
-    title: "Total Male",
-    value: enrolledStudents.toString(),
+    title: "Male Students",
+    value: `${maleActiveCount}`,
     icon: Users,
     iconColor: "text-indigo-600",
     bgColor: "bg-indigo-600",
   },
   {
-    title: "Total Female",
-    value: enrolledStudents.toString(),
+    title: "Female Students",
+    value: `${femaleActiveCount}`,
     icon: GraduationCap,
     iconColor: "text-pink-600",
     bgColor: "bg-pink-600",
   },
-  //   {
-  //     title: "Total active students",
-  //     value: enrolledStudents.filter((s) => s.isActive === true).length.toString(),
-  //     icon: Users,
-  //     iconColor: "text-green-600",
-  //     bgColor: "bg-green-600",
-  //   }
 ];
 
 // Sample student data for the table
@@ -143,7 +146,7 @@ const defaultGenderData = [
 ];
 
 // Colors for the pie chart
-const COLORS = ["#0088FE", "#FF8042"];
+const COLORS = ["#0088FE", "#FF8042", "#00C49F", "#FFBB28"];
 
 const AdmissionDashboard = () => {
   useAuthGuard(["admission"]);
@@ -201,16 +204,23 @@ const AdmissionDashboard = () => {
   // Calculate gender distribution
   useEffect(() => {
     if (students.length > 0) {
-      const maleCount = students.filter(
+      const maleTotal = students.filter(
         (student) => student.gender === "male",
       ).length;
-      const femaleCount = students.filter(
+      const femaleTotal = students.filter(
         (student) => student.gender === "female",
       ).length;
 
+      const maleActive = students.filter(
+        (student) => student.gender === "male" && student.isActive,
+      ).length;
+      const femaleActive = students.filter(
+        (student) => student.gender === "female" && student.isActive,
+      ).length;
+
       setGenderData([
-        { name: "Male", value: maleCount },
-        { name: "Female", value: femaleCount },
+        { name: "Male ", value: maleTotal },
+        { name: "Female", value: femaleTotal },
       ]);
     }
   }, [students]);
@@ -238,11 +248,29 @@ const AdmissionDashboard = () => {
     (app) => app.status === "pending",
   ).length;
 
+  // Count active students and gender distribution
+  const activeStudents = students.filter((student) => student.isActive).length;
+  const maleTotalCount = students.filter(
+    (student) => student.gender === "male",
+  ).length;
+  const femaleTotalCount = students.filter(
+    (student) => student.gender === "female",
+  ).length;
+  const maleActiveCount = students.filter(
+    (student) => student.gender === "male" && student.isActive,
+  ).length;
+  const femaleActiveCount = students.filter(
+    (student) => student.gender === "female" && student.isActive,
+  ).length;
+
   // Create stats with real data
   const admissionStats = createAdmissionStats(
     students.length,
-    students.length - pendingApplications, // Enrolled = Total - Pending
-    pendingApplications,
+    activeStudents,
+    maleTotalCount,
+    femaleTotalCount,
+    maleActiveCount,
+    femaleActiveCount,
   );
 
   return (

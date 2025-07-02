@@ -19,10 +19,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -38,10 +36,6 @@ const facultyFormSchema = z.object({
       /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z\s]*$/,
       { message: "Faculty name should only contain letters and spaces" },
     ),
-  description: z
-    .string()
-    .min(10, { message: "Description must be at least 10 characters" })
-    .optional(),
   dean: z
     .string()
     .min(2, { message: "Dean name is required" })
@@ -49,14 +43,6 @@ const facultyFormSchema = z.object({
       /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z\s]*$/,
       { message: "Dean name should only contain letters and spaces" },
     ),
-  location: z
-    .string()
-    .min(2, { message: "Location is required" })
-    .regex(
-      /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z\s]*$/,
-      { message: "Location should only contain letters and spaces" },
-    )
-    .optional(),
   establish: z.coerce
     .number()
     .min(1900, { message: "Year must be valid (after 1900)" })
@@ -82,9 +68,7 @@ const FacultiesPage = () => {
     resolver: zodResolver(facultyFormSchema),
     defaultValues: {
       name: "",
-      description: "",
       dean: "",
-      location: "",
       establish: new Date().getFullYear(),
     },
   });
@@ -125,9 +109,7 @@ const FacultiesPage = () => {
     setEditingFaculty(faculty);
     form.reset({
       name: faculty.name,
-      description: faculty.description || "",
       dean: faculty.dean,
-      location: faculty.location || "",
       establish: faculty.establish,
     });
     setIsOpen(true);
@@ -158,10 +140,6 @@ const FacultiesPage = () => {
     {
       accessorKey: "dean",
       header: "Dean",
-    },
-    {
-      accessorKey: "location",
-      header: "Location",
     },
     {
       accessorKey: "establish",
@@ -250,24 +228,6 @@ const FacultiesPage = () => {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Enter faculty description"
-                        className="min-h-[80px]"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -277,23 +237,6 @@ const FacultiesPage = () => {
                       <FormLabel>Dean</FormLabel>
                       <FormControl>
                         <Input placeholder="Enter dean's name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Location</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter faculty location"
-                          {...field}
-                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

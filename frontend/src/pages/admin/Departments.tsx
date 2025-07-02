@@ -178,17 +178,11 @@ const DepartmentsPage = () => {
 
   // Handle delete department
   const handleDelete = async (id: string) => {
-    if (
-      confirm(
-        "Are you sure you want to delete this department? This action cannot be undone.",
-      )
-    ) {
-      try {
-        await deleteDepartment(id);
-      } catch (error) {
-        toast.error("Failed to delete department");
-        console.error(error);
-      }
+    try {
+      await deleteDepartment(id);
+    } catch (error) {
+      toast.error("Failed to delete department");
+      console.error(error);
     }
   };
 
@@ -202,10 +196,10 @@ const DepartmentsPage = () => {
       accessorKey: "facultyName",
       header: "Faculty",
     },
-    {
-      accessorKey: "departmentHead",
-      header: "Department Head",
-    },
+    // {
+    //   accessorKey: "departmentHead",
+    //   header: "Department Head",
+    // },
     {
       accessorKey: "price",
       header: "Tuition Price",
@@ -218,10 +212,6 @@ const DepartmentsPage = () => {
       },
     },
 
-    {
-      accessorKey: "phone",
-      header: "Phone",
-    },
     {
       accessorKey: "semester",
       header: "Semesters",

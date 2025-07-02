@@ -39,7 +39,7 @@ const FinancialReportsPage = () => {
         }}
       />
 
-      <FinancialReportFilters onFilter={handleFilter} />
+      {/* <FinancialReportFilters onFilter={handleFilter} /> */}
 
       <div className="flex justify-end mb-4">
         <ExportButtons

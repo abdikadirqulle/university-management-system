@@ -206,10 +206,6 @@ const CoursesPage = () => {
       header: "Credits",
     },
     {
-      accessorKey: "academicYear",
-      header: "Academic Year",
-    },
-    {
       accessorKey: "semester",
       header: "Semester",
     },

@@ -515,6 +515,13 @@ const requestPasswordReset = async (req, res) => {
       where: { email },
     })
 
+    if (user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Only admins can reset passwords.",
+      })
+    }
+
     if (!user) {
       return res.status(404).json({
         success: false,

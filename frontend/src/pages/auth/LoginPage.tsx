@@ -143,7 +143,7 @@ const LoginPage = () => {
             )}
           />
 
-          {/* <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
               <Link
                 to="/forgot-password"
@@ -152,7 +152,7 @@ const LoginPage = () => {
                 Forgot your password?
               </Link>
             </div>
-          </div> */}
+          </div>
 
           <Button
             type="submit"

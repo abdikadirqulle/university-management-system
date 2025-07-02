@@ -73,7 +73,7 @@ const App = () => (
                 element={<ResetPasswordPage />}
               />
               {/* Root redirect to login */}
-              <Route path="/" element={<LoginPage />} />
+              {/* <Route path="/" element={<Index />} /> */}
             </Route>
 
             {/* Admin routes */}
@@ -129,6 +129,7 @@ const App = () => (
 
             {/* 404 Page */}
             <Route path="*" element={<NotFound />} />
+            <Route path="/" element={<Index />} />
           </Routes>
         </AuthProvider>
       </BrowserRouter>

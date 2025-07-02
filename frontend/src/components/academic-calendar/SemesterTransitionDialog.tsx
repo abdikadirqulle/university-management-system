@@ -33,7 +33,6 @@ import { api } from "@/services/api";
 
 // Define the form schema
 const formSchema = z.object({
-  semester: z.string().min(1, "Semester is required"),
   academicYear: z.string().min(1, "Academic year is required"),
 });
 
@@ -48,11 +47,6 @@ const SemesterTransitionDialog: React.FC<SemesterTransitionDialogProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
-  // Generate semester options (1-8)
-  const semesterOptions = Array.from({ length: 12 }, (_, i) => i + 1);
-
-  console.log(semesterOptions);
-
   // Generate academic year options
   const currentYear = new Date().getFullYear();
   const academicYearOptions = [
@@ -65,7 +59,6 @@ const SemesterTransitionDialog: React.FC<SemesterTransitionDialogProps> = ({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      semester: "",
       academicYear: `${currentYear}-${currentYear + 1}`,
     },
   });
@@ -102,44 +95,15 @@ const SemesterTransitionDialog: React.FC<SemesterTransitionDialogProps> = ({
         <DialogHeader>
           <DialogTitle>End-of-Semester Transition</DialogTitle>
           <DialogDescription>
-            This will process end-of-semester transitions for all students in
-            the selected semester. Pending fees will be forwarded to the next
-            semester, and students will be promoted.
+            This will process end-of-semester transitions for all students.
+            Students will be promoted to their next semester, and any pending
+            fees will be forwarded to the next semester.
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Semester Selection */}
-              <FormField
-                control={form.control}
-                name="semester"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Current Semester</FormLabel>
-                    <Select
-                      onValueChange={(value) => field.onChange(value)}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select semester" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {semesterOptions.map((sem) => (
-                          <SelectItem key={sem} value={sem.toString()}>
-                            Semester {sem}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
+            <div className="grid grid-cols-1 gap-4">
               {/* Academic Year */}
               <FormField
                 control={form.control}
