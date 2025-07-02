@@ -95,9 +95,10 @@ const SemesterTransitionDialog: React.FC<SemesterTransitionDialogProps> = ({
         <DialogHeader>
           <DialogTitle>End-of-Semester Transition</DialogTitle>
           <DialogDescription>
-            This will process end-of-semester transitions for all students.
-            Students will be promoted to their next semester, and any pending
-            fees will be forwarded to the next semester.
+            This will process end-of-semester transitions for all students
+            across all semesters. Students will be promoted to their next
+            semester, and any pending fees will be forwarded. Students who have
+            completed all semesters will be marked as graduated.
           </DialogDescription>
         </DialogHeader>
 

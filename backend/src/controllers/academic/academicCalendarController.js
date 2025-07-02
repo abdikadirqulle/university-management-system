@@ -26,7 +26,6 @@ const createCalendarEvent = async (req, res) => {
       !startDate ||
       !endDate ||
       !eventType ||
-      !semester ||
       !academicYear ||
       !createdBy
     ) {
@@ -51,11 +50,7 @@ const createCalendarEvent = async (req, res) => {
 
     // If this is a semester end event, trigger the semester transition process
     if (eventType === "semesterEnd") {
-      await handleSemesterTransition(
-        semester,
-        academicYear,
-        affectedDepartments
-      )
+      await handleSemesterTransition(academicYear)
     }
 
     res.status(201).json(calendarEvent)
@@ -178,11 +173,7 @@ const updateCalendarEvent = async (req, res) => {
       updatedEvent.isActive &&
       (!existingEvent.isActive || existingEvent.eventType !== "semesterEnd")
     ) {
-      await handleSemesterTransition(
-        updatedEvent.semester,
-        updatedEvent.academicYear,
-        updatedEvent.affectedDepartments
-      )
+      await handleSemesterTransition(updatedEvent.academicYear)
     }
 
     res.status(200).json(updatedEvent)
@@ -229,22 +220,20 @@ const deleteCalendarEvent = async (req, res) => {
 
 const handleTransition = async (req, res) => {
   try {
-    const { semester, academicYear } = req.body
+    const { academicYear } = req.body
 
-    if (!semester || !academicYear) {
+    if (!academicYear) {
       return res.status(400).json({
         success: false,
-        message: "Missing required fields: semester, academicYear",
+        message: "Missing required field: academicYear",
       })
     }
 
-    const semesterInt = Number(semester)
-
-    await handleSemesterTransition(semesterInt, academicYear)
+    await handleSemesterTransition(academicYear)
 
     res.status(200).json({
       success: true,
-      message: `Semester transition completed for semester ${semester}, academic year ${academicYear}`,
+      message: `Semester transition completed for academic year ${academicYear}`,
     })
   } catch (error) {
     console.error("Error triggering semester transition:", error)
@@ -260,14 +249,12 @@ const handleTransition = async (req, res) => {
  * Handle semester transition logic when a semester ends
  * This function updates student semesters and tuition fees
  */
-const handleSemesterTransition = async (semesterInt, academicYear) => {
+const handleSemesterTransition = async (academicYear) => {
   try {
-    // Get all active students in the affected departments
+    // Get all active students
     const students = await prisma.student.findMany({
       where: {
         isActive: true,
-        // status: "normal",
-        semester: semesterInt,
       },
       include: {
         department: true,
@@ -282,7 +269,6 @@ const handleSemesterTransition = async (semesterInt, academicYear) => {
         },
       },
     })
-    console.log(semesterInt)
 
     console.log(`Found ${students.length} students for semester transition`)
 
@@ -354,14 +340,6 @@ const handleSemesterTransition = async (semesterInt, academicYear) => {
         // Calculate new tuition fee
         const tuitionFee = student.department.price || 0
 
-        // let scholarshipInt = 0
-        // if (currentAccount.scholarship !== 0) {
-        //   scholarshipInt =
-        //     currentAccount?.tuitionFee - currentAccount?.scholarship || 0
-        // }
-
-        // console.log(chalk.yellow.bold(`scholarshipInt: ${scholarshipInt}`))
-
         // Create new student account for the next semester
         const updateStudentAccount = await prisma.studentAccount.update({
           where: { studentId: student.studentId },
@@ -374,7 +352,6 @@ const handleSemesterTransition = async (semesterInt, academicYear) => {
             paidAmount: 0, // Reset paid amount for new semester
             paidType: currentAccount?.paidType || null, // Maintain the same payment type
             discount: 0, // Reset discount for new semester
-            // scholarship: scholarshipInt, // Maintain scholarship for new semester
             status: "normal", // Set status to normal for regular semester transition
           },
         })
