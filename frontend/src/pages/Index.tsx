@@ -295,12 +295,7 @@ const Index = () => {
               >
                 Features
               </a>
-              <a
-                href="#pricing"
-                className="hover:text-primary transition-colors"
-              >
-                Pricing
-              </a>
+
               <a
                 href="#testimonials"
                 className="hover:text-primary transition-colors"
@@ -316,8 +311,7 @@ const Index = () => {
             </div>
           </div>
           <div className="border-t border-white/10 mt-8 pt-8 text-center text-sm text-white/60">
-            &copy; {new Date().getFullYear()} AqoonMaamul. All rights
-            reserved.
+            &copy; {new Date().getFullYear()} AqoonMaamul. All rights reserved.
           </div>
         </div>
       </footer>
